@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hello World</title>
+
+  <style>
+    /* Simple, readable defaults */
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      padding: 1.5rem;
+      color: #111;
+      background-color: #fff;
+    }
+
+    a {
+      color: #005fcc;
+    }
+
+    a:focus-visible {
+      outline: 3px solid #ffbf47;
+      outline-offset: 2px;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #000;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header>
+    <h1>Hello, world</h1>
+
+    <nav aria-label="Primary navigation">
+      <ul>
+        <li><a href="/alex">Alex</a></li>
+        <li><a href="/gaems">Gaems</a></li>
+        <li><a href="/design">Design</a></li>
+        <li><a href="/blog">Blog</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p>
+      Welcome. This is a simple, accessible starting point.
+    </p>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year"></span></p>
+  </footer>
+
+  <script>
+    // Optional: keep the year current without harming accessibility
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
