@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood's | Lincoln Way Case Study</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="header.html"></div>
+
+<div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+<h1>Lincoln Way Service Design, <abbr title="User Experience">UX</abbr> & Art Direction</h1>
+<div class="tldr-label">
+    TL;DR
+</div>
+<h6>
+    Alex worked with a small team to deliver customer experience strategy, UX design, and art direction for Lincoln's mobility platform. The app boasts a 4+ star rating from over 150k Android and iOS users as of Dec, 2020.
+</h6>
+<p>Lincoln Way is The Lincoln Motor Company’s upscale version of the FordPass app and ecosystem. Completely reimagined for an audience that expects excellence and ease, the Lincoln Way needed to be seamless. As of this writing the app holds a solid 4.6 star
+    rating from almost 30k reviews.
+</p>
+<p>Touch points in advertising, in-dealership, and online, would lead users to their mobile devices. The mobile experience would provide Lincoln owners with concierge service via chatbot. the whole thing comes full circle with valet parking, delivery of
+    a loaner when maintenance is needed, and more.</p>
+
+<p>My role on the experience design team was part Service Designer, part Art Director.</p>
+
+<p>I engaged in cultural and trend research to understand expectations of Lincoln owners. I helped develop a few personas to tailor features to the self-sufficient and the tech challenged. I produced multiple concepts for consideration and testing by the
+    brand. I worked alongside business analysts to make sure our more far fetched ideas could be built. Then, I switched hats to work on delivery.</p>
+<picture>
+    <source media="(min-width: 1440px)" srcset="img/projects/lincoln/lincoln01-hd.webp">
+    <source media="(min-width: 768px)" srcset="img/projects/lincoln/lincoln01-d.webp">
+    <source media="(max-width: 768px)" srcset="img/projects/lincoln/lincoln01.webp">
+    <img src="img/projects/lincoln/lincoln01.jpg" alt="testing responsive" class="big-picture big-picture-inline big-picture-hd">
+</picture>
+<p class="pic-clear">Within a simple and elegant philosophy of creative direction that championed beauty, I got to work on the UI. Myself and fellow art director Andy divvied up what came to total hundreds of UI screens. We developed a pattern library and visual language
+    for the app, with considerations for native iOS and Android development. We worked with a stable of 4 UX designers who kept us honest with low-fi wires. In the end, high fidelity prototypes were needed for brand alignment and for handoff to developers.
+    We managed the design process via kanban, and never missed a deliverable.</p>
+
+<p>The first few releases provided the types of things commonly associated with vehicle apps. Users could start their vehicle, adjust temperature, lock doors, and find parking. Subsequent releases introduced a concierge experience, maintenance scheduling,
+    and brand curated events. From ”how might we” to a high end luxury experience in your pocket, this project was a great mix of tech and style.</p>
+
+<div class="tile"><span class="tile-text">4.6&star; rating</span></div>
+<div class="tile tile2"><span class="tile-text">30k+ reviews</span></div>
+&nbsp;
+<h3>Product Responsibilities</h3>
+<ul>
+    <li class="responsibility">Service Design</li>
+    <li class="responsibility">UI Design</li>
+    <li class="responsibility">Design System Management</li>
+    <li class="responsibility">Accessibility</li>
+</ul>
+<h3>Product Technologies & Skills</h3>
+<ul>
+    <li class="skill">Brainstorming</li>
+    <li class="skill">Mood Boards</li>
+    <li class="skill">Prototyping</li>
+    <li class="skill">Pitching</li>
+    <li class="skill">Sketch</li>
+    <li class="skill">Invision</li>
+</ul>
+<h3>Product Team</h3>
+<ul>
+    <li class="team-member">Alex Lockwood</li>
+    <li class="team-role">Product Designer</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/karaherbert" rel="external" target="_blank">Kara Herbert</a></li>
+    <li class="team-role">UX Lead</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/andrew-crooks-70940079" rel="external" target="_blank">Andy Crooks</a></li>
+    <li class="team-role">Art Director</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/jana-roszkowski-2234391" rel="external" target="_blank">Jana Roszkowski</a></li>
+    <li class="team-role">Product Owner</li>
+    <li class="team-member">Team of 6 Business Analyists & UX Contractors</li>
+</ul>
+<hr>
+<div class="projects-label">Would you like to see more?</div>
+<span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+<div w3-include-html="footer.html"></div>
+<script>
+    includeHTML();
+</script>

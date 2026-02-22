@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood | Logo Design Gallery</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="header.html"></div>
+
+<div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+<h1>Branding & Logos</h1>
+<p>Logos for various clients across various industries.</p>
+
+<!-- Rounded jQuery switch 
+<p id="grayscale-switch">
+    <label class="switch">
+    <input type="checkbox" id="grayscaleswitch">
+    <span class="slider round"><span class="switch-label">Colorize</span></span>
+  </label>
+    <script>
+        $('#grayscaleswitch').change(function() {
+            if ($(this).is(":checked")) {
+                $('.project-logo').removeClass('project-logo-grayscaler');
+                $('.invert-me').addClass('inverter');
+            } else {
+                $('.project-logo').addClass('project-logo-grayscaler');
+                $('.invert-me').removeClass('inverter');
+            }
+        });
+    </script>
+</p>
+-->
+<!-- Rounded .js switch -->
+
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/kleingers-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/kleingers-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/kleingers-logo.png" alt="logo for The Kleingers Group, architects" class="big-picture project-logo project-logo-grayscaler" style="background: snow;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/helloflight-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/helloflight-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/helloflight-logo.png" alt="logo for Hello Flight, flight tracking website" class="big-picture project-logo project-logo-grayscaler" style="background: aliceblue;">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset=" img/projects/logo/servus-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/servus-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/servus-logo.png " alt="logo for Servus, HR company " class="big-picture project-logo project-logo-grayscaler" style="background: linen;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/donniemaserati-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/donniemaserati-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/donniemaserati-logo.png " alt="logo for Donnie Maserati, rapper " class="big-picture project-logo project-logo-grayscaler invert-me" style="background: papayawhip;">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/kyndle-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/kyndle-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/kyndle-logo.png " alt="logo for Kyndle, Kentucky public service non-profit organization " class="big-picture project-logo project-logo-grayscaler" style="background: ghostwhite;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/cliffdivers-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/cliffdivers-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/cliffdivers-logo.png " alt="logo for The Cliff Divers, entreprenuers group " class="big-picture project-logo project-logo-grayscaler invert-me" style="background: darkseagreen;">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/servus50-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/servus50-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/servus50-logo.png " alt="50th anniversary celebration logo for Servus, formerly BR Associates " class="big-picture project-logo project-logo-grayscaler"
+            style="background: linen;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/celestialgifts-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/celestialgifts-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/celestialgifts-logo.png " alt="logo for Celestial Gifts, small business" class="big-picture project-logo project-logo-grayscaler invert-me" style="background: lavender;">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/highland-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/highland-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/highland-logo.png " alt="logo for Highland Glass, glass artisans " class="big-picture project-logo project-logo-grayscaler" style="background:rgb(225,245,255);">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/cr-logo.webp " type="image/webp ">
+        <img srcset="img/projects/logo/cr-logo.png " sizes="(min-width: 768px) " src="img/projects/logo/cr-logo.png " alt="Publisher 's mark for CR Publishing" class="big-picture project-logo project-logo-grayscaler">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/mueller-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/mueller-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/mueller-logo.png" alt="logo for Mueller, environmental engineers" class="big-picture project-logo project-logo-grayscaler" style="background: aliceblue;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/firekid-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/firekid-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/firekid-logo.png" alt="logo for Firekid, musician" class="big-picture project-logo project-logo-grayscaler" style="background: lightsalmon;">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/theclubgirls-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/theclubgirls-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/theclubgirls-logo.png" alt="logo for The Club Girls, VIP online community" class="big-picture project-logo project-logo-grayscaler" style="background: linear-gradient(45deg, rgb(111,71,102), black);;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/alexlockwood-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/alexlockwood-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/alexlockwood-logo.png" alt="personal logo of Alex Lockwood" class="big-picture project-logo project-logo-grayscaler" style="background: #fff200;">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/mee-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/mee-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/mee-logo.png" alt="logo for Mechanical & electrical engineering firm" class="big-picture project-logo project-logo-grayscaler" style="background: lightblue;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/sorghum-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/sorghum-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/sorghum-logo.png" alt="logo for sorghum partners, agriculture advocates" class="big-picture project-logo project-logo-grayscaler" style="background: orange;">
+    </picture>
+</div>
+<div class="portfolio portfolio-left">
+    <picture>
+        <source srcset="img/projects/logo/jesusandres-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/jesusandres-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/jesusandres-logo.png" alt="logo for Jesus Andres, photographer" class="big-picture project-logo project-logo-grayscaler invert-me" style="background: mediumturquoise;">
+    </picture>
+</div>
+<div class="portfolio portfolio-right">
+    <picture>
+        <source srcset="img/projects/logo/jrpr-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/jrpr-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/jrpr-logo.png" alt="logo for Jameeda Rucker, Public Relations" class="big-picture project-logo project-logo-grayscaler" style="background:linear-gradient(63deg, rgba(96,150,255,1) 0%, rgba(96,150,255,1) 50%, rgba(255,252,51,1) 50%, rgba(255,252,51,1) 100%);">
+    </picture>
+</div>
+<div class="portfolio portfolio-center">
+    <picture>
+        <source srcset="img/projects/logo/83bar-logo.webp" type="image/webp">
+        <img srcset="img/projects/logo/83bar-logo.png" sizes="(min-width: 768px)" src="img/projects/logo/83bar-logo.png" alt="logo for 83bar, venture capitalist firm" class="big-picture project-logo project-logo-grayscaler invert-me" style="background: #ccc;">
+    </picture>
+</div>
+&nbsp;
+<hr>
+<div class="projects-label">Would you like to see more?</div>
+<span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html '" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+<div w3-include-html="footer.html"></div>
+<script>
+    includeHTML();
+</script>

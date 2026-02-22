@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood's | Social Media App Product Design & Brand Case Study</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.jpg">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="header.html"></div>
+
+<div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+<h1>Social Media App Product Design & Brand</h1>
+<div class="tldr-label">
+    TL;DR
+</div>
+<h6>Alex created a brand presence, full mobile application UX flow, UI designs, and functional prototype to test and market a new social media concept and patent a unique interaction design pattern.</h6>
+<picture>
+    <source media="(min-width: 1440px)" srcset="img/projects/social-app/social-app-flow.webp" type="image/webp">
+    <source media="(min-width: 768px)" srcset="img/projects/social-app/social-app-flow.webp" type="image/webp">
+    <source media="(max-width: 768px)" srcset="img/projects/social-app/social-app-flow.webp" type="image/webp">
+    <img src="img/projects/social-app/social-app-flow.jpg" alt="Freehand boards showing app flow complexity" class="big-picture big-picture-inline">
+</picture>
+<h2>Unique emoji-based 😜 posts & search 👀
+</h2>
+<p>Concept design for creation, delivery, and discovery of video, image and text content. Branding, brand and UX research, user flow, product and interaction design.</p>
+<h2>🤔 Opportunity</h2>
+<p>Create a unique content delivery system expanding on existing communication methods. Emoji take on a meaning of their own, contextual to the sender, the viewer, and the tone and timing of the conversation. What if an emoji acted as a container for deeper
+    content?
+</p>
+<p>The feed appears as a stream of emoji only from your connections for a quick vibe check. Not looking to engage in certain mood or topic? Keep scrolling. See something curious? Tap to see more.</p>
+<p>Explore the world on a map UI with clusters of posts. Pop in to see commonly used emoji, and engage or bounce. Or, flip the script and type a string of emoji. See where that string is showing up worldwide and see public posts, discovering the deeper meaning
+    ascribed by various cultures and groups.</p>
+<p>Similar to Live Photos, active emoji are activated by a simple action. Interaction design needs to be accessible and feel natural. By working with available characters, active emoji are easy to understand and fun to expand on. Most frequent users of social
+    media and collaborative communication apps develop emoji shorthand naturally. Active emoji take this phenomenon to the next level.</p>
+<h2>🏋️‍♀️ Results</h2>
+<p>95% of potential users surveyed across 3 personas expressed a high level of interest and excitement, while a small contingent did admittedly view the idea as “🌽 corny.” I disengaged with the team handing off comprehensive UX flows, a brand kit, and basic
+    design system for marketing and development, all informed by user prototype testing.</p>
+<h3>
+    Initiative Responsibilities
+</h3>
+
+<ul>
+    <li class="responsibility">Interaction Design</li>
+    <li class="responsibility">Information Architecture</li>
+    <li class="responsibility"><abbr title="User Experience">UX</abbr> Research</li>
+    <li class="responsibility">Wireframing</li>
+    <li class="responsibility">Usability Testing</li>
+    <li class="responsibility">Accessibility</li>
+    <li class="responsibility">Visual Design</li>
+    <li class="responsibility">Branding</li>
+</ul>
+<h3>
+    Product Technologies & Skills
+</h3>
+
+<ul>
+    <li class="skill">Design Thinking</li>
+    <li class="skill">Product Management</li>
+    <li class="skill">User Flows</li>
+    <li class="skill">Freehand</li>
+    <li class="skill">Invision Studio</li>
+</ul>
+<div class="img-tile-mosaic">
+    &nbsp;
+    <hr>
+    <div class="projects-label">Would you like to see more?</div>
+    <span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+    <div w3-include-html="footer.html"></div>
+    <script>
+        includeHTML();
+    </script>

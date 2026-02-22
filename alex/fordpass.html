@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood's | FordPass Case Study</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="header.html"></div>
+
+<div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+<h1>FordPass App <abbr title="User Experience">UX</abbr> & Art Direction</h1>
+<div class="tldr-label">
+    TL;DR
+</div>
+<h6>Alex created UX prototypes, interaction patterns, and visual designs for the first few releases of the FordPass app and platform. More than 1.4 million people have become FordPass users, with Apple saying the FordPass app is "setting the bar for Automotive
+    OEM Apps."</h6>
+<picture>
+    <source srcset="img/projects/fp/fp-vid.webp" type="image/webp">
+    <img srcset="img/projects/fp/fp-vid.png" sizes="(min-width: 768px)" src="img/projects/fp/fp-vid.png" alt="FordPass in action" class="big-picture big-picture-inline">
+</picture>
+<p class="pic-clear">FordPass is an app that brings a full service Ford service center experience and vehicle controls to your mobile device. By the end of my engagement a commercial advertising the app aired during the Super Bowl and thousands of users were onboarded. Over
+    four years later the app sees continuous improvement that garners it a 4.6 star rating average from 180k+ user reviews.</p>
+<div class="img-tile-mosaic">
+    <picture>
+        <source srcset="img/projects/fp/fp01.webp" type="image/webp">
+        <img srcset="img/projects/fp/fp01.png" sizes="(min-width: 768px)" src="img/projects/fp/fp01.png" alt="FordPass map UI" class="tile pic-tile">
+    </picture>
+    <picture>
+        <source srcset="img/projects/fp/fp02.webp" type="image/webp">
+        <img srcset="img/projects/fp/fp02.png" sizes="(min-width: 768px)" src="img/projects/fp/fp02.png" alt="FordPass Perks Apple Watch UI" class="tile pic-tile">
+    </picture>
+</div>
+<p class="pic-clear">Through service design UX and UI I helped inform the FordPass ecosystem past the screen. From the dealership to ownership FordPass is designed to be a constant companion to your vehicle.</p>
+<picture>
+    <source srcset="img/projects/fp/fp03.webp" type="image/webp">
+    <img srcset="img/projects/fp/fp03.png" sizes="(min-width: 768px)" src="img/projects/fp/fp03.png" alt="FordPass app screens" class="big-picture big-picture-inline">
+</picture>
+<p class="pic-clear">I worked as a UX designer and art director to deliver concepts and UI designs. I created UI assets to start and stop vehicles lock and unlock doors and more. With UX partners I designed financing and parking workflows. I created proof of concept prototypes
+    to approach loyalty program partner brands to aid the product owner in pitches.</p>
+<div class="img-tile-mosaic">
+    <picture>
+        <source srcset="img/projects/fp/fp04.webp" type="image/webp">
+        <img srcset="img/projects/fp/fp04.png" sizes="(min-width: 768px)" src="img/projects/fp/fp04.png" alt="Vehicle control icons" class="tile pic-tile">
+    </picture>
+    <picture>
+        <source srcset="img/projects/fp/fp05.webp" type="image/webp">
+        <img srcset="img/projects/fp/fp05.png" sizes="(min-width: 768px)" src="img/projects/fp/fp05.png" alt="FordPass app on mobile device" class="tile pic-tile">
+    </picture>
+</div>
+<p>&nbsp;</p>
+<div class="tile"><span class="tile-text">4.6&star; Rating</span></div>
+<div class="tile tile2"><span class="tile-text">1MM+ Users</span></div>
+&nbsp;
+<h3>Product Responsibilities</h3>
+<ul>
+    <li class="responsibility">Service Design</li>
+    <li class="responsibility">UI Design</li>
+    <li class="responsibility">Design System Management</li>
+    <li class="responsibility">Accessibility</li>
+</ul>
+<h3>Product Technologies & Skills</h3>
+<ul>
+    <li class="skill">Brainstorming</li>
+    <li class="skill">Mood Boards</li>
+    <li class="skill">Prototyping</li>
+    <li class="skill">Pitching</li>
+    <li class="skill">Sketch</li>
+    <li class="skill">Invision</li>
+</ul>
+<h3>Product Team</h3>
+<ul>
+    <li class="team-member">Alex Lockwood</li>
+    <li class="team-role">Product Designer</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/karaherbert" rel="external" target="_blank">Kara Herbert</a></li>
+    <li class="team-role">UX Lead</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/andrew-crooks-70940079" rel="external" target="_blank">Andy Crooks</a></li>
+    <li class="team-role">Art Director</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/jana-roszkowski-2234391" rel="external" target="_blank">Jana Roszkowski</a></li>
+    <li class="team-role">Product Owner</li>
+    <li class="team-member">Team of 6 Business Analyists & UX Contractors</li>
+</ul>
+<hr>
+<div class="projects-label">Would you like to see more?</div>
+<span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+<div w3-include-html="footer.html"></div>
+<script>
+    includeHTML();
+</script>

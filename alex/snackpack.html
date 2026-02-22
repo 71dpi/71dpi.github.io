@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood | Snack Pack Case Study</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="header.html"></div>
+
+<div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+<h1>Snack Pack UI & Content</h1>
+<picture>
+    <source srcset="img/projects/snackpack/snackpack01.webp" type="image/webp">
+    <img srcset="img/projects/snackpack/snackpack01.gif" sizes="(min-width: 768px)" src="img/projects/snackpack/snackpack01.gif" alt="Pudding kid from Billy Madison" class="little-picture-inline pic-inline">
+</picture>
+&nbsp;
+<p>Responsive web <abbr title="User Experience">UX</abbr>/<abbr title="User Interface">UI</abbr> for the brown bag lunch classic, Snack Pack. Key considerations for the site were brand presence, easy access to products and nutrition facts, and content strategy
+    to boost SEO and drive traffic, while making things easy to share on social media.</p>
+<picture>
+    <source srcset="img/projects/snackpack/snackpack02.webp" type="image/webp">
+    <img srcset="img/projects/snackpack/snackpack02.jpg" sizes="(min-width: 768px)" src="img/projects/snackpack/snackpack02.jpg" alt="Snack Pack homepage design" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/snackpack/snackpack03.webp" type="image/webp">
+    <img srcset="img/projects/snackpack/snackpack03.mp4" sizes="(min-width: 768px)" src="img/projects/snackpack/snackpack03.mp4" alt="Video showing Snack Pack site experience" class="little-picture-inline pic-inline">
+</picture>
+<picture>
+    <source srcset="img/projects/snackpack/snackpack04.webp" type="image/webp">
+    <img srcset="img/projects/snackpack/snackpack04.jpg" sizes="(min-width: 768px)" src="img/projects/snackpack/snackpack04.jpg" alt="Snack Pack site content" class="big-picture">
+</picture>
+<div class="tile"><span class="tile-text">Responsive</span></div>
+<div class="tile tile2"><span class="tile-text">SEO Boost</span></div>
+&nbsp;
+<hr>
+<div class="projects-label">Would you like to see more?</div>
+<span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+<div w3-include-html="footer.html"></div>
+<script>
+    includeHTML();
+</script>

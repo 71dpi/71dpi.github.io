@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood | Kroger Assortment Display Strategy</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    return;
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div w3-include-html="header.html"></div>
+
+    <div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+
+    <main class="case-study">
+        <h1>Kroger Assortment Display Strategy</h1>
+
+        <div class="tldr-label">TL;DR</div>
+        <h6>Alex designed a signal-driven assortment display framework that shows customers only the items they can actually buy and receive—improving add-to-cart, average basket value, and reducing fallout by making availability transparent across fulfillment methods and locations.</h6>
+
+        <section>
+            <h2>Context</h2>
+            <p>I led the design strategy for Kroger’s assortment display initiative—a critical effort to make the shopping experience more relevant and frictionless. The goal was to surface the most desirable assortment based on customer signals such as fulfillment preference, location, and behavioral signals.</p>
+        </section>
+
+        <section>
+            <h2>The Challenge</h2>
+            <p>Customers frequently encountered items unavailable for their chosen fulfillment method, which led to cart abandonment and reduced trust. The solution needed to:</p>
+            <ul>
+                <li>Make availability transparent.</li>
+                <li>Reduce wasted effort for customers.</li>
+                <li>Increase confidence in the shopping experience.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>My Approach</h2>
+            <p>I designed a signal-driven framework that dynamically adjusted assortment display based on:</p>
+            <ul>
+                <li><strong>Fulfillment Preferences</strong>: Delivery, pickup, or shipping options.</li>
+                <li><strong>Location & Timing</strong>: ZIP code and timeslot availability.</li>
+                <li><strong>Behavioral Insights</strong>: Past modality choices and browsing patterns.</li>
+            </ul>
+            <p>The system ensured customers only saw what they could realistically buy and receive—eliminating disappointment and improving clarity.</p>
+        </section>
+
+        <section>
+            <h2>Impact</h2>
+            <ul>
+                <li><strong>Conversion Lift</strong>: Prompting customers to select fulfillment early and filtering unavailable items streamlined the journey and reduced abandonment.</li>
+                <li><strong>Fallout Reduction</strong>: Clear availability messaging minimized frustration and improved order completion rates.</li>
+                <li><strong>Customer Confidence</strong>: Transparency around “what’s buyable and how” strengthened trust and loyalty.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>My Role</h2>
+            <ul>
+                <li><strong>Strategic Design Leadership</strong>: Defined display logic and availability hierarchy across product grids, PDPs, and cart flows.</li>
+                <li><strong>Framework Creation</strong>: Built a repeatable system for interpreting customer signals to ensure consistency and scalability.</li>
+                <li><strong>Future-Proofing</strong>: Documented learnings and codified decision-making processes for smooth handoffs and iteration.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Why It Matters</h2>
+            <p>This is a long-tail initiative with no discrete endpoint—customer expectations and operations evolve. I designed an iterative, scalable system and handoff process so future teams could continue improving without losing strategic clarity.</p>
+        </section>
+
+        <section>
+            <h2>Key Outcomes</h2>
+            <ul>
+                <li>Increased add-to-cart rates and average basket value.</li>
+                <li>Reduced customer fallout and improved satisfaction.</li>
+                <li>Established a repeatable, scalable framework for assortment display optimization.</li>
+            </ul>
+        </section>
+
+        <h3>Initiative Responsibilities</h3>
+        <ul>
+            <li class="responsibility">Assortment Strategy & Design</li>
+            <li class="responsibility">Signal Modeling & Display Logic</li>
+            <li class="responsibility">Cross-Functional Alignment (DX, Ops, Engineering)</li>
+            <li class="responsibility">Prototyping & Usability Testing</li>
+            <li class="responsibility">Documentation & Handoff</li>
+        </ul>
+
+        <h3>Product Technologies & Skills</h3>
+        <ul>
+            <li class="skill">Design Systems</li>
+            <li class="skill">Product Strategy</li>
+            <li class="skill">A/B Testing & Experimentation</li>
+            <li class="skill">Signal & Data Modeling (basic)</li>
+            <li class="skill">Prototyping (Figma)</li>
+            <li class="skill">Usability Testing</li>
+            <li class="skill">Cross-Functional Stakeholder Management</li>
+        </ul>
+
+        <div class="img-tile-mosaic">
+            <div class="tile"><span class="tile-emoji" style="background: #ccc;">Fallout ▼</span></div>
+            <div class="tile tile2"><span class="tile-emoji">Usability ▲</span></div>
+        </div>
+
+        <hr>
+        <div class="projects-label">Would you like to see more?</div>
+        <p class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'">View Projects</button></p>
+
+    </main>
+
+    <div w3-include-html="footer.html"></div>
+    <script>
+        includeHTML();
+    </script>
+</body>
+</html>

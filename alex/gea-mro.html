@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood's | GE Aerospace MRO Network Service Design Case Study</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.jpg">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="header.html"></div>
+
+<div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+<h1>GE Aerospace MRO Network Service Design</h1>
+<div class="tldr-label">
+    TL;DR
+</div>
+<h6>For GE Aerospace Services business, Alex led service blueprinting and research to show how billions of dollars in services are forecasted, planned, and actualized across a global network of internal and 3rd party shops. Unlike a shop-centric value stream
+    approach, this enabled stakeholders to identify opportunities to improve data flow and quality across an enterprise rather than just one product.
+</h6>
+<picture>
+    <source media="(min-width: 1440px)" srcset="img/projects/gea-mro/gea-mro-blueprint.webp" type="image/webp">
+    <source media="(min-width: 768px)" srcset="img/projects/gea-mro/gea-mro-blueprint.webp" type="image/webp">
+    <source media="(max-width: 768px)" srcset="img/projects/gea-mro/gea-mro-blueprint.webp" type="image/webp">
+    <img src="img/projects/gea-mro/gea-mro-blueprint.jpg" alt="process visualization displayed as wall art" class="big-picture big-picture-inline">
+</picture>
+<h2>Problem</h2>
+<p>When an airplane isn’t flying it isn’t making money. Data quality, completeness and availability are the backbone of an effective and efficient engine repair. That’s how a maintenance provider makes their money. In fact, <a href="https://www.investors.com/news/ge-stock-rallies-ahead-of-huge-ge-aerospace-play-whats-in-store-for-investors/"
+        target="_blank">GE Aerospace MRO services generated
+    18.3 billion dollars in revenue in 2022</a>. A good maintenance plan and a speedy shop visit is a win for everyone. It’s complicated stuff, and I had the pleasure of helping to visualize and make sense of it all.</p>
+<p>So with hundreds of engines needing various levels of support at OEM and licensed partner shops at any given time across the globe, it’s no wonder things get complicated quickly. For the GE Aviation Services business, my job was to visualize that complexity,
+    customer touch points, the actors involved. To find where data is and isn’t flowing. And of course, map any pain points and Lean improvement opportunities along the way.</p>
+<h2>Discovery</h2>
+<p>I partnered with UX Researcher Carl Stevens to assess everything from 30 year forecasts, to 30 day engine overhauls, to the 30 pounds of paperwork that travel with an engine when it is delivered to an MRO facility. We interviewed stakeholders and poured
+    over available VOC to understand variance across 7 shops and 13 products.</p>
+<p>My direct contributions to this effort included a research plan, research outcomes and findings decks. The shop and business operations personas and service blueprint I produced are living documentation that is designed to evolve with the people and processes
+    they portray.</p>
+<picture>
+    <source srcset="img/projects/gea-mro/gea-mro-poster.webp" type="image/webp">
+    <img srcset="img/projects/gea-mro/gea-mro-poster.jpg" sizes="(min-width: 768px)" src="img/projects/gea-mro/gea-mro-poster.jpg" alt="modern poster of visualizing forecasting and planning processes as a solar system" class="big-picture big-picture-inline">
+</picture>
+<h2>Outcomes</h2>
+<p>After two quarters of discovery, Carl and I were able to equip the business with a wealth of insights. In a Lean manufacturing environment, UX design isn’t always the way to directly improve a process. What this initiative did successfully was to serve
+    as a catalyst for change. It gave context to those building solutions, improved decision making capabilities of the business, and provided measurable and structured KPIs for process and data flow improvement efforts. Our work served as pre-work to
+    a Lean Value Stream Mapping initiative and subsequent kaizen events that have improved shop performance, improving turnaround time for customers and shop profitability. Our artifacts have helped designers and developers make smarter bets on the digital
+    products that drive the processes.</p>
+<h3>
+    Initiative Responsibilities
+</h3>
+
+<ul>
+    <li class="responsibility">Strategy</li>
+    <li class="responsibility">Planning</li>
+    <li class="responsibility"><abbr title="User Experience">UX</abbr> Research</li>
+    <li class="responsibility">Process Visualization</li>
+</ul>
+<h3>
+    Product Technologies & Skills
+</h3>
+
+<ul>
+    <li class="skill">Design Thinking</li>
+    <li class="skill">Product Management</li>
+    <li class="skill">Lean</li>
+    <li class="skill">Interviews</li>
+    <li class="skill">Card Sorting</li>
+    <li class="skill">Journey Mapping</li>
+    <li class="skill">Process Mapping</li>
+    <li class="skill">Miro</li>
+</ul>
+<div class="img-tile-mosaic">
+    &nbsp;
+    <hr>
+    <div class="projects-label">Would you like to see more?</div>
+    <span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+    <div w3-include-html="footer.html"></div>
+    <script>
+        includeHTML();
+    </script>

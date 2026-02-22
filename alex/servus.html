@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Alex Lockwood | Servus! Case Study</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="header.html"></div>
+
+<div class="back"><a href="projects.html">&#10229; Go Back</a></div>
+<h1>Servus! Branding & Digital</h1>
+<p>Naming, branding, identity, collateral and responsive website design with parallax effects for the largest franchisee of Long John Silver's restaurants. The focus for their brand and assets is to give back to their employees through recognition, events
+    and encouragement.</p>
+<picture>
+    <source srcset="img/projects/servus/servus01.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus01.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus01.jpg" alt="Servus! business cards" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus02.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus02.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus02.jpg" alt="Naming and branding" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus03.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus03.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus03.jpg" alt="a unique web experience built to celebrate present and future team members" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus04.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus04.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus04.jpg" alt="Food and fun" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus05.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus05.mp4" sizes="(min-width: 768px)" src="img/projects/servus/servus05.mp4" alt="animation showing website parallax functionality" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus06.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus06.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus06.jpg" alt="Careers and locations" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus07.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus07.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus07.jpg" alt="website on laptop and mobile device" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus08.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus08.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus08.jpg" alt="franchises and benefits" class="big-picture">
+</picture>
+<picture>
+    <source srcset="img/projects/servus/servus09.webp" type="image/webp">
+    <img srcset="img/projects/servus/servus09.jpg" sizes="(min-width: 768px)" src="img/projects/servus/servus09.jpg" alt="more detail pages shown on laptop and two mobile devices" class="big-picture big-picture-inline">
+</picture>
+<h3>
+    Project Responsibilities
+</h3>
+<ul>
+    <li class="responsibility">Creative Direction</li>
+    <li class="responsibility">Naming</li>
+    <li class="responsibility">Branding</li>
+    <li class="responsibility">Information Architecture</li>
+    <li class="responsibility">Wireframes</li>
+    <li class="responsibility">UI Design</li>
+    <li class="responsibility">Animation</li>
+</ul>
+<h3>
+    Project Team
+</h3>
+<ul>
+    <li class="team-member">Alex Lockwood</li>
+    <li class="team-role">Creative Director, UX Architect</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/bradluttrell" rel="external" target="_blank">Brad Luttrell</a></li>
+    <li class="team-role">Associate Creative Director, Copywriter</li>
+    <li class="team-member"><a href="https://www.linkedin.com/in/markandrewpalmer" rel="external" target="_blank">Mark Palmer</a></li>
+    <li class="team-role">Chief Creative Officer</li>
+</ul>
+<!--
+<div class="tile"><span class="tile-text">A goal or something</span></div>
+<div class="tile tile2"><span class="tile-text">Maybe an outcome</span></div>
+-->
+<hr>
+<div class="projects-label">Would you like to see more?</div>
+<span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+<div w3-include-html="footer.html"></div>
+<script>
+    includeHTML();
+</script>
