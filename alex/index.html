@@ -87,8 +87,10 @@
     </script>
 </head>
 
-
-<div w3-include-html="header.html"></div>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+  <div w3-include-html="header.html" role="banner" aria-label="Site header"></div>
+  <main id="main" role="main">
 
 <h1><abbr title="User Experience">UX</abbr> + Creative Direction + <abbr title="Management">MGMT</abbr> + Design</h1>
 <picture>
@@ -167,9 +169,8 @@
         <source media="(max-width: 768px)" srcset="img/about4.webp" type="image/webp">
         <img srcset="img/about4.png" src="img/about4.png" alt="Illustration of a bowl of rice with a happy face" class="tile pic-tile little-tile">
     </picture>
-</div>
-<p>&nbsp;</p>
-<div w3-include-html="footer.html"></div>
-<script>
+  </main>
+  <div w3-include-html="footer.html" role="contentinfo" aria-label="Site footer"></div>
+  <script>
     includeHTML();
 </script>

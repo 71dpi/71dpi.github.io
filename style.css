@@ -729,3 +729,67 @@
                 margin: 1rem 0 3rem;
             }
         }
+        /* WCAG 3 Accessibility Enhancements */
+        
+        /* Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            z-index: 100;
+            text-decoration: none;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+        
+        /* Focus visible for keyboard navigation */
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid #6236ff;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(98, 54, 255, 0.3);
+        }
+        
+        /* Respect prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: more) {
+            a {
+                text-decoration: underline;
+            }
+            
+            button,
+            input,
+            select,
+            textarea {
+                border-width: 2px;
+            }
+        }
+        
+        /* Text readability */
+        p {
+            line-height: 1.6;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            line-height: 1.3;
+        }
