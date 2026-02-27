@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Enterprise Design System Case Study: Alex Lockwood's design system for data-intensive applications. Component design and design infrastructure for complex products.">
+    <meta name="keywords" content="design system, component design, product design, UX design, data visualization, case study">
+    <meta name="author" content="Alex Lockwood">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://71dpi.github.io/alex/design-system.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Enterprise Design System for Data-Intensive Applications | Case Study | Alex Lockwood">
+    <meta property="og:description" content="Design system and component architecture for enterprise data-intensive applications.">
+    <meta property="og:url" content="https://71dpi.github.io/alex/design-system.html">
+    <meta property="og:image" content="https://71dpi.github.io/alex/img/projects/design-system/">
+    <meta property="article:author" content="Alex Lockwood">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Enterprise Design System | Case Study">
+    <meta name="twitter:description" content="Design system architecture for data-intensive applications">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "name": "Enterprise Design System for Data-Intensive Applications",
+      "author": {"@type": "Person", "name": "Alex Lockwood"},
+      "description": "Design system and component architecture for enterprise applications",
+      "url": "https://71dpi.github.io/alex/design-system.html",
+      "inLanguage": "en"
+    }
+    </script>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <title>Alex Lockwood's | Enterprise Design System for Data-Intensive Applications Case Study</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.jpg">
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                    /* Make an HTTP request using the attribute value as the file name: */
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            /* Remove the attribute, and call this function once more: */
+                            elmnt.removeAttribute("w3-include-html");
+                            includeHTML();
+                        }
+                    }
+                    xhttp.open("GET", file, true);
+                    xhttp.send();
+                    /* Exit the function: */
+                    return;
+                }
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1J92RYBWB4');
+    </script>
+</head>
+
+<div w3-include-html="/components/header.html"></div>
+
+<div class="back"><a href="/projects/projects.html">&#10229; Go Back</a></div>
+<h1>Enterprise Design System for Data-Intensive Applications</h1>
+<div class="tldr-label">
+    TL;DR
+</div>
+<h6>For GE Aerospace Services business, Alex led service blueprinting and research to show how billions of dollars in services are forecasted, planned, and actualized across a global network of internal and 3rd party shops. Unlike a shop-centric value stream
+    approach, this enabled stakeholders to identify opportunities to improve data flow and quality across an enterprise rather than just one product.
+</h6>
+<picture>
+    <source media="(min-width: 1440px)" srcset="/img/projects/design-system/design-system01.webp" type="image/webp">
+    <source media="(min-width: 768px)" srcset="/img/projects/design-system/design-system01.webp" type="image/webp">
+    <source media="(max-width: 768px)" srcset="/img/projects/design-system/design-system01.webp" type="image/webp">
+    <img src="/img/projects/design-system/design-system01.jpg" alt="design system componentry" class="big-picture big-picture-inline">
+</picture>
+<h2>Overview</h2>
+<p>In my role as a UI/UX Designer at GE Aviation, I led the conceptualization, design, and implementation of a robust enterprise design system tailored for customer-facing applications. This comprehensive design system was meticulously crafted to excel in
+    handling data-dense displays while ensuring seamless responsiveness across various devices, including mobile, large monitors, and laptops. Over time, I stepped back from management of the design system and continued to contribute to it as I continued
+    to used it and lead projects that used its design and web componentry.</p>
+<picture>
+    <source srcset="/img/projects/design-system/design-system02.webp" type="image/webp">
+    <img srcset="/img/projects/design-system/design-system02.jpg" sizes="(min-width: 768px)" src="/img/projects/design-system/design-system02.jpg" alt="design system in use" class="big-picture big-picture-inline">
+</picture>
+<h2>Key Features and Achievements</h2>
+<ol>
+    <li>Data-Dense Display Optimization</li>
+    <ul>
+        <li>* Challenge: Our enterprise applications dealt with vast amounts of data, requiring a design system that could present complex information intuitively without compromising usability.</li>
+        <li>* Solution: I spearheaded the development of a modular grid system and data visualization components that allowed for efficient organization and presentation of dense data sets. Through iterative user testing and feedback loops, we refined the
+            data presentation to strike the perfect balance between information richness and user comprehension.</li>
+    </ul>
+    <li>Cross-Device Responsiveness</li>
+    <ul>
+        <li>* Challenge: The diverse range of devices used by our customers necessitated a design system that seamlessly adapted to various screen sizes and resolutions. </li>
+        <li>* Solution: Leveraging responsive design principles, I ensured that the design system was not only adaptable but provided an optimal viewing experience on devices ranging from mobile phones to large displays. Media queries, flexible layouts, and
+            adaptive components were integrated to guarantee a consistent and user-friendly interface across all devices.</li>
+    </ul>
+    <li>Mobile-First Approach</li>
+    <ul>
+        <li>* Challenge: Recognizing the increasing prevalence of mobile usage among our customers, a mobile-first strategy was imperative. </li>
+        <li>* Solution: I championed a mobile-first design approach, prioritizing the mobile experience in the design process. This involved creating touch-friendly interfaces, optimizing performance for slower network conditions, and implementing progressive
+            enhancement techniques to ensure a seamless transition from mobile to larger screens.</li>
+    </ul>
+    <li>Collaboration and Adoption</li>
+    <ul>
+        <li>* Achievement: The successful implementation of the design system was not only a testament to its functionality but also its adoption across the organization. </li>
+        <li>* Solution: To foster adoption, I conducted comprehensive training sessions for development teams, providing documentation and resources. Regular feedback loops and continuous improvement cycles were established to refine the design system based
+            on real-world usage and evolving business needs. Continued socialization is managed by a small group of contributors as the system continues to thrive.</li>
+    </ul>
+</ol>
+<h2>Impact</h2>
+<p>The enterprise design system significantly improved the efficiency of our development teams, reduced time-to-market for new features, and garnered positive feedback from end-users for its intuitive and consistent interface. The project showcased my ability
+    to bridge the gap between complex technical requirements and user-centric design principles, resulting in a scalable and adaptable design system that continues to evolve with the dynamic needs of our enterprise applications.</p>
+<picture>
+    <source srcset="/img/projects/design-system/design-system03.webp" type="image/webp">
+    <img srcset="/img/projects/design-system/design-system03.jpg" sizes="(min-width: 768px)" src="/img/projects/design-system/design-system03.jpg" alt="daily UI screens for exploration" class="big-picture big-picture-inline">
+</picture>
+<h2>Bonus</h2>
+<p>One thing I found particularly interesting and useful when reimagining a design system meant for such broad use was to step outside of the business context of the design system and see how the system would apply. For two months I participated in a daily
+    UI challenge, utilizing the design system as my crayon box. The prompts for the challege stretched the design's use cases well beyond what we'd intended, and as a result generated many great conversations and considerations</p>
+
+<h3>
+    Responsibilities
+</h3>
+
+<ul>
+    <li class="responsibility">Strategy</li>
+    <li class="responsibility">User Interface Design</li>
+    <li class="responsibility">Visual Design</li>
+    <li class="responsibility">Accessibility</li>
+    <li class="responsibility">Communication and Socialization</li>
+</ul>
+<h3>
+    Technologies & Skills
+</h3>
+<ul>
+    <li class="skill">Sketch</li>
+    <li class="skill">Invision</li>
+    <li class="skill">CSS</li>
+    <li class="skill">Javascript</li>
+</ul>
+<div class="img-tile-mosaic">
+    &nbsp;
+    <hr>
+    <div class="projects-label">Would you like to see more?</div>
+    <span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+    <div w3-include-html="/components/footer.html"></div>
+    <script>
+        includeHTML();
+    </script>
