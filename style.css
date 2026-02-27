@@ -60,6 +60,12 @@
             min-height: 13rem;
             background-color: #fff200; /* match header background while loading */
         }
+
+        @media screen and (min-width: 768px) {
+            #header-template {
+                min-height: 6rem;
+            }
+        }
         
         #project-logo {
             filter: none;
