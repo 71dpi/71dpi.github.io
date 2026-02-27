@@ -55,8 +55,10 @@
             min-height: 5.2rem;
         }
         
+        /* reserve space for included header to eliminate layout shift during async load */
         #header-template {
             min-height: 13rem;
+            background-color: #fff200; /* match header background while loading */
         }
         
         #project-logo {
