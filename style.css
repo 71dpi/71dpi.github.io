@@ -398,6 +398,32 @@
             border: none;
             border-radius: .25rem;
             border-width: 1px;
+        }
+
+        /* Grid for games */
+        .inline-links.grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            align-items: center;
+            justify-items: center;
+            margin: 0; 
+            padding: 1rem 10%; 
+        }
+        .inline-links.grid a { display: block; text-align: center; }
+        .inline-links.grid img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 6px;
+            transition: transform 220ms ease, box-shadow 220ms ease;
+            will-change: transform;
+        }
+        .inline-links.grid a:hover img,
+        .inline-links.grid a:focus img {
+            transform: scale(1.06);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        }
             border-style: solid;
             border-color: rgba(0, 0, 0, 0);
             width: -webkit-fill-available;
