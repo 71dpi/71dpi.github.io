@@ -403,7 +403,7 @@
         /* Grid for games */
         .inline-links.grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
             gap: 1rem;
             align-items: center;
             justify-items: center;
@@ -424,6 +424,17 @@
             transform: scale(1.06);
             box-shadow: 0 6px 18px rgba(0,0,0,0.12);
         }
+        .inline-links.grid .caption {
+            display: block;
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            color: #333;
+        }
+        .inline-links.grid a {
+            margin: 0.5rem;
+        }
+        
+        a.button.big-button {
             border-style: solid;
             border-color: rgba(0, 0, 0, 0);
             width: -webkit-fill-available;
@@ -597,7 +608,6 @@
         figcaption {
             text-align: center;
         }
-        /* make it bigger for desktop */
         
         @media screen and (max-width: 850px) {
             .desktop-menu-item-home {
