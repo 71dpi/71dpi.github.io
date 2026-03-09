@@ -201,8 +201,8 @@ nav.inline-links.grid .caption {
 
         nav {
             display: block;
-            float: right;
-            margin-right: 10%;
+            float: left;
+            margin-left: 10%;
         }
 
         a.logo-typography:hover {
