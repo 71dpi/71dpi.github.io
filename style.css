@@ -404,12 +404,12 @@
         /* Grid for games */
         .inline-links.grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+            grid-template-columns: repeat(auto-fit, 8rem);
             gap: 1rem;
-            align-items: center;
+            justify-content: center;
             justify-items: center;
             margin: 0;
-            padding: 1rem 10%;
+            padding: 1rem 0;
         }
 
         .inline-links.grid a {
