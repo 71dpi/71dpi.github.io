@@ -5,9 +5,9 @@ nav.inline-links.grid {
   gap: 1rem;
   justify-items: center;
   align-items: center;
-  margin: 0 auto;
-  max-width: 100%;
+  width: 100%;
   padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 nav.inline-links.grid a {
@@ -39,24 +39,37 @@ nav.inline-links.grid .caption {
   font-weight: 500;
 }
 
-/* Tablet: 2 columns */
-@media (max-width: 1024px) {
+/* Large tablet: 4 columns */
+@media (max-width: 1400px) {
   nav.inline-links.grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    max-width: 100%;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
   }
 
   nav.inline-links.grid picture,
   nav.inline-links.grid img {
-    max-width: 160px;
+    max-width: 150px;
   }
 }
 
-/* Mobile: 2 columns, tighter spacing */
+/* Tablet: 3 columns */
+@media (max-width: 1024px) {
+  nav.inline-links.grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  nav.inline-links.grid picture,
+  nav.inline-links.grid img {
+    max-width: 130px;
+  }
+}
+
+/* Small tablet/Large mobile: 2 columns */
 @media (max-width: 768px) {
   nav.inline-links.grid {
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
     padding: 0 0.5rem;
   }
 
@@ -66,25 +79,13 @@ nav.inline-links.grid .caption {
 
   nav.inline-links.grid picture,
   nav.inline-links.grid img {
-    max-width: 120px;
+    max-width: 110px;
   }
 
   nav.inline-links.grid .caption {
     font-size: 0.9rem;
-                }
-            }
-
-            @media (max-width: 700px) {
-                nav.inline-links.grid {
-                    grid-template-columns: repeat(2, 1fr);
-                    max-width: 100%;
-                    gap: 1rem;
-                }
-                nav.inline-links.grid picture,
-                nav.inline-links.grid img {
-                    max-width: 120px;
-                }
-            }
+  }
+}
         html,
         button,
         select {
@@ -490,12 +491,12 @@ nav.inline-links.grid .caption {
 
         /* Grid for games */
         .inline-links.grid {
+            max-width: fit-content;
             display: grid;
             grid-template-columns: repeat(auto-fit, 8rem);
             gap: 1rem;
             justify-content: center;
             justify-items: center;
-            margin: 0;
             padding: 0 0;
         }
 
