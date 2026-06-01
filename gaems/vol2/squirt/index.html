@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Squirt</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #00D4FF; }
+    #game-screen { background: #7CFF00; display: flex; align-items: center; justify-content: space-around; flex-direction: row; }
+    #hose-area {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; height: 100%; cursor: pointer; user-select: none; touch-action: none;
+    }
+    #hose-emoji { font-size: 5rem; transition: transform 0.1s; }
+    #hose-area:active #hose-emoji { transform: scale(0.85); }
+    #plant-area {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; height: 100%; position: relative;
+    }
+    #plant-emoji { font-size: 6rem; transition: filter 0.3s, transform 0.5s; filter: grayscale(60%) brightness(0.8); }
+    #plant-emoji.happy { filter: grayscale(0%) brightness(1.1); transform: scale(1.1); }
+    #water-meter-wrap {
+      width: 80px; height: 16px; background: rgba(0,0,0,0.2); border-radius: 8px;
+      margin-top: 8px; overflow: hidden;
+    }
+    #water-meter {
+      height: 100%; width: 0%; background: #00D4FF;
+      border-radius: 8px; transition: width 0.15s;
+    }
+    #tap-hint { font-size: 0.85rem; font-weight: 800; color: #006600; margin-top: 6px; }
+    .droplet {
+      position: absolute; width: 14px; height: 14px;
+      background: #00D4FF; border-radius: 50%;
+      pointer-events: none; animation: fly-drop 0.5s ease-in forwards;
+    }
+    @keyframes fly-drop {
+      from { opacity: 1; transform: translateX(0) translateY(0) scale(1); }
+      to   { opacity: 0; transform: translateX(200px) translateY(-20px) scale(0.3); }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Squirt</h1>
+    <div class="game-subject">🪴</div>
+    <p class="game-tagline">Tap the hose to water the plant!<br>Win: Fill the meter 10 taps</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="hose-area">
+      <div id="hose-emoji">🚿</div>
+      <div id="tap-hint">TAP!</div>
+    </div>
+    <div id="plant-area">
+      <div id="plant-emoji">🪴</div>
+      <div id="water-meter-wrap"><div id="water-meter"></div></div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🌱</div>
+    <p class="game-tagline">Watered!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🥀</div>
+    <p class="game-tagline">So thirsty!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'squirt';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+    let tapCount = 0;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    function spawnDroplet() {
+      const hoseArea = document.getElementById('hose-area');
+      const rect = hoseArea.getBoundingClientRect();
+      const gameRect = document.getElementById('game-screen').getBoundingClientRect();
+      const drop = document.createElement('div');
+      drop.className = 'droplet';
+      drop.style.left = (rect.right - gameRect.left - 14) + 'px';
+      drop.style.top  = (rect.top  - gameRect.top + rect.height / 2) + 'px';
+      document.getElementById('game-screen').appendChild(drop);
+      drop.addEventListener('animationend', () => drop.remove());
+    }
+
+    function onTap() {
+      if (!gameRunning) return;
+      tapCount++;
+      spawnDroplet();
+      const pct = Math.min(tapCount * 10, 100);
+      document.getElementById('water-meter').style.width = pct + '%';
+      if (tapCount >= 10) {
+        document.getElementById('plant-emoji').classList.add('happy');
+        triggerWin();
+      }
+    }
+
+    const hoseArea = document.getElementById('hose-area');
+    hoseArea.addEventListener('click', onTap);
+    hoseArea.addEventListener('touchstart', (e) => { e.preventDefault(); onTap(); }, { passive: false });
+
+    function startGame() {
+      tapCount = 0;
+      cancelAnimationFrame(timerRAF);
+      document.getElementById('water-meter').style.width = '0%';
+      document.getElementById('plant-emoji').classList.remove('happy');
+      document.querySelectorAll('.droplet').forEach(d => d.remove());
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

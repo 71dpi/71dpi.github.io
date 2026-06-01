@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Iron</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+    #game-screen { background: #00D4FF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; overflow: hidden; position: relative; touch-action: none; }
+    #shirt-container {
+      position: relative; width: 260px; height: 220px;
+      background: #e8f4ff; border-radius: 0 0 30px 30px;
+      border: 4px solid #a0c8e0;
+      /* shirt shape top */
+      clip-path: polygon(20% 0%, 35% 15%, 50% 5%, 65% 15%, 80% 0%, 100% 10%, 100% 100%, 0% 100%, 0% 10%);
+    }
+    .wrinkle {
+      position: absolute; pointer-events: none;
+      height: 3px; background: #9ab8cc; border-radius: 2px;
+      transform-origin: left center;
+    }
+    #iron {
+      position: absolute; width: 70px; height: 40px;
+      background: linear-gradient(135deg, #ddd 60%, #aaa);
+      border-radius: 0 30px 30px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      pointer-events: none; display: none;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+    #iron::after {
+      content: ''; position: absolute; left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #FF6B00; box-shadow: 0 0 8px #FF6B00;
+    }
+    #wrinkles-left {
+      font-size: 1.2rem; font-weight: 900; color: #004060;
+      background: rgba(255,255,255,0.5); border-radius: 10px; padding: 4px 12px;
+    }
+    #steam {
+      position: absolute; pointer-events: none; z-index: 11;
+      font-size: 1.2rem; opacity: 0;
+      animation: steam-anim 0.6s ease-out forwards;
+    }
+    @keyframes steam-anim {
+      0%   { opacity: 0.8; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-30px) scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Iron</h1>
+    <div class="game-subject">👔</div>
+    <p class="game-tagline">Drag the iron over the wrinkles!<br>Win: Smooth all 8 wrinkles</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="shirt-container">
+      <div id="iron"></div>
+    </div>
+    <div id="wrinkles-left">8 wrinkles left</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Pressed!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">👔</div>
+    <p class="game-tagline">Still crumpled!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'iron';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+    let wrinkleData, ironActive;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    function spawnWrinkles() {
+      document.querySelectorAll('.wrinkle').forEach(w => w.remove());
+      wrinkleData = [];
+      const shirt = document.getElementById('shirt-container');
+      const positions = [
+        {x: 30,  y: 60,  w: 80,  r: 5},
+        {x: 150, y: 50,  w: 75,  r: -8},
+        {x: 20,  y: 110, w: 90,  r: 12},
+        {x: 140, y: 105, w: 70,  r: -5},
+        {x: 60,  y: 160, w: 100, r: 7},
+        {x: 30,  y: 195, w: 65,  r: -10},
+        {x: 150, y: 175, w: 80,  r: 3},
+        {x: 100, y: 80,  w: 60,  r: 15},
+      ];
+      positions.forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'wrinkle';
+        div.dataset.id = i;
+        div.style.left   = p.x + 'px';
+        div.style.top    = p.y + 'px';
+        div.style.width  = p.w + 'px';
+        div.style.transform = `rotate(${p.r}deg)`;
+        shirt.appendChild(div);
+        wrinkleData.push({ el: div, cx: p.x + p.w / 2, cy: p.y, active: true });
+      });
+    }
+
+    function steamPuff(x, y) {
+      const gs = document.getElementById('game-screen');
+      const gr = gs.getBoundingClientRect();
+      const s = document.createElement('div');
+      s.className = 'steam';
+      s.textContent = '💨';
+      s.style.left = (x - gr.left) + 'px';
+      s.style.top  = (y - gr.top) + 'px';
+      gs.appendChild(s);
+      s.addEventListener('animationend', () => s.remove());
+    }
+
+    function onIronMove(clientX, clientY) {
+      if (!gameRunning) return;
+      const iron = document.getElementById('iron');
+      const shirt = document.getElementById('shirt-container');
+      const sr = shirt.getBoundingClientRect();
+      const ix = clientX - sr.left;
+      const iy = clientY - sr.top;
+
+      iron.style.display = 'block';
+      iron.style.left = ix + 'px';
+      iron.style.top  = iy + 'px';
+
+      let remaining = 0;
+      wrinkleData.forEach(w => {
+        if (!w.active) return;
+        const dx = ix - w.cx, dy = iy - w.cy;
+        if (Math.sqrt(dx*dx + dy*dy) < 35) {
+          w.active = false;
+          w.el.style.opacity = '0';
+          w.el.style.transition = 'opacity 0.2s';
+          setTimeout(() => w.el.remove(), 200);
+          steamPuff(clientX, clientY);
+        } else {
+          remaining++;
+        }
+      });
+
+      const total = wrinkleData.filter(w => w.active).length;
+      document.getElementById('wrinkles-left').textContent = total + ' wrinkle' + (total === 1 ? '' : 's') + ' left';
+      if (total === 0) triggerWin();
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', (e) => {
+      if (!gameRunning) return;
+      ironActive = true;
+      e.preventDefault();
+      onIronMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    gs.addEventListener('touchmove', (e) => {
+      if (!gameRunning || !ironActive) return;
+      e.preventDefault();
+      onIronMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    gs.addEventListener('touchend', () => {
+      ironActive = false;
+      document.getElementById('iron').style.display = 'none';
+    });
+    gs.addEventListener('mousedown', (e) => { ironActive = true; onIronMove(e.clientX, e.clientY); });
+    gs.addEventListener('mousemove', (e) => { if (ironActive && gameRunning) onIronMove(e.clientX, e.clientY); });
+    gs.addEventListener('mouseup', () => { ironActive = false; document.getElementById('iron').style.display = 'none'; });
+    gs.addEventListener('mouseleave', () => { ironActive = false; document.getElementById('iron').style.display = 'none'; });
+
+    function startGame() {
+      ironActive = false;
+      cancelAnimationFrame(timerRAF);
+      document.getElementById('iron').style.display = 'none';
+      show('game');
+      spawnWrinkles();
+      document.getElementById('wrinkles-left').textContent = '8 wrinkles left';
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

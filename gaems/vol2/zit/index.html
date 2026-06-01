@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>ZIT</title>
+  <meta name="theme-color" content="#FFB800">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFB800; --color-accent: #FF6B00; }
+
+    #game-screen { touch-action: none; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    #face-wrap {
+      position: relative;
+      display: inline-block;
+      line-height: 1;
+    }
+
+    #face {
+      font-size: 8rem;
+      display: block;
+      pointer-events: none;
+    }
+
+    #zit {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      background: radial-gradient(circle at 40% 35%, #ff6666 0%, #cc0000 60%, #990000 100%);
+      border-radius: 50%;
+      border: 3px solid #880000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,200,200,0.4);
+      cursor: pointer;
+      top: 48%;
+      left: 60%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s;
+      z-index: 2;
+    }
+
+    #zit:active { transform: translate(-50%,-50%) scale(0.85); }
+
+    #zit.popping {
+      animation: pop-anim 0.4s ease forwards;
+    }
+
+    @keyframes pop-anim {
+      0%   { transform: translate(-50%,-50%) scale(1); }
+      30%  { transform: translate(-50%,-50%) scale(1.4); background: radial-gradient(circle, #ff4444, #cc0000); }
+      60%  { transform: translate(-50%,-50%) scale(0.1); opacity: 0.5; }
+      100% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+    }
+
+    #splat {
+      position: absolute;
+      font-size: 2rem;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 3;
+      top: 40%;
+      left: 60%;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.2s;
+    }
+
+    #tap-counter {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: rgba(0,0,0,0.5);
+    }
+
+    #hint {
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.4);
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.15); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">ZIT</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">😬</div>
+    <p class="game-tagline">Tap the blemish 5 times to pop it!<br>Win: Clear skin!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="face-wrap">
+        <div id="face">😬</div>
+        <div id="zit"></div>
+        <div id="splat">💥</div>
+      </div>
+      <div id="tap-counter">Taps: 0 / 5</div>
+      <div id="hint">Tap the red zit!</div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✨</div>
+    <p class="game-tagline">Clear skin!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😬</div>
+    <p class="game-tagline">Still there!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'zit';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 7;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 500); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const zit = document.getElementById('zit');
+    const face = document.getElementById('face');
+    const splat = document.getElementById('splat');
+    const tapCounterEl = document.getElementById('tap-counter');
+    let tapCount = 0;
+    const TAPS_NEEDED = 5;
+
+    // detect pinch via touch
+    let pinchStartDist = 0;
+    let pinchTriggered = false;
+
+    zit.addEventListener('click', onZitTap);
+    zit.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDist = Math.hypot(dx, dy);
+        pinchTriggered = false;
+      }
+    }, { passive: true });
+
+    document.getElementById('game-screen').addEventListener('touchmove', (e) => {
+      if (!gameRunning || pinchTriggered) return;
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        if (pinchStartDist > 0 && pinchStartDist - dist > 30) {
+          pinchTriggered = true;
+          popZit();
+        }
+      }
+    }, { passive: true });
+
+    function onZitTap(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      tapCount++;
+      tapCounterEl.textContent = `Taps: ${tapCount} / ${TAPS_NEEDED}`;
+
+      // grow zit slightly per tap
+      const scale = 1 + tapCount * 0.06;
+      zit.style.transform = `translate(-50%,-50%) scale(${scale})`;
+
+      if (tapCount >= TAPS_NEEDED) {
+        popZit();
+      }
+    }
+
+    function popZit() {
+      if (!gameRunning) return;
+      zit.classList.add('popping');
+      splat.style.opacity = '1';
+      face.textContent = '😌';
+      setTimeout(() => {
+        splat.style.opacity = '0';
+        triggerWin();
+      }, 400);
+    }
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      tapCount = 0;
+      tapCounterEl.textContent = `Taps: 0 / ${TAPS_NEEDED}`;
+      face.textContent = '😬';
+      splat.style.opacity = '0';
+      zit.classList.remove('popping');
+      zit.style.transform = 'translate(-50%,-50%) scale(1)';
+      zit.style.opacity = '1';
+      pinchStartDist = 0;
+      pinchTriggered = false;
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

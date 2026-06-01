@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>HAUL</title>
+  <meta name="theme-color" content="#FFF200">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFF200; --color-accent: #FF6B00; }
+    #game-screen { background: #FFF200; }
+
+    #haul-area {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    .bill {
+      position: absolute;
+      font-size: 4rem;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      line-height: 1;
+      filter: drop-shadow(3px 3px 0 #000);
+      z-index: 10;
+    }
+
+    @keyframes bill-fall {
+      0%   { transform: translateY(0) rotate(0deg); }
+      25%  { transform: translateY(25vh) rotate(15deg); }
+      50%  { transform: translateY(50vh) rotate(-10deg); }
+      75%  { transform: translateY(75vh) rotate(20deg); }
+      100% { transform: translateY(110vh) rotate(30deg); }
+    }
+
+    @keyframes bill-caught {
+      0%   { transform: scale(1); opacity: 1; }
+      50%  { transform: scale(1.5); opacity: 0.8; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    #hud {
+      position: absolute;
+      top: 20px; left: 0; right: 0;
+      text-align: center;
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: #000;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    #score-display {
+      position: absolute;
+      top: 55px; left: 0; right: 0;
+      text-align: center;
+      font-weight: 900;
+      font-size: 2.5rem;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 30;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FF6B00; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">HAUL</h1>
+    <div class="game-subject">💵</div>
+    <p class="game-tagline">Tap falling bills before they escape!<br>Win: Catch 2 of 3!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="haul-area">
+      <div id="hud">Tap the bills!</div>
+      <div id="score-display">0/3 caught</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🤑</div>
+    <p class="game-tagline">Rich!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😭</div>
+    <p class="game-tagline">Broke!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'haul';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 7;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) endGame();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── HAUL GAME ──
+    const haulArea = document.getElementById('haul-area');
+    const hud = document.getElementById('hud');
+    const scoreDisplay = document.getElementById('score-display');
+    const TOTAL_BILLS = 3;
+    const NEED_TO_CATCH = 2;
+    const FALL_DURATION = 3200; // ms
+
+    let caught = 0;
+    let missed = 0;
+    let billsLaunched = 0;
+    let billTimers = [];
+
+    function launchBill(delay) {
+      const t = setTimeout(() => {
+        if (!gameRunning) return;
+        billsLaunched++;
+        const bill = document.createElement('div');
+        bill.className = 'bill';
+        bill.textContent = '💵';
+        const leftPct = 10 + Math.random() * 70;
+        bill.style.left = leftPct + '%';
+        bill.style.top = '0px';
+        bill.style.animation = `bill-fall ${FALL_DURATION}ms linear forwards`;
+        haulArea.appendChild(bill);
+
+        function catchBill(e) {
+          e.stopPropagation();
+          if (!gameRunning) return;
+          bill.style.animation = 'none';
+          bill.style.animation = 'bill-caught 0.3s forwards';
+          bill.removeEventListener('touchstart', catchBill);
+          bill.removeEventListener('mousedown', catchBill);
+          caught++;
+          scoreDisplay.textContent = `${caught}/3 caught`;
+          setTimeout(() => { bill.remove(); checkEnd(); }, 350);
+        }
+
+        bill.addEventListener('touchstart', catchBill, { passive: false });
+        bill.addEventListener('mousedown', catchBill);
+
+        // If bill exits bottom
+        const missTimer = setTimeout(() => {
+          if (!gameRunning) return;
+          if (bill.parentNode) {
+            bill.remove();
+            missed++;
+            checkEnd();
+          }
+        }, FALL_DURATION + 200);
+        billTimers.push(missTimer);
+      }, delay);
+      billTimers.push(t);
+    }
+
+    function checkEnd() {
+      const total = caught + missed;
+      if (caught >= NEED_TO_CATCH) { triggerWin(); return; }
+      if (missed > TOTAL_BILLS - NEED_TO_CATCH) { triggerLose(); return; }
+      if (total >= TOTAL_BILLS) {
+        if (caught >= NEED_TO_CATCH) triggerWin(); else triggerLose();
+      }
+    }
+
+    function endGame() {
+      if (!gameRunning) return;
+      gameRunning = false;
+      // Clear remaining bills
+      haulArea.querySelectorAll('.bill').forEach(b => b.remove());
+      if (caught >= NEED_TO_CATCH) show('win'); else show('lose');
+    }
+
+    function startGame() {
+      billTimers.forEach(clearTimeout);
+      billTimers = [];
+      haulArea.querySelectorAll('.bill').forEach(b => b.remove());
+      caught = 0;
+      missed = 0;
+      billsLaunched = 0;
+      scoreDisplay.textContent = '0/3 caught';
+      hud.textContent = 'Tap the bills!';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+
+      // Launch 3 bills at staggered intervals
+      launchBill(500);
+      launchBill(2000);
+      launchBill(3800);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

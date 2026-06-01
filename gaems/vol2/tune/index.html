@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>TUNE</title>
+  <meta name="theme-color" content="#795548">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #EFEBE9; --color-accent: #FF6B00; }
+    #game-area { position:relative; width:min(300px,85vw); margin:0 auto; touch-action:none; }
+    #radio-svg { width:100%; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #tune-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+    #dial-track { width:min(260px,75vw); height:40px; background:#D7CCC8; border:var(--stroke) solid #000; border-radius:99px; box-shadow:var(--shadow); position:relative; margin:0 auto; touch-action:none; cursor:grab; overflow:visible; }
+    #dial-knob { position:absolute; top:50%; width:44px; height:44px; background:#FF6B00; border:var(--stroke) solid #000; border-radius:50%; box-shadow:var(--shadow); transform:translate(-50%,-50%); cursor:grab; }
+    #dial-knob::after { content:''; position:absolute; top:50%; left:50%; width:4px; height:14px; background:#fff; border-radius:2px; transform:translate(-50%,-100%); }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">TUNE</h1>
+    <div class="game-subject">📻</div>
+    <p class="game-tagline">Slide the dial until the static clears</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="radio-svg" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Radio body -->
+        <rect x="10" y="20" width="280" height="180" rx="16" fill="#795548" stroke="#000" stroke-width="4"/>
+        <!-- Speaker grille -->
+        <rect x="25" y="35" width="110" height="90" rx="8" fill="#5D4037" stroke="#000" stroke-width="2"/>
+        <line x1="35" y1="50" x2="125" y2="50" stroke="#4E342E" stroke-width="2"/>
+        <line x1="35" y1="60" x2="125" y2="60" stroke="#4E342E" stroke-width="2"/>
+        <line x1="35" y1="70" x2="125" y2="70" stroke="#4E342E" stroke-width="2"/>
+        <line x1="35" y1="80" x2="125" y2="80" stroke="#4E342E" stroke-width="2"/>
+        <line x1="35" y1="90" x2="125" y2="90" stroke="#4E342E" stroke-width="2"/>
+        <line x1="35" y1="100" x2="125" y2="100" stroke="#4E342E" stroke-width="2"/>
+        <line x1="35" y1="110" x2="125" y2="110" stroke="#4E342E" stroke-width="2"/>
+        <!-- Display window -->
+        <rect x="148" y="35" width="130" height="60" rx="6" fill="#1A1A1A" stroke="#000" stroke-width="2"/>
+        <!-- Frequency scale -->
+        <rect x="152" y="39" width="122" height="52" rx="4" fill="#2E7D32"/>
+        <text x="213" y="62" text-anchor="middle" fill="#A5D6A7" font-size="10" font-family="monospace">FM 88.....108</text>
+        <text x="213" y="78" id="freq-display" text-anchor="middle" fill="#69F0AE" font-size="14" font-weight="bold" font-family="monospace">-- MHz</text>
+        <!-- Static wavy lines in display -->
+        <path id="static-lines" d="M155,50 Q160,45 165,50 Q170,55 175,50 Q180,45 185,50 Q190,55 195,50 Q200,45 205,50 Q210,55 215,50 Q220,45 225,50 Q230,55 235,50 Q240,45 245,50 Q250,55 255,50 Q260,45 265,50 Q268,50 270,50" fill="none" stroke="#A5D6A7" stroke-width="1.5" opacity="0.7"/>
+        <!-- Knobs -->
+        <circle cx="45" cy="155" r="18" fill="#FF6B00" stroke="#000" stroke-width="3"/>
+        <circle cx="45" cy="148" r="4" fill="#fff"/>
+        <circle cx="90" cy="155" r="14" fill="#FF6B00" stroke="#000" stroke-width="2.5"/>
+        <circle cx="90" cy="149" r="3" fill="#fff"/>
+        <!-- Antenna -->
+        <line x1="260" y1="20" x2="285" y2="-10" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+        <rect x="255" y="15" width="10" height="10" rx="2" fill="#5D4037" stroke="#000" stroke-width="2"/>
+        <!-- Target zone indicator (hidden) -->
+        <text id="lock-text" x="213" y="88" text-anchor="middle" fill="#69F0AE" font-size="8" font-family="monospace" opacity="0">LOCKED!</text>
+      </svg>
+    </div>
+    <div id="dial-track">
+      <div id="dial-knob" style="left:20px"></div>
+    </div>
+    <p id="tune-label">TUNE THE DIAL!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">📻</div>
+    <p class="game-tagline">Locked on!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">STATIC!</p>
+    <div class="game-subject anim-shake">📻</div>
+    <p class="game-tagline">Couldn't find the station!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='tune', TIME_LIMIT=8;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, dragging=false;
+    const track=document.getElementById('dial-track'), knob=document.getElementById('dial-knob');
+    const freqDisplay=document.getElementById('freq-display'), staticLines=document.getElementById('static-lines'), lockText=document.getElementById('lock-text');
+    const label=document.getElementById('tune-label');
+    let knobPct=0.1, targetPct=0, lockStart=0, locked=false, LOCK_NEEDED=1200;
+
+    function setKnob(pct){
+      knobPct=Math.max(0,Math.min(1,pct));
+      const trackW=track.getBoundingClientRect().width;
+      knob.style.left=(knobPct*trackW)+'px';
+      const freq=(88+knobPct*20).toFixed(1);
+      freqDisplay.textContent=freq+' MHz';
+      const dist=Math.abs(knobPct-targetPct);
+      const onStation=dist<0.06;
+      // Update static visualization
+      const amp=onStation?2:12;
+      let d='M155,65';
+      for(let x=155;x<=270;x+=5){
+        const noise=onStation?(Math.sin(x*0.3)*amp):(Math.random()*amp*2-amp);
+        d+=' L'+(x+5)+','+(65+noise);
+      }
+      staticLines.setAttribute('d',d);
+      staticLines.setAttribute('opacity', onStation?'0.3':'0.8');
+      if(onStation){
+        if(!locked){locked=true;lockStart=Date.now();}
+        const elapsed=Date.now()-lockStart;
+        if(elapsed>=LOCK_NEEDED){triggerWin();return;}
+        label.textContent='HOLD IT! '+(Math.round((LOCK_NEEDED-elapsed)/100)/10)+'s';
+        lockText.setAttribute('opacity','1');
+        freqDisplay.setAttribute('fill','#FFFF00');
+      } else {
+        locked=false;
+        lockText.setAttribute('opacity','0');
+        freqDisplay.setAttribute('fill','#69F0AE');
+        label.textContent='TUNE THE DIAL!';
+      }
+    }
+
+    function getKnobPct(clientX){
+      const rect=track.getBoundingClientRect();
+      return (clientX-rect.left)/rect.width;
+    }
+    track.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();dragging=true;setKnob(getKnobPct(e.changedTouches[0].clientX));},{passive:false});
+    track.addEventListener('touchmove',e=>{if(!gameRunning||!dragging)return;e.preventDefault();setKnob(getKnobPct(e.changedTouches[0].clientX));},{passive:false});
+    track.addEventListener('touchend',()=>{dragging=false;});
+    track.addEventListener('mousedown',e=>{if(!gameRunning)return;dragging=true;setKnob(getKnobPct(e.clientX));});
+    document.addEventListener('mousemove',e=>{if(!gameRunning||!dragging)return;setKnob(getKnobPct(e.clientX));});
+    document.addEventListener('mouseup',()=>{dragging=false;});
+
+    let animRAF2=0;
+    function animStatic(){
+      if(!gameRunning)return;
+      if(!dragging&&!locked){
+        // slowly drift static display
+        let d='M155,65';
+        for(let x=155;x<=270;x+=5){const noise=(Math.random()*20-10);d+=' L'+(x+5)+','+(65+noise);}
+        staticLines.setAttribute('d',d);
+      }
+      animRAF2=requestAnimationFrame(animStatic);
+    }
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(animRAF2);setTimeout(()=>show('win'),400);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF2);show('lose');}
+    function startGame(){
+      targetPct=0.25+Math.random()*0.5; locked=false; knobPct=0.05; dragging=false;
+      knob.style.left='5%';
+      freqDisplay.textContent='-- MHz';
+      lockText.setAttribute('opacity','0');
+      freqDisplay.setAttribute('fill','#69F0AE');
+      label.textContent='TUNE THE DIAL!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);
+      animRAF2=requestAnimationFrame(animStatic);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

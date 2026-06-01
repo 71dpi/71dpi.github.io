@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>COVER</title>
+  <meta name="theme-color" content="#90CAF9">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #90CAF9; --color-accent: #1565C0; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(280px,80vw); margin:0 auto; touch-action:none; overflow:hidden; border-radius:12px; border:var(--stroke) solid #000; box-shadow:var(--shadow); }
+    #scene-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #cover-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">COVER</h1>
+    <div class="game-subject">☔</div>
+    <p class="game-tagline">Drag the umbrella over the pedestrian<br>before the rain hits!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="scene-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Sky bg -->
+        <rect x="0" y="0" width="300" height="280" fill="#90CAF9"/>
+        <!-- Ground -->
+        <rect x="0" y="240" width="300" height="40" fill="#78909C"/>
+        <!-- Rain drops (animated) -->
+        <g id="rain-group">
+          <line x1="30" y1="0" x2="25" y2="25" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="70" y1="10" x2="65" y2="35" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="110" y1="0" x2="105" y2="25" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="150" y1="5" x2="145" y2="30" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="190" y1="0" x2="185" y2="25" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="230" y1="10" x2="225" y2="35" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="270" y1="0" x2="265" y2="25" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="50" y1="30" x2="45" y2="55" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="90" y1="20" x2="85" y2="45" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="130" y1="30" x2="125" y2="55" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="170" y1="15" x2="165" y2="40" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="210" y1="25" x2="205" y2="50" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+          <line x1="250" y1="10" x2="245" y2="35" stroke="#5B9BD5" stroke-width="2" opacity="0.7"/>
+        </g>
+        <!-- Pedestrian (moves across) -->
+        <g id="person">
+          <circle cx="0" cy="200" r="14" fill="#FBBF6E" stroke="#000" stroke-width="2"/>
+          <rect x="-10" y="214" width="20" height="22" rx="4" fill="#E53935" stroke="#000" stroke-width="2"/>
+          <line x1="-10" y1="240" x2="-14" y2="255" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+          <line x1="10" y1="240" x2="14" y2="255" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <!-- Umbrella (draggable) -->
+        <g id="umbrella">
+          <path d="M150,100 A50,50 0 0,1 250,100 Z" fill="#E53935" stroke="#000" stroke-width="3"/>
+          <path d="M150,100 A50,50 0 0,1 250,100" fill="none" stroke="#000" stroke-width="3"/>
+          <line x1="200" y1="100" x2="200" y2="155" stroke="#000" stroke-width="3"/>
+          <path d="M200,155 Q215,165 215,175 Q215,185 200,185" stroke="#000" stroke-width="3" fill="none"/>
+          <!-- Ribs -->
+          <line x1="200" y1="100" x2="150" y2="100" stroke="#C62828" stroke-width="1.5"/>
+          <line x1="200" y1="100" x2="167" y2="88" stroke="#C62828" stroke-width="1.5"/>
+          <line x1="200" y1="100" x2="183" y2="83" stroke="#C62828" stroke-width="1.5"/>
+          <line x1="200" y1="100" x2="217" y2="83" stroke="#C62828" stroke-width="1.5"/>
+          <line x1="200" y1="100" x2="233" y2="88" stroke="#C62828" stroke-width="1.5"/>
+          <line x1="200" y1="100" x2="250" y2="100" stroke="#C62828" stroke-width="1.5"/>
+          <!-- cover indicator ring (hidden) -->
+          <circle id="cover-ring" cx="200" cy="130" r="60" fill="none" stroke="#00C853" stroke-width="4" opacity="0" stroke-dasharray="6 4"/>
+        </g>
+      </svg>
+    </div>
+    <p id="cover-label">DRAG THE UMBRELLA!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">☔</div>
+    <p class="game-tagline">Stayed dry!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">SOAKED!</p>
+    <div class="game-subject anim-shake">🌧️</div>
+    <p class="game-tagline">Got wet!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='cover', TIME_LIMIT=6;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, moveRAF=0, dragging=false;
+    const gameArea=document.getElementById('game-area');
+    const umbrella=document.getElementById('umbrella'), person=document.getElementById('person'), ring=document.getElementById('cover-ring');
+    const label=document.getElementById('cover-label');
+    const SVG_W=300, SVG_H=280;
+    let umbX=200, umbY=120, personX=0, personDir=1, covered=false, coverTime=0;
+
+    function getSVGPos(clientX, clientY){
+      const rect=gameArea.getBoundingClientRect();
+      return {x:clientX/rect.width*SVG_W, y:clientY/rect.height*SVG_H};
+    }
+    function moveUmbrella(x,y){
+      umbX=Math.max(60,Math.min(SVG_W-60,x));
+      umbY=Math.max(60,Math.min(SVG_H-60,y));
+      umbrella.setAttribute('transform','translate('+(umbX-200)+','+(umbY-120)+')');
+    }
+    function updateRain(){
+      const rain=document.getElementById('rain-group');
+      const t=(Date.now()-timerStart)/100;
+      rain.setAttribute('transform','translate(0,'+(t%30)+')');
+    }
+
+    function movePerson(){
+      personX+=personDir*1.2;
+      if(personX>300){personX=300;personDir=-1;}
+      if(personX<0){personX=0;personDir=1;}
+      person.setAttribute('transform','translate('+(personX)+',0)');
+      // Check coverage: umbrella covers person?
+      const umbBottom=umbY+80, umbLeft=umbX-60, umbRight=umbX+60;
+      const persHeadX=personX, persHeadY=200;
+      const isCovered=persHeadX>umbLeft&&persHeadX<umbRight&&persHeadY<umbBottom&&persHeadY>umbY-10;
+      ring.setAttribute('opacity',isCovered?'0.8':'0');
+      if(isCovered){
+        if(!covered){covered=true;coverTime=Date.now();}
+        else if(Date.now()-coverTime>1800){triggerWin();return;}
+        label.textContent='HOLD IT THERE!';
+      } else {
+        covered=false;
+        label.textContent='DRAG THE UMBRELLA!';
+        // If rain has been falling and person is exposed past halfway - lose mechanic handled by timer
+      }
+      updateRain();
+      if(gameRunning)moveRAF=requestAnimationFrame(movePerson);
+    }
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();dragging=true;const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);moveUmbrella(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning||!dragging)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);moveUmbrella(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchend',()=>{dragging=false;});
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;dragging=true;const p=getSVGPos(e.clientX,e.clientY);moveUmbrella(p.x,p.y);});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!dragging)return;const p=getSVGPos(e.clientX,e.clientY);moveUmbrella(p.x,p.y);});
+    gameArea.addEventListener('mouseup',()=>{dragging=false;});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(moveRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(moveRAF);show('lose');}
+    function startGame(){
+      personX=20;personDir=1;covered=false;umbX=200;umbY=120;dragging=false;
+      umbrella.setAttribute('transform','translate(0,0)');
+      person.setAttribute('transform','translate(20,0)');
+      label.textContent='DRAG THE UMBRELLA!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);
+      moveRAF=requestAnimationFrame(movePerson);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

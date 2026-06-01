@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>AIM</title>
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #000000; --color-accent: #FF0062; }
+    #game-screen { background: #000; }
+
+    #space-area {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    #crosshair {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px; height: 80px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #crosshair::before, #crosshair::after {
+      content: '';
+      position: absolute;
+      background: #FF0062;
+    }
+    #crosshair::before {
+      width: 2px; height: 100%;
+      left: 50%; top: 0;
+      transform: translateX(-50%);
+    }
+    #crosshair::after {
+      width: 100%; height: 2px;
+      top: 50%; left: 0;
+      transform: translateY(-50%);
+    }
+    #crosshair-ring {
+      position: absolute;
+      inset: 0;
+      border: 2px solid #FF0062;
+      border-radius: 50%;
+    }
+
+    #asteroid {
+      position: absolute;
+      font-size: 3rem;
+      cursor: grab;
+      user-select: none;
+      z-index: 15;
+      transform: translate(-50%, -50%);
+      touch-action: none;
+      line-height: 1;
+    }
+
+    #lock-ring {
+      position: absolute;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 20;
+      display: none;
+    }
+
+    #hud {
+      position: absolute;
+      top: 20px; left: 0; right: 0;
+      text-align: center;
+      color: #FF0062;
+      font-weight: 900;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(255,255,255,0.1);
+      z-index: 40;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FF0062; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen" style="background:#000;color:#fff;">
+    <h1 class="game-title" style="color:#FF0062;">AIM</h1>
+    <div class="game-subject">☄️</div>
+    <p class="game-tagline" style="color:#fff;">Drag the asteroid onto the crosshair!<br>Win: Hold it for 1.5s</p>
+    <button class="btn btn-play" id="btn-play" style="background:#FF0062;">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="space-area">
+      <div id="asteroid">☄️</div>
+      <div id="crosshair"><div id="crosshair-ring"></div></div>
+      <div id="lock-ring"></div>
+      <div id="hud">LOCK ON: 0%</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden" style="background:#000;color:#fff;">
+    <p class="result-label" style="color:#FF0062;">WIN!</p>
+    <div class="game-subject anim-bounce">💥</div>
+    <p class="game-tagline" style="color:#fff;">Targeted!</p>
+    <button class="btn btn-replay" id="btn-replay-win" style="background:#FF0062;color:#fff;">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">☄️</div>
+    <p class="game-tagline">It got away!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'aim';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 9;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── AIM GAME ──
+    const asteroid = document.getElementById('asteroid');
+    const lockRing = document.getElementById('lock-ring');
+    const hud = document.getElementById('hud');
+    const spaceArea = document.getElementById('space-area');
+
+    let astX = 100, astY = 200, velX = 1.2, velY = 0.9;
+    let driftRAF;
+    let lockStart = null;
+    const LOCK_TIME = 1500;
+    const LOCK_DIST = 25;
+
+    let dragging = false, dragOX = 0, dragOY = 0;
+
+    function addStars() {
+      const area = spaceArea;
+      for (let i = 0; i < 60; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.opacity = (0.3 + Math.random() * 0.7).toFixed(2);
+        area.appendChild(s);
+      }
+    }
+
+    function getCrosshairCenter() {
+      const r = document.getElementById('crosshair').getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function driftLoop() {
+      if (!gameRunning) return;
+      if (!dragging) {
+        const W = spaceArea.offsetWidth, H = spaceArea.offsetHeight;
+        astX += velX;
+        astY += velY;
+        if (astX < 30) { astX = 30; velX = Math.abs(velX); }
+        if (astX > W - 30) { astX = W - 30; velX = -Math.abs(velX); }
+        if (astY < 60) { astY = 60; velY = Math.abs(velY); }
+        if (astY > H - 60) { astY = H - 60; velY = -Math.abs(velY); }
+        asteroid.style.left = astX + 'px';
+        asteroid.style.top = astY + 'px';
+      }
+
+      // Lock-on check
+      const ch = getCrosshairCenter();
+      const aRect = asteroid.getBoundingClientRect();
+      const ax = aRect.left + aRect.width / 2;
+      const ay = aRect.top + aRect.height / 2;
+      const d = Math.hypot(ax - ch.x, ay - ch.y);
+
+      if (d < LOCK_DIST) {
+        if (!lockStart) lockStart = Date.now();
+        const pct = Math.min(100, ((Date.now() - lockStart) / LOCK_TIME) * 100);
+        hud.textContent = `LOCK ON: ${Math.round(pct)}%`;
+        lockRing.style.display = 'block';
+        lockRing.style.left = astX + 'px';
+        lockRing.style.top = astY + 'px';
+        lockRing.style.border = `4px solid conic-gradient(#FF0062 ${pct}%, transparent ${pct}%)`;
+        // simple progress via outline trick
+        lockRing.style.background = `conic-gradient(#FF0062 ${pct * 3.6}deg, rgba(255,0,98,0.2) ${pct * 3.6}deg)`;
+        if (pct >= 100) { triggerWin(); return; }
+      } else {
+        lockStart = null;
+        hud.textContent = 'LOCK ON: 0%';
+        lockRing.style.display = 'none';
+      }
+
+      driftRAF = requestAnimationFrame(driftLoop);
+    }
+
+    function getEvtPos(e) {
+      return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                       : { x: e.clientX, y: e.clientY };
+    }
+
+    function onDown(e) {
+      if (!gameRunning) return;
+      const p = getEvtPos(e);
+      const r = asteroid.getBoundingClientRect();
+      if (p.x < r.left - 20 || p.x > r.right + 20 || p.y < r.top - 20 || p.y > r.bottom + 20) return;
+      dragging = true;
+      dragOX = p.x - astX;
+      dragOY = p.y - astY;
+      e.preventDefault();
+    }
+
+    function onMove(e) {
+      if (!dragging || !gameRunning) return;
+      const p = getEvtPos(e);
+      const W = spaceArea.offsetWidth, H = spaceArea.offsetHeight;
+      astX = Math.max(30, Math.min(W - 30, p.x - dragOX));
+      astY = Math.max(60, Math.min(H - 60, p.y - dragOY));
+      asteroid.style.left = astX + 'px';
+      asteroid.style.top = astY + 'px';
+      e.preventDefault();
+    }
+
+    function onUp() { dragging = false; }
+
+    spaceArea.addEventListener('touchstart', onDown, { passive: false });
+    spaceArea.addEventListener('touchmove', onMove, { passive: false });
+    spaceArea.addEventListener('touchend', onUp);
+    spaceArea.addEventListener('mousedown', onDown);
+    spaceArea.addEventListener('mousemove', onMove);
+    spaceArea.addEventListener('mouseup', onUp);
+
+    function startGame() {
+      cancelAnimationFrame(driftRAF);
+      dragging = false;
+      lockStart = null;
+      lockRing.style.display = 'none';
+      hud.textContent = 'LOCK ON: 0%';
+      const W = spaceArea.offsetWidth || window.innerWidth;
+      const H = spaceArea.offsetHeight || window.innerHeight;
+      astX = W * 0.2;
+      astY = H * 0.3;
+      velX = 1.2 * (Math.random() > 0.5 ? 1 : -1);
+      velY = 0.9 * (Math.random() > 0.5 ? 1 : -1);
+      asteroid.style.left = astX + 'px';
+      asteroid.style.top = astY + 'px';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      driftRAF = requestAnimationFrame(driftLoop);
+    }
+
+    // Add stars once
+    addStars();
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

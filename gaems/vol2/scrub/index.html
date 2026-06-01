@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SCRUB</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+    #game-screen { background: #00D4FF; }
+
+    #scrub-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+
+    #duck-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #duck-emoji {
+      font-size: 9rem;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .dirt-spot {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #5D3A1A 0%, #3D2010 100%);
+      border: 2px solid #2C1810;
+      z-index: 2;
+      transition: transform 0.2s, opacity 0.2s;
+      pointer-events: none;
+    }
+    .dirt-spot.scrubbed {
+      transform: scale(0);
+      opacity: 0;
+    }
+
+    #hud {
+      position: absolute;
+      top: 20px; left: 0; right: 0;
+      text-align: center;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: #000;
+      pointer-events: none;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FF6B00; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SCRUB</h1>
+    <div class="game-subject">🐥</div>
+    <p class="game-tagline">Rub away all the dirt spots!<br>Win: Squeaky clean duck</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="scrub-area">
+      <div id="hud">8 spots left</div>
+      <div id="duck-container">
+        <div id="duck-emoji">🐥</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✨</div>
+    <p class="game-tagline">Squeaky clean!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🐥</div>
+    <p class="game-tagline">Still grimy!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'scrub';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── SCRUB GAME ──
+    const duckContainer = document.getElementById('duck-container');
+    const hud = document.getElementById('hud');
+    const scrubArea = document.getElementById('scrub-area');
+    const TOTAL_SPOTS = 8;
+    const SCRUB_DIST = 35;
+
+    let spots = [];
+    let spotsLeft = TOTAL_SPOTS;
+
+    // Dirt positions relative to duck center, within duck bounds
+    const DIRT_POSITIONS = [
+      { x: -50, y: -60 }, { x: 30, y: -55 }, { x: 60, y: -20 },
+      { x: 55, y: 30 },  { x: 10, y: 70 },  { x: -50, y: 50 },
+      { x: -65, y: 5 },  { x: -15, y: -30 },
+    ];
+
+    function createDirt() {
+      spots.forEach(s => s.el.remove());
+      spots = [];
+      DIRT_POSITIONS.forEach((pos, i) => {
+        const el = document.createElement('div');
+        el.className = 'dirt-spot';
+        el.style.left = (100 + pos.x - 11) + 'px';
+        el.style.top = (100 + pos.y - 11) + 'px';
+        duckContainer.appendChild(el);
+        spots.push({ el, x: 100 + pos.x, y: 100 + pos.y, scrubbed: false });
+      });
+      spotsLeft = TOTAL_SPOTS;
+      hud.textContent = `${spotsLeft} spots left`;
+    }
+
+    function scrubAt(clientX, clientY) {
+      if (!gameRunning) return;
+      const rect = duckContainer.getBoundingClientRect();
+      const lx = clientX - rect.left;
+      const ly = clientY - rect.top;
+
+      let changed = false;
+      spots.forEach(s => {
+        if (s.scrubbed) return;
+        const d = Math.hypot(lx - s.x, ly - s.y);
+        if (d < SCRUB_DIST) {
+          s.scrubbed = true;
+          s.el.classList.add('scrubbed');
+          spotsLeft--;
+          changed = true;
+        }
+      });
+      if (changed) {
+        hud.textContent = spotsLeft > 0 ? `${spotsLeft} spots left` : 'Clean!';
+        if (spotsLeft === 0) triggerWin();
+      }
+    }
+
+    scrubArea.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      scrubAt(t.clientX, t.clientY);
+    }, { passive: false });
+
+    scrubArea.addEventListener('mousemove', e => {
+      if (e.buttons === 1) scrubAt(e.clientX, e.clientY);
+    });
+
+    scrubArea.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      scrubAt(t.clientX, t.clientY);
+    }, { passive: false });
+
+    scrubArea.addEventListener('mousedown', e => scrubAt(e.clientX, e.clientY));
+
+    function startGame() {
+      createDirt();
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

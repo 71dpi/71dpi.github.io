@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>DUNK</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+
+    #game-screen { touch-action: none; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #bin {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 4rem;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    #bin-zone {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 50px;
+      /* visual debug: border: 2px dashed rgba(0,0,0,0.2); */
+    }
+
+    #paper-ball {
+      position: absolute;
+      font-size: 3rem;
+      line-height: 1;
+      bottom: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      cursor: default;
+    }
+
+    #swipe-zone {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40%;
+      touch-action: none;
+    }
+
+    #hint {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.5);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.15); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+
+    #swish-text {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">DUNK</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🗑️</div>
+    <p class="game-tagline">Swipe UP to launch the paper ball into the bin!<br>Win: Swish!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="bin">🗑️</div>
+      <div id="bin-zone"></div>
+      <div id="paper-ball">🗞️</div>
+      <div id="swipe-zone"></div>
+      <div id="hint">Swipe ↑ to shoot!</div>
+      <div id="swish-text">SWISH! ✨</div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✨</div>
+    <p class="game-tagline">Swish!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🗞️</div>
+    <p class="game-tagline">Airball!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'dunk';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 600); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const paperBall = document.getElementById('paper-ball');
+    const swipeZone = document.getElementById('swipe-zone');
+    const binZone   = document.getElementById('bin-zone');
+    const swishText = document.getElementById('swish-text');
+    let launched = false;
+    let swipeStartX, swipeStartY, swipeStartTime;
+
+    function resetBall() {
+      launched = false;
+      paperBall.style.position = 'absolute';
+      paperBall.style.bottom = '18%';
+      paperBall.style.left = '50%';
+      paperBall.style.top = '';
+      paperBall.style.transform = 'translateX(-50%)';
+      paperBall.style.transition = '';
+      paperBall.style.opacity = '1';
+      swishText.style.opacity = '0';
+    }
+
+    function onSwipeStart(e) {
+      if (!gameRunning || launched) return;
+      const pt = e.touches ? e.touches[0] : e;
+      swipeStartX = pt.clientX;
+      swipeStartY = pt.clientY;
+      swipeStartTime = Date.now();
+    }
+
+    function onSwipeEnd(e) {
+      if (!gameRunning || launched) return;
+      const pt = e.changedTouches ? e.changedTouches[0] : e;
+      const dx = pt.clientX - swipeStartX;
+      const dy = pt.clientY - swipeStartY;
+      const dt = (Date.now() - swipeStartTime) / 1000;
+      if (dy > -30) return; // must be upward swipe
+
+      launched = true;
+      const speed = Math.min(Math.abs(dy) / dt, 800);
+      launchBall(dx, dy, speed);
+    }
+
+    function launchBall(dx, dy, speed) {
+      const area = document.getElementById('game-area').getBoundingClientRect();
+      const ballRect = paperBall.getBoundingClientRect();
+      const startX = ballRect.left + ballRect.width / 2 - area.left;
+      const startY = ballRect.top + ballRect.height / 2 - area.top;
+
+      const binRect = binZone.getBoundingClientRect();
+      const binCX = binRect.left + binRect.width / 2 - area.left;
+      const binCY = binRect.top + binRect.height / 2 - area.top;
+
+      // compute normalized aim vector
+      const totalDist = Math.hypot(dx, dy) || 1;
+      const normX = dx / totalDist;
+      const normY = dy / totalDist;
+      const travelFactor = 0.55 + (speed / 800) * 0.45;
+
+      // destination: somewhere near/in the bin based on swipe direction + speed
+      let destX = startX + normX * area.height * travelFactor;
+      let destY = startY + normY * area.height * travelFactor;
+
+      const DURATION = 700; // ms
+      const startTime = Date.now();
+
+      // peak height (parabola)
+      const peakY = startY - area.height * 0.55;
+
+      paperBall.style.position = 'absolute';
+      paperBall.style.bottom = 'auto';
+      paperBall.style.left = startX + 'px';
+      paperBall.style.top = startY + 'px';
+      paperBall.style.transform = 'translate(-50%, -50%)';
+
+      function animateBall() {
+        const t = Math.min((Date.now() - startTime) / DURATION, 1);
+        const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        const cx = startX + (destX - startX) * t;
+        // parabolic Y
+        const cy = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * peakY + t * t * destY;
+        paperBall.style.left = cx + 'px';
+        paperBall.style.top  = cy + 'px';
+        paperBall.style.transform = `translate(-50%,-50%) rotate(${t * 540}deg)`;
+
+        if (t < 1) {
+          requestAnimationFrame(animateBall);
+        } else {
+          // check if in bin
+          const finalBallX = area.left + cx;
+          const finalBallY = area.top + cy;
+          const inX = Math.abs(finalBallX - (binRect.left + binRect.width / 2)) < 60;
+          const inY = Math.abs(finalBallY - (binRect.top + binRect.height / 2)) < 50;
+          if (inX && inY) {
+            swishText.style.opacity = '1';
+            paperBall.style.opacity = '0';
+            triggerWin();
+          } else {
+            paperBall.style.transition = 'opacity 0.4s';
+            paperBall.style.opacity = '0';
+            setTimeout(() => { if (!gameRunning) return; resetBall(); launched = false; }, 500);
+            setTimeout(() => { if (gameRunning) triggerLose(); }, 1200);
+          }
+        }
+      }
+      requestAnimationFrame(animateBall);
+    }
+
+    swipeZone.addEventListener('touchstart', onSwipeStart, { passive: true });
+    swipeZone.addEventListener('touchend', onSwipeEnd, { passive: true });
+    swipeZone.addEventListener('mousedown', onSwipeStart);
+    swipeZone.addEventListener('mouseup', onSwipeEnd);
+    // also full screen for desktop
+    document.getElementById('game-screen').addEventListener('mousedown', onSwipeStart);
+    document.getElementById('game-screen').addEventListener('mouseup', onSwipeEnd);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      resetBall();
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

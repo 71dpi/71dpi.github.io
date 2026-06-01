@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>PET</title>
+  <meta name="theme-color" content="#FF3EDB">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF3EDB; --color-accent: #FFF200; }
+    #game-screen { background: #FF3EDB; touch-action: none; }
+
+    #pet-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      touch-action: none;
+    }
+
+    #cat-display {
+      font-size: 8rem;
+      line-height: 1;
+      text-align: center;
+      transition: font-size 0.15s;
+      cursor: default;
+      user-select: none;
+    }
+
+    #purr-label {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #000;
+    }
+
+    #purr-bar-wrap {
+      width: 80%;
+      max-width: 280px;
+      height: 24px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 12px;
+      border: 3px solid #000;
+      overflow: hidden;
+    }
+
+    #purr-fill {
+      height: 100%;
+      background: #FFF200;
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.1s;
+    }
+
+    #stroke-counter {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #000;
+      background: rgba(255,255,255,0.7);
+      padding: 0.3rem 1rem;
+      border-radius: 12px;
+    }
+
+    #pet-hint {
+      font-size: 1rem;
+      font-weight: 700;
+      color: rgba(0,0,0,0.7);
+      text-align: center;
+    }
+
+    .cat-happy { animation: catHappy 0.3s ease; }
+    .cat-rough { animation: catAngry 0.3s ease; }
+
+    @keyframes catHappy {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes catAngry {
+      0%, 100% { transform: translateX(0); }
+      25%       { transform: translateX(-10px); }
+      75%       { transform: translateX(10px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">PET</h1>
+    <div class="game-subject">🐱</div>
+    <p class="game-tagline">Stroke the cat left &amp; right!<br>Win: 12 gentle strokes</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="pet-area">
+      <div id="cat-display">🐱</div>
+      <div id="stroke-counter">Strokes: 0 / 12</div>
+      <div id="purr-label">PURR METER</div>
+      <div id="purr-bar-wrap"><div id="purr-fill"></div></div>
+      <div id="pet-hint">↔️ Gently stroke left &amp; right</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😸</div>
+    <p class="game-tagline">Happy kitty!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😾</div>
+    <p class="game-tagline">Hiss!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'pet';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const catEl = document.getElementById('cat-display');
+    const purrFill = document.getElementById('purr-fill');
+    const strokeCounter = document.getElementById('stroke-counter');
+
+    const MAX_STROKES = 12;
+    let strokes = 0;
+    let purrMeter = 0; // 0-100
+    let lastX = null;
+    let lastDirection = null; // 'left' or 'right'
+    let lastMoveTime = null;
+
+    function addStroke(isRough) {
+      if (isRough) {
+        purrMeter = Math.max(0, purrMeter - 8);
+        catEl.classList.remove('cat-happy', 'cat-rough');
+        void catEl.offsetWidth;
+        catEl.classList.add('cat-rough');
+        catEl.textContent = '🙀';
+        setTimeout(() => { catEl.textContent = '🐱'; }, 400);
+      } else {
+        strokes++;
+        purrMeter = Math.min(100, purrMeter + (100 / MAX_STROKES));
+        catEl.classList.remove('cat-happy', 'cat-rough');
+        void catEl.offsetWidth;
+        catEl.classList.add('cat-happy');
+        if (strokes >= MAX_STROKES * 0.7) catEl.textContent = '😺';
+        strokeCounter.textContent = `Strokes: ${strokes} / ${MAX_STROKES}`;
+        if (strokes >= MAX_STROKES) {
+          purrFill.style.width = '100%';
+          triggerWin();
+          return;
+        }
+      }
+      purrFill.style.width = purrMeter + '%';
+    }
+
+    function onMove(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      const pt = e.touches ? e.touches[0] : e;
+      const x = pt.clientX;
+      const now = Date.now();
+
+      if (lastX !== null) {
+        const dx = x - lastX;
+        const dt = now - (lastMoveTime || now);
+        const speed = Math.abs(dx) / (dt || 1) * 1000; // px/s
+
+        const dir = dx > 0 ? 'right' : 'left';
+
+        if (Math.abs(dx) > 8) { // minimum movement threshold
+          if (lastDirection !== null && dir !== lastDirection) {
+            // Direction changed = one stroke
+            if (speed > 300) {
+              addStroke(true); // too rough
+            } else {
+              addStroke(false);
+            }
+          }
+          lastDirection = dir;
+        }
+      }
+
+      lastX = x;
+      lastMoveTime = now;
+    }
+
+    function onEnd() {
+      lastX = null;
+      lastDirection = null;
+    }
+
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.addEventListener('touchmove', onMove, { passive: false });
+    gameScreen.addEventListener('touchend', onEnd);
+    gameScreen.addEventListener('mousemove', onMove);
+    gameScreen.addEventListener('mouseup', onEnd);
+
+    function startGame() {
+      strokes = 0;
+      purrMeter = 0;
+      lastX = null;
+      lastDirection = null;
+      catEl.textContent = '🐱';
+      purrFill.style.width = '0%';
+      strokeCounter.textContent = 'Strokes: 0 / 12';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

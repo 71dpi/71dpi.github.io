@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>BRAKE</title>
+  <meta name="theme-color" content="#FF0062">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF0062; --color-accent: #FFF200; }
+    #game-screen { background: #111; touch-action: none; overflow: hidden; }
+
+    #road-view {
+      position: absolute;
+      inset: 40px 0 0 0;
+      perspective: 400px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    /* Road receding into distance */
+    #road {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+    }
+
+    #road-surface {
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 60%;
+      background: #333;
+      clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+    }
+
+    /* Lane lines */
+    #road-surface::after {
+      content: '';
+      position: absolute;
+      top: 30%; bottom: 0;
+      left: 47%; right: 47%;
+      background: repeating-linear-gradient(
+        to bottom, #FFF200 0%, #FFF200 20%, transparent 20%, transparent 40%
+      );
+    }
+
+    #wall {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.15);
+      transform-origin: center center;
+      width: 280px;
+      height: 200px;
+      background: #CC3333;
+      border: 8px solid #000;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      transition: none;
+      z-index: 5;
+    }
+
+    #speed-display {
+      position: absolute;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #FFF;
+      text-shadow: 2px 2px 0 #000;
+      background: rgba(0,0,0,0.6);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+    }
+
+    #dashboard {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 35%;
+      background: #222;
+      border-top: 4px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    #brake-btn {
+      width: 120px;
+      height: 55px;
+      background: #FF0000;
+      border: 4px solid #000;
+      border-radius: 12px;
+      box-shadow: 0 6px 0 #990000, 4px 4px 0 #000;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      transition: transform 0.05s, box-shadow 0.05s;
+    }
+    #brake-btn.pressed {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #990000, 1px 1px 0 #000;
+    }
+
+    #speedometer {
+      width: 160px;
+      height: 12px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 6px;
+      border: 2px solid #444;
+      overflow: hidden;
+    }
+    #speed-fill {
+      height: 100%;
+      background: #FF4500;
+      border-radius: 4px;
+      transition: width 0.1s;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">BRAKE</h1>
+    <div class="game-subject">🚗</div>
+    <p class="game-tagline">Hold the BRAKE before the wall hits!<br>Win: Stop in time</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="road-view">
+      <div id="road">
+        <div id="road-surface"></div>
+      </div>
+      <div id="wall">🧱</div>
+    </div>
+    <div id="speed-display">⚡ FAST</div>
+    <div id="dashboard">
+      <div id="speedometer"><div id="speed-fill"></div></div>
+      <div id="brake-btn">BRAKE</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😅</div>
+    <p class="game-tagline">Stopped!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💥</div>
+    <p class="game-tagline">CRASH!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'brake';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) { if (gameRunning) triggerLose(); }
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(driveRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(driveRAF); show('lose'); }
+
+    const wallEl = document.getElementById('wall');
+    const speedFill = document.getElementById('speed-fill');
+    const speedDisplay = document.getElementById('speed-display');
+    const brakeBtn = document.getElementById('brake-btn');
+
+    let wallScale = 0.15;
+    let speed = 0.25; // scale increase per second
+    const MAX_SCALE = 2.5; // wall fills screen = crash
+    let isHoldingBrake = false;
+    let driveRAF = null;
+    let lastDriveT = null;
+
+    function driveLoop(ts) {
+      if (!gameRunning) return;
+      if (!lastDriveT) lastDriveT = ts;
+      const dt = (ts - lastDriveT) / 1000;
+      lastDriveT = ts;
+
+      if (isHoldingBrake) {
+        speed = Math.max(0, speed - 0.4 * dt);
+        speedDisplay.textContent = speed < 0.05 ? '🛑 STOPPED' : speed < 0.15 ? '🐢 SLOW' : '⚡ FAST';
+      }
+
+      wallScale += speed * dt;
+      wallEl.style.transform = `translateX(-50%) scale(${wallScale})`;
+      speedFill.style.width = (speed / 0.25 * 100) + '%';
+      speedFill.style.background = speed > 0.15 ? '#FF4500' : '#FFF200';
+
+      if (wallScale >= MAX_SCALE) {
+        triggerLose();
+        return;
+      }
+
+      if (speed <= 0 && isHoldingBrake) {
+        // Car stopped!
+        triggerWin();
+        return;
+      }
+
+      driveRAF = requestAnimationFrame(driveLoop);
+    }
+
+    function onBrakeDown(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      isHoldingBrake = true;
+      brakeBtn.classList.add('pressed');
+    }
+    function onBrakeUp(e) {
+      isHoldingBrake = false;
+      brakeBtn.classList.remove('pressed');
+    }
+
+    brakeBtn.addEventListener('touchstart', onBrakeDown, { passive: false });
+    brakeBtn.addEventListener('touchend', onBrakeUp);
+    brakeBtn.addEventListener('mousedown', onBrakeDown);
+    brakeBtn.addEventListener('mouseup', onBrakeUp);
+
+    function startGame() {
+      cancelAnimationFrame(driveRAF);
+      wallScale = 0.15;
+      speed = 0.25;
+      isHoldingBrake = false;
+      lastDriveT = null;
+      wallEl.style.transform = `translateX(-50%) scale(${wallScale})`;
+      speedFill.style.width = '100%';
+      speedDisplay.textContent = '⚡ FAST';
+      brakeBtn.classList.remove('pressed');
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      driveRAF = requestAnimationFrame(driveLoop);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

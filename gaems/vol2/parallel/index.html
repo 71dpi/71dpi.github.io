@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>PARALLEL</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+
+    #game-screen { touch-action: none; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #1a1a2e;
+      overflow: hidden;
+    }
+
+    /* Road markings */
+    #road {
+      position: absolute;
+      inset: 0;
+    }
+
+    .lane-line {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 3px;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.4) 0px,
+        rgba(255,255,255,0.4) 20px,
+        transparent 20px,
+        transparent 40px
+      );
+    }
+
+    /* Parking spot */
+    #parking-spot {
+      position: absolute;
+      border: 5px solid #fff;
+      border-radius: 6px;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 130px;
+      border-style: solid;
+    }
+
+    #parking-spot::before {
+      content: 'P';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      font-weight: 900;
+      color: rgba(255,255,255,0.3);
+      font-family: var(--font);
+    }
+
+    #spot-indicator {
+      position: absolute;
+      inset: -5px;
+      border: 5px solid transparent;
+      border-radius: 6px;
+      transition: border-color 0.2s;
+    }
+
+    #spot-indicator.in-spot { border-color: #7CFF00; }
+
+    /* Car */
+    #car {
+      position: absolute;
+      font-size: 3.5rem;
+      line-height: 1;
+      cursor: grab;
+      touch-action: none;
+      z-index: 5;
+      transform: rotate(180deg); /* facing down (top-down view going up into spot) */
+      user-select: none;
+    }
+
+    #hint {
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.7);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.3); z-index: 10; }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+
+    #in-spot-bar-wrap {
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 12px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 99px;
+      overflow: hidden;
+      z-index: 10;
+    }
+    #in-spot-bar {
+      height: 100%;
+      background: #7CFF00;
+      width: 0%;
+      border-radius: 99px;
+      transition: width 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">PARALLEL</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🚗</div>
+    <p class="game-tagline">Drag the car into the parking spot!<br>Win: Parked!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="road">
+        <div class="lane-line" style="left:30%"></div>
+        <div class="lane-line" style="left:70%"></div>
+      </div>
+      <div id="parking-spot"><div id="spot-indicator"></div></div>
+      <div id="car">🚗</div>
+      <div id="hint">Drag the car into the spot</div>
+      <div id="in-spot-bar-wrap"><div id="in-spot-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🅿️</div>
+    <p class="game-tagline">Parked!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🚗</div>
+    <p class="game-tagline">No spot!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'parallel';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(checkRAF); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(checkRAF); show('lose'); }
+
+    const car     = document.getElementById('car');
+    const spot    = document.getElementById('parking-spot');
+    const spotInd = document.getElementById('spot-indicator');
+    const inSpotBar = document.getElementById('in-spot-bar');
+    const gameArea  = document.getElementById('game-area');
+    const HOLD_NEEDED = 0.5; // seconds
+
+    let carX = 50, carY = 25; // percent of area
+    let dragging = false;
+    let lastDragX = 0, lastDragY = 0;
+    let holdTime = 0;
+    let lastCheckTime = 0;
+    let checkRAF;
+
+    function isCarInSpot() {
+      const carRect  = car.getBoundingClientRect();
+      const spotRect = spot.getBoundingClientRect();
+      const carCX = carRect.left + carRect.width / 2;
+      const carCY = carRect.top + carRect.height / 2;
+      const spotCX = spotRect.left + spotRect.width / 2;
+      const spotCY = spotRect.top + spotRect.height / 2;
+      return (
+        Math.abs(carCX - spotCX) < spotRect.width * 0.45 &&
+        Math.abs(carCY - spotCY) < spotRect.height * 0.45
+      );
+    }
+
+    function checkFrame(ts) {
+      if (!gameRunning) return;
+      const dt = lastCheckTime ? (ts - lastCheckTime) / 1000 : 0;
+      lastCheckTime = ts;
+
+      const inSpot = isCarInSpot();
+      spotInd.classList.toggle('in-spot', inSpot);
+
+      if (inSpot) {
+        holdTime += dt;
+        inSpotBar.style.width = Math.min(holdTime / HOLD_NEEDED * 100, 100) + '%';
+        if (holdTime >= HOLD_NEEDED) { triggerWin(); return; }
+      } else {
+        holdTime = 0;
+        inSpotBar.style.width = '0%';
+      }
+
+      checkRAF = requestAnimationFrame(checkFrame);
+    }
+
+    function onDragStart(e) {
+      if (!gameRunning) return;
+      const pt = e.touches ? e.touches[0] : e;
+      const carRect = car.getBoundingClientRect();
+      const carCX = carRect.left + carRect.width / 2;
+      const carCY = carRect.top + carRect.height / 2;
+      if (Math.hypot(pt.clientX - carCX, pt.clientY - carCY) < 50) {
+        dragging = true;
+        lastDragX = pt.clientX;
+        lastDragY = pt.clientY;
+        e.preventDefault();
+      }
+    }
+    function onDragMove(e) {
+      if (!dragging || !gameRunning) return;
+      e.preventDefault();
+      const pt = e.touches ? e.touches[0] : e;
+      const aRect = gameArea.getBoundingClientRect();
+      const dx = pt.clientX - lastDragX;
+      const dy = pt.clientY - lastDragY;
+      lastDragX = pt.clientX;
+      lastDragY = pt.clientY;
+      carX += (dx / aRect.width) * 100;
+      carY += (dy / aRect.height) * 100;
+      carX = Math.max(5, Math.min(95, carX));
+      carY = Math.max(5, Math.min(90, carY));
+      car.style.left = `calc(${carX}% - 1.75rem)`;
+      car.style.top  = `calc(${carY}% - 1.75rem)`;
+    }
+    function onDragEnd() { dragging = false; }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', onDragStart, { passive: false });
+    gs.addEventListener('touchmove', onDragMove, { passive: false });
+    gs.addEventListener('touchend', onDragEnd);
+    gs.addEventListener('mousedown', onDragStart);
+    gs.addEventListener('mousemove', onDragMove);
+    gs.addEventListener('mouseup', onDragEnd);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      dragging = false;
+      holdTime = 0;
+      lastCheckTime = 0;
+      carX = 50; carY = 20;
+      inSpotBar.style.width = '0%';
+      spotInd.classList.remove('in-spot');
+      car.style.left = 'calc(50% - 1.75rem)';
+      car.style.top  = '20%';
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      checkRAF = requestAnimationFrame(checkFrame);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

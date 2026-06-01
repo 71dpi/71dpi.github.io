@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>UNROLL</title>
+  <meta name="theme-color" content="#FFF200">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFF200; --color-accent: #FF6B00; }
+
+    #game-screen { touch-action: none; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    #roll {
+      font-size: 8rem;
+      line-height: 1;
+      display: block;
+      transition: transform 0.1s;
+    }
+
+    #sheet-count {
+      font-size: 5rem;
+      font-weight: 900;
+      color: #000;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #sheet-label {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: rgba(0,0,0,0.5);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    #swipe-hint {
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.5);
+    }
+
+    #progress-bar {
+      width: 80%;
+      height: 16px;
+      background: rgba(0,0,0,0.1);
+      border: 3px solid #000;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 99px;
+      width: 100%;
+      transition: width 0.15s;
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.15); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+
+    @keyframes roll-pulse {
+      0%   { transform: scale(1) rotate(0deg); }
+      50%  { transform: scale(1.15) rotate(-8deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .roll-pulse { animation: roll-pulse 0.18s ease; }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">UNROLL</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🧻</div>
+    <p class="game-tagline">Swipe DOWN to unroll the paper!<br>Win: Empty core!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="roll">🧻</div>
+      <div id="sheet-count">20</div>
+      <div id="sheet-label">sheets left</div>
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+      <div id="swipe-hint">Swipe ↓ to unroll</div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🪣</div>
+    <p class="game-tagline">Empty core!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🧻</div>
+    <p class="game-tagline">Still rolling!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'unroll';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const roll = document.getElementById('roll');
+    const sheetCountEl = document.getElementById('sheet-count');
+    const progressFill = document.getElementById('progress-fill');
+    const TOTAL = 20;
+    let sheets = TOTAL;
+    let touchStartY = 0;
+    let lastStrokeY = 0;
+    let strokeActive = false;
+
+    function decrement() {
+      if (sheets <= 0 || !gameRunning) return;
+      sheets--;
+      sheetCountEl.textContent = sheets;
+      progressFill.style.width = (sheets / TOTAL * 100) + '%';
+      // pulse roll
+      roll.classList.remove('roll-pulse');
+      roll.offsetHeight;
+      roll.classList.add('roll-pulse');
+      roll.addEventListener('animationend', () => roll.classList.remove('roll-pulse'), { once: true });
+      if (sheets === 0) {
+        roll.textContent = '🫙'; // empty
+        triggerWin();
+      }
+    }
+
+    function onTouchStart(e) {
+      if (!gameRunning) return;
+      touchStartY = e.touches ? e.touches[0].clientY : e.clientY;
+      lastStrokeY = touchStartY;
+      strokeActive = true;
+    }
+
+    function onTouchMove(e) {
+      if (!gameRunning || !strokeActive) return;
+      e.preventDefault();
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const dy = clientY - lastStrokeY;
+      if (dy > 35) {
+        lastStrokeY = clientY;
+        decrement();
+      }
+    }
+
+    function onTouchEnd() { strokeActive = false; }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', onTouchStart, { passive: false });
+    gs.addEventListener('touchmove', onTouchMove, { passive: false });
+    gs.addEventListener('touchend', onTouchEnd);
+    gs.addEventListener('mousedown', onTouchStart);
+    gs.addEventListener('mousemove', onTouchMove);
+    gs.addEventListener('mouseup', onTouchEnd);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      sheets = TOTAL;
+      sheetCountEl.textContent = TOTAL;
+      progressFill.style.width = '100%';
+      roll.textContent = '🧻';
+      strokeActive = false;
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

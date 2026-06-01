@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>BALANCE</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+
+    #game-screen { touch-action: none; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 0 1.5rem;
+    }
+
+    #plates {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+      transition: transform 0.12s ease;
+      pointer-events: none;
+      font-size: 3.5rem;
+      line-height: 1;
+    }
+
+    #plates .plate { display: block; }
+
+    #balance-track {
+      width: 100%;
+      max-width: 320px;
+      height: 56px;
+      background: rgba(0,0,0,0.12);
+      border: 4px solid #000;
+      border-radius: 99px;
+      box-shadow: 4px 4px 0 #000;
+      position: relative;
+      touch-action: none;
+    }
+
+    #green-zone {
+      position: absolute;
+      top: 4px; bottom: 4px;
+      left: 30%; right: 30%;
+      background: rgba(0, 220, 100, 0.4);
+      border-radius: 99px;
+    }
+
+    #indicator {
+      position: absolute;
+      top: 50%;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      border: 4px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      transform: translate(-50%, -50%);
+      transition: left 0.05s linear;
+    }
+
+    #indicator.in-zone { background: #00DD66; }
+
+    #balance-label {
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    #hold-bar-wrap {
+      width: 100%;
+      max-width: 320px;
+      height: 20px;
+      background: rgba(0,0,0,0.1);
+      border: 3px solid #000;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    #hold-bar {
+      height: 100%;
+      background: #00DD66;
+      width: 0%;
+      border-radius: 99px;
+      transition: width 0.1s;
+    }
+
+    #hold-label {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.5);
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.15); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">BALANCE</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🍽️</div>
+    <p class="game-tagline">Drag left/right to keep the plates balanced in the green zone for 5 seconds!<br>Win: Balanced!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="plates">
+        <span class="plate">🍽️</span>
+        <span class="plate">🍽️</span>
+        <span class="plate">🍽️</span>
+      </div>
+      <div id="balance-track">
+        <div id="green-zone"></div>
+        <div id="indicator"></div>
+      </div>
+      <div id="balance-label">Drag ← → to balance</div>
+      <div id="hold-bar-wrap"><div id="hold-bar"></div></div>
+      <div id="hold-label">Hold in green: 0.0 / 5.0s</div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">👨‍🍳</div>
+    <p class="game-tagline">Balanced!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💥</div>
+    <p class="game-tagline">CRASH!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'balance';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(gameRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(gameRAF); show('lose'); }
+
+    const indicator  = document.getElementById('indicator');
+    const track      = document.getElementById('balance-track');
+    const plates     = document.getElementById('plates');
+    const holdBar    = document.getElementById('hold-bar');
+    const holdLabel  = document.getElementById('hold-label');
+
+    let indicatorPos = 50; // 0-100 percent
+    let driftVel = 0;
+    let playerForce = 0;
+    let holdTime = 0;
+    let lastFrameTime = 0;
+    let gameRAF;
+    let dragActive = false;
+    let lastDragX = 0;
+    const HOLD_NEEDED = 5.0;
+
+    function isInZone() {
+      return indicatorPos > 30 && indicatorPos < 70;
+    }
+
+    function updatePhysics(ts) {
+      if (!gameRunning) return;
+      const dt = lastFrameTime ? Math.min((ts - lastFrameTime) / 1000, 0.05) : 0.016;
+      lastFrameTime = ts;
+
+      // random drift
+      driftVel += (Math.random() - 0.5) * 12 * dt;
+      driftVel *= 0.95; // damping
+
+      // player counterforce
+      indicatorPos += (driftVel + playerForce) * dt * 20;
+      playerForce *= 0.85;
+      indicatorPos = Math.max(2, Math.min(98, indicatorPos));
+
+      // update UI
+      indicator.style.left = indicatorPos + '%';
+      const inZone = isInZone();
+      indicator.classList.toggle('in-zone', inZone);
+
+      // tilt plates
+      const tiltDeg = (indicatorPos - 50) * 0.6;
+      plates.style.transform = `rotate(${tiltDeg}deg)`;
+
+      if (inZone) {
+        holdTime += dt;
+        if (holdTime >= HOLD_NEEDED) { triggerWin(); return; }
+      } else {
+        holdTime = Math.max(0, holdTime - dt * 0.5);
+      }
+
+      holdBar.style.width = (holdTime / HOLD_NEEDED * 100) + '%';
+      holdLabel.textContent = `Hold in green: ${holdTime.toFixed(1)} / ${HOLD_NEEDED.toFixed(1)}s`;
+
+      gameRAF = requestAnimationFrame(updatePhysics);
+    }
+
+    function onDragStart(e) {
+      if (!gameRunning) return;
+      dragActive = true;
+      lastDragX = e.touches ? e.touches[0].clientX : e.clientX;
+    }
+    function onDragMove(e) {
+      if (!gameRunning || !dragActive) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const dx = clientX - lastDragX;
+      lastDragX = clientX;
+      playerForce -= dx * 0.15; // counter drift
+    }
+    function onDragEnd() { dragActive = false; }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', onDragStart, { passive: true });
+    gs.addEventListener('touchmove', onDragMove, { passive: false });
+    gs.addEventListener('touchend', onDragEnd);
+    gs.addEventListener('mousedown', onDragStart);
+    gs.addEventListener('mousemove', onDragMove);
+    gs.addEventListener('mouseup', onDragEnd);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      indicatorPos = 50;
+      driftVel = 0;
+      playerForce = 0;
+      holdTime = 0;
+      lastFrameTime = 0;
+      holdBar.style.width = '0%';
+      holdLabel.textContent = `Hold in green: 0.0 / ${HOLD_NEEDED.toFixed(1)}s`;
+      plates.style.transform = '';
+      indicator.classList.remove('in-zone');
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      gameRAF = requestAnimationFrame(updatePhysics);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

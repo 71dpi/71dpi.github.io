@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SLICE</title>
+  <meta name="theme-color" content="#FF4500">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF4500; --color-accent: #FFF200; }
+
+    #game-screen { touch-action: none; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #center-line {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      border-left: 6px dashed rgba(255,255,255,0.7);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #carrot {
+      position: absolute;
+      top: 50%;
+      left: -60px;
+      transform: translateY(-50%);
+      font-size: 3.5rem;
+      line-height: 1;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #carrot.sliding {
+      animation: slide-carrot var(--slide-dur) linear infinite;
+    }
+
+    @keyframes slide-carrot {
+      from { left: -60px; }
+      to   { left: calc(100% + 20px); }
+    }
+
+    #slash-effect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 3;
+      transition: opacity 0.2s;
+    }
+
+    #hint {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.8);
+      white-space: nowrap;
+    }
+
+    #pass-count {
+      position: absolute;
+      top: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: rgba(255,255,255,0.8);
+      white-space: nowrap;
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.2); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+
+    #cut-line {
+      position: absolute;
+      background: rgba(255,255,255,0.9);
+      height: 4px;
+      pointer-events: none;
+      border-radius: 2px;
+      opacity: 0;
+      z-index: 5;
+      transform-origin: left center;
+    }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SLICE</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🥕</div>
+    <p class="game-tagline">Swipe across the screen when the carrot is at the CENTER line!<br>Win: Clean cut!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="center-line"></div>
+      <div id="carrot">🥕</div>
+      <div id="slash-effect">💥</div>
+      <div id="hint">Swipe ← → to slice!</div>
+      <div id="pass-count">Pass: 0 / 3</div>
+      <div id="cut-line"></div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🔪</div>
+    <p class="game-tagline">Clean cut!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🥕</div>
+    <p class="game-tagline">Missed!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'slice';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const carrot = document.getElementById('carrot');
+    const slashEffect = document.getElementById('slash-effect');
+    const passCountEl = document.getElementById('pass-count');
+    const cutLine = document.getElementById('cut-line');
+    const SLIDE_DUR = 2.5; // seconds per pass
+
+    let swipeStartX = 0;
+    let passes = 0;
+    const MAX_PASSES = 3;
+
+    function getCarrotCenterX() {
+      const r = carrot.getBoundingClientRect();
+      return r.left + r.width / 2;
+    }
+
+    function isCarrotAtCenter() {
+      const area = document.getElementById('game-area').getBoundingClientRect();
+      const cx = area.left + area.width / 2;
+      const ccx = getCarrotCenterX();
+      return Math.abs(ccx - cx) < 55;
+    }
+
+    function onSwipeStart(e) {
+      if (!gameRunning) return;
+      swipeStartX = e.touches ? e.touches[0].clientX : e.clientX;
+    }
+
+    function onSwipeEnd(e) {
+      if (!gameRunning) return;
+      const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+      const dx = Math.abs(endX - swipeStartX);
+
+      if (dx < 40) return; // too short
+
+      passes++;
+      passCountEl.textContent = `Pass: ${passes} / ${MAX_PASSES}`;
+
+      if (isCarrotAtCenter()) {
+        // WIN
+        showCutLine(swipeStartX, endX);
+        slashEffect.style.opacity = '1';
+        slashEffect.textContent = '💥';
+        carrot.style.opacity = '0';
+        setTimeout(() => { slashEffect.style.opacity = '0'; }, 500);
+        triggerWin();
+      } else {
+        // miss flash
+        slashEffect.style.opacity = '1';
+        slashEffect.textContent = '✗';
+        setTimeout(() => { slashEffect.style.opacity = '0'; }, 300);
+        if (passes >= MAX_PASSES) {
+          setTimeout(() => triggerLose(), 400);
+        }
+      }
+    }
+
+    function showCutLine(x1, x2) {
+      const area = document.getElementById('game-area').getBoundingClientRect();
+      const y = area.height / 2;
+      const lx = Math.min(x1, x2) - area.left;
+      const len = Math.abs(x2 - x1);
+      cutLine.style.top = y + 'px';
+      cutLine.style.left = lx + 'px';
+      cutLine.style.width = len + 'px';
+      cutLine.style.opacity = '1';
+      setTimeout(() => { cutLine.style.opacity = '0'; }, 500);
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', onSwipeStart, { passive: true });
+    gs.addEventListener('touchend', onSwipeEnd, { passive: true });
+    gs.addEventListener('mousedown', onSwipeStart);
+    gs.addEventListener('mouseup', onSwipeEnd);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      passes = 0;
+      passCountEl.textContent = `Pass: 0 / ${MAX_PASSES}`;
+      slashEffect.style.opacity = '0';
+      cutLine.style.opacity = '0';
+      carrot.style.opacity = '1';
+
+      // restart CSS animation
+      carrot.classList.remove('sliding');
+      carrot.style.animation = 'none';
+      carrot.style.left = '-60px';
+      carrot.offsetHeight;
+      carrot.style.setProperty('--slide-dur', SLIDE_DUR + 's');
+      carrot.classList.add('sliding');
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

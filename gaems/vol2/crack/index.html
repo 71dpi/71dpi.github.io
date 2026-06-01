@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Crack</title>
+  <meta name="theme-color" content="#FFB800">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFB800; --color-accent: #FF6B00; }
+    #game-screen { background: #FFB800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+    #egg-bowl {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    #egg { font-size: 6rem; line-height: 1; transition: transform 0.1s; }
+    #egg.crack-anim { animation: egg-crack 0.3s ease-out; }
+    @keyframes egg-crack {
+      0%  { transform: rotate(0) scale(1); }
+      30% { transform: rotate(-15deg) scale(1.1); }
+      60% { transform: rotate(15deg) scale(0.95); }
+      100%{ transform: rotate(0) scale(1); }
+    }
+    #bowl { font-size: 4rem; }
+    #meter-column {
+      display: flex; flex-direction: row; align-items: flex-end; gap: 16px;
+    }
+    #power-wrap {
+      width: 30px; height: 200px; background: rgba(0,0,0,0.15);
+      border-radius: 15px; overflow: hidden; position: relative;
+    }
+    #power-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: #FF6B00; border-radius: 15px;
+      transition: height 0.05s;
+    }
+    #sweet-zone {
+      position: absolute; bottom: 40%; left: 0; right: 0;
+      height: 30%; background: rgba(0,255,80,0.45); border-radius: 0;
+    }
+    #sweet-label {
+      position: absolute; left: 36px; bottom: 40%;
+      height: 30%; display: flex; align-items: center;
+      font-size: 0.65rem; font-weight: 900; color: #006600; white-space: nowrap;
+    }
+    #crack-btn {
+      font-size: 2.5rem; font-weight: 900; padding: 18px 36px;
+      background: #FFF200; color: #7a2d00; border: none; border-radius: 20px;
+      box-shadow: 0 6px 0 #b8aa00; cursor: pointer;
+      touch-action: manipulation;
+    }
+    #crack-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b8aa00; }
+    #attempts-left { font-size: 1rem; font-weight: 900; color: #7a3800; }
+    #crack-feedback { font-size: 1rem; font-weight: 900; color: #fff; min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Crack</h1>
+    <div class="game-subject">🥚</div>
+    <p class="game-tagline">Tap when meter is in the green zone!<br>Win: Crack it cleanly (3 tries)</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="egg-bowl">
+      <div id="egg">🥚</div>
+      <div id="bowl">🥣</div>
+    </div>
+    <div id="meter-column">
+      <div id="power-wrap">
+        <div id="sweet-zone"></div>
+        <div id="power-bar" style="height:0%"></div>
+      </div>
+      <div id="sweet-label">SWEET<br>ZONE</div>
+    </div>
+    <button id="crack-btn">CRACK!</button>
+    <div id="attempts-left">3 tries left</div>
+    <div id="crack-feedback"></div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🍳</div>
+    <p class="game-tagline">Cracked!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🥚</div>
+    <p class="game-tagline">Botched!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'crack';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+    let meterRAF, meterPct, attempts;
+    const PERIOD = 1500; // ms for one sine cycle
+    const SWEET_LOW = 40, SWEET_HIGH = 70;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(meterRAF); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(meterRAF); show('lose'); }
+
+    function animMeter() {
+      if (!gameRunning) return;
+      const t = Date.now();
+      meterPct = 50 + 45 * Math.sin((t / PERIOD) * Math.PI * 2);
+      document.getElementById('power-bar').style.height = meterPct + '%';
+      meterRAF = requestAnimationFrame(animMeter);
+    }
+
+    function onCrack() {
+      if (!gameRunning) return;
+      const inZone = meterPct >= SWEET_LOW && meterPct <= SWEET_HIGH;
+      const egg = document.getElementById('egg');
+      egg.classList.remove('crack-anim');
+      void egg.offsetWidth;
+      egg.classList.add('crack-anim');
+
+      if (inZone) {
+        document.getElementById('crack-feedback').textContent = 'Perfect crack!';
+        triggerWin();
+        return;
+      }
+
+      attempts--;
+      if (meterPct < SWEET_LOW) {
+        document.getElementById('crack-feedback').textContent = 'Too soft!';
+      } else {
+        document.getElementById('crack-feedback').textContent = 'Too hard!';
+      }
+      document.getElementById('attempts-left').textContent = attempts + ' tr' + (attempts === 1 ? 'y' : 'ies') + ' left';
+
+      if (attempts <= 0) {
+        triggerLose();
+      }
+    }
+
+    const btn = document.getElementById('crack-btn');
+    btn.addEventListener('click', onCrack);
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); onCrack(); });
+
+    function startGame() {
+      attempts = 3;
+      cancelAnimationFrame(timerRAF);
+      cancelAnimationFrame(meterRAF);
+      document.getElementById('power-bar').style.height = '0%';
+      document.getElementById('attempts-left').textContent = '3 tries left';
+      document.getElementById('crack-feedback').textContent = '';
+      document.getElementById('egg').classList.remove('crack-anim');
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      animMeter();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

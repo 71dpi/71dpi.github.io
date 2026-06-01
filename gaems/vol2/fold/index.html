@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>FOLD</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+    #game-screen { background: #00D4FF; }
+
+    #fold-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      touch-action: none;
+    }
+
+    #shirt-container {
+      position: relative;
+      width: 240px;
+      height: 240px;
+    }
+
+    #shirt-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(4px 4px 0 #000);
+    }
+
+    .corner-arrow {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border: 4px solid #000;
+      border-radius: 50%;
+      background: #FFF200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 3px 3px 0 #000;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      z-index: 10;
+    }
+    .corner-arrow.done {
+      background: #00D66B;
+      transform: scale(0.8);
+    }
+
+    #corner-tl { top: 0; left: 0; }
+    #corner-tr { top: 0; right: 0; }
+    #corner-bl { bottom: 0; left: 0; }
+    #corner-br { bottom: 0; right: 0; }
+
+    #hud {
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #000;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FF6B00; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">FOLD</h1>
+    <div class="game-subject">👕</div>
+    <p class="game-tagline">Swipe each corner toward the center!<br>Win: Neat pile!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="fold-area">
+      <div id="hud">Fold all 4 corners!</div>
+      <div id="shirt-container">
+        <svg id="shirt-svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+          <!-- Shirt body -->
+          <rect x="40" y="80" width="160" height="140" rx="8" fill="#4444FF" stroke="#000" stroke-width="4"/>
+          <!-- Collar -->
+          <path d="M80 80 Q120 110 160 80" stroke="#000" stroke-width="4" fill="none"/>
+          <!-- Left sleeve -->
+          <polygon points="40,80 10,50 30,45 60,80" fill="#4444FF" stroke="#000" stroke-width="4"/>
+          <!-- Right sleeve -->
+          <polygon points="200,80 230,50 210,45 180,80" fill="#4444FF" stroke="#000" stroke-width="4"/>
+          <!-- Stripes for decoration -->
+          <line x1="40" y1="120" x2="200" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+          <line x1="40" y1="150" x2="200" y2="150" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+        </svg>
+        <div class="corner-arrow" id="corner-tl">↘</div>
+        <div class="corner-arrow" id="corner-tr">↙</div>
+        <div class="corner-arrow" id="corner-bl">↗</div>
+        <div class="corner-arrow" id="corner-br">↖</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Neat pile!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">👕</div>
+    <p class="game-tagline">Wrinkled mess!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'fold';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── FOLD GAME ──
+    const hud = document.getElementById('hud');
+    const CORNERS = ['tl', 'tr', 'bl', 'br'];
+    // direction each corner swipe should go (toward center)
+    // tl: right+down, tr: left+down, bl: right+up, br: left+up
+    const CORNER_DIRS = {
+      tl: { dx: 1, dy: 1 },
+      tr: { dx: -1, dy: 1 },
+      bl: { dx: 1, dy: -1 },
+      br: { dx: -1, dy: -1 },
+    };
+
+    let foldedCorners = { tl: false, tr: false, bl: false, br: false };
+    let activeTouch = null; // { cornerId, startX, startY }
+
+    function checkWin() {
+      if (Object.values(foldedCorners).every(Boolean)) triggerWin();
+    }
+
+    function updateHud() {
+      const done = Object.values(foldedCorners).filter(Boolean).length;
+      hud.textContent = done < 4 ? `${4 - done} corners left` : 'Done!';
+    }
+
+    function onTouchStart(e) {
+      if (!gameRunning) return;
+      const touch = e.changedTouches[0];
+      for (const id of CORNERS) {
+        if (foldedCorners[id]) continue;
+        const el = document.getElementById(`corner-${id}`);
+        const r = el.getBoundingClientRect();
+        if (touch.clientX >= r.left - 20 && touch.clientX <= r.right + 20 &&
+            touch.clientY >= r.top - 20 && touch.clientY <= r.bottom + 20) {
+          activeTouch = { cornerId: id, startX: touch.clientX, startY: touch.clientY, id: touch.identifier };
+          break;
+        }
+      }
+      e.preventDefault();
+    }
+
+    function onTouchMove(e) {
+      if (!gameRunning || !activeTouch) return;
+      let touch = null;
+      for (const t of e.changedTouches) {
+        if (t.identifier === activeTouch.id) { touch = t; break; }
+      }
+      if (!touch) return;
+      const dx = touch.clientX - activeTouch.startX;
+      const dy = touch.clientY - activeTouch.startY;
+      const dir = CORNER_DIRS[activeTouch.cornerId];
+      // Need at least 40px movement in the correct direction
+      if (dx * dir.dx > 30 && dy * dir.dy > 30) {
+        const id = activeTouch.cornerId;
+        foldedCorners[id] = true;
+        const el = document.getElementById(`corner-${id}`);
+        el.textContent = '✓';
+        el.classList.add('done');
+        activeTouch = null;
+        updateHud();
+        checkWin();
+      }
+      e.preventDefault();
+    }
+
+    function onTouchEnd(e) {
+      if (activeTouch) {
+        for (const t of e.changedTouches) {
+          if (t.identifier === activeTouch.id) { activeTouch = null; break; }
+        }
+      }
+    }
+
+    // Mouse support
+    let mouseCorner = null;
+    function onMouseDown(e) {
+      if (!gameRunning) return;
+      for (const id of CORNERS) {
+        if (foldedCorners[id]) continue;
+        const el = document.getElementById(`corner-${id}`);
+        const r = el.getBoundingClientRect();
+        if (e.clientX >= r.left - 20 && e.clientX <= r.right + 20 &&
+            e.clientY >= r.top - 20 && e.clientY <= r.bottom + 20) {
+          mouseCorner = { cornerId: id, startX: e.clientX, startY: e.clientY };
+          break;
+        }
+      }
+    }
+    function onMouseMove(e) {
+      if (!gameRunning || !mouseCorner || e.buttons !== 1) return;
+      const dx = e.clientX - mouseCorner.startX;
+      const dy = e.clientY - mouseCorner.startY;
+      const dir = CORNER_DIRS[mouseCorner.cornerId];
+      if (dx * dir.dx > 30 && dy * dir.dy > 30) {
+        const id = mouseCorner.cornerId;
+        foldedCorners[id] = true;
+        const el = document.getElementById(`corner-${id}`);
+        el.textContent = '✓';
+        el.classList.add('done');
+        mouseCorner = null;
+        updateHud();
+        checkWin();
+      }
+    }
+    function onMouseUp() { mouseCorner = null; }
+
+    const foldArea = document.getElementById('fold-area');
+    foldArea.addEventListener('touchstart', onTouchStart, { passive: false });
+    foldArea.addEventListener('touchmove', onTouchMove, { passive: false });
+    foldArea.addEventListener('touchend', onTouchEnd);
+    foldArea.addEventListener('mousedown', onMouseDown);
+    foldArea.addEventListener('mousemove', onMouseMove);
+    foldArea.addEventListener('mouseup', onMouseUp);
+
+    function startGame() {
+      foldedCorners = { tl: false, tr: false, bl: false, br: false };
+      activeTouch = null;
+      mouseCorner = null;
+      CORNERS.forEach(id => {
+        const el = document.getElementById(`corner-${id}`);
+        const arrows = { tl: '↘', tr: '↙', bl: '↗', br: '↖' };
+        el.textContent = arrows[id];
+        el.classList.remove('done');
+      });
+      hud.textContent = 'Fold all 4 corners!';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

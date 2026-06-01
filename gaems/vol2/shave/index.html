@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SHAVE</title>
+  <meta name="theme-color" content="#FFF200">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+
+  <style>
+    :root { --color-bg: #FFF200; --color-accent: #FF6B00; }
+
+    /* ── Face / beard canvas ─────────────────────── */
+    #game-area {
+      position: relative;
+      width: min(320px, 80vw);
+      height: min(320px, 80vw);
+      margin: 0 auto;
+    }
+
+    #face-svg {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    /* Razor that tracks the finger */
+    #razor {
+      position: absolute;
+      font-size: 2.5rem;
+      pointer-events: none;
+      transform: translate(-50%, -50%) rotate(0deg);
+      transition: opacity 0.1s;
+      opacity: 0;
+    }
+
+    /* ── Timer bar ───────────────────────────────── */
+    #timer-bar-wrap {
+      width: min(320px, 80vw);
+      height: 14px;
+      background: #fff;
+      border: var(--stroke) solid #000;
+      border-radius: 99px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    #timer-bar {
+      height: 100%;
+      background: var(--color-accent);
+      width: 100%;
+      transform-origin: left;
+      transition: width 0.1s linear;
+    }
+
+    /* ── Progress label ──────────────────────────── */
+    #progress-label {
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ START SCREEN ══════════════════════════════ -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SHAVE</h1>
+    <div class="game-subject">🧔</div>
+    <p class="game-tagline">Swipe down to remove beard hair<br>Win: Smooth face</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back to game hub">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle to random game">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share this game">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Support on Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- ══ GAME SCREEN ═══════════════════════════════ -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+
+    <div id="game-area">
+      <!-- Beard face SVG — swap art/subject.svg here when custom art is ready -->
+      <!-- TO REPLACE: put a <img src="art/subject.svg"> here and remove the inline SVG -->
+      <svg id="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Face -->
+        <circle cx="100" cy="95" r="70" fill="#FBBF6E" stroke="#000" stroke-width="4"/>
+        <!-- Eyes -->
+        <circle cx="78" cy="80" r="8" fill="#fff" stroke="#000" stroke-width="3"/>
+        <circle cx="122" cy="80" r="8" fill="#fff" stroke="#000" stroke-width="3"/>
+        <circle cx="80" cy="82" r="4" fill="#000"/>
+        <circle cx="124" cy="82" r="4" fill="#000"/>
+        <!-- Nose -->
+        <ellipse cx="100" cy="100" rx="6" ry="8" fill="#E8A55E" stroke="#000" stroke-width="2"/>
+        <!-- Mouth (neutral, gets happy on win) -->
+        <path id="face-mouth" d="M85,118 Q100,125 115,118" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- Beard hairs — each one is a <line> with class "hair" -->
+        <!-- Row 1 (chin area) -->
+        <line class="hair" x1="72"  y1="128" x2="72"  y2="148" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="80"  y1="132" x2="80"  y2="154" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="88"  y1="134" x2="88"  y2="157" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="96"  y1="136" x2="96"  y2="159" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="104" y1="136" x2="104" y2="159" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="112" y1="134" x2="112" y2="157" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="120" y1="132" x2="120" y2="154" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="128" y1="128" x2="128" y2="148" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <!-- Row 2 (upper beard) -->
+        <line class="hair" x1="65"  y1="115" x2="65"  y2="135" stroke="#5a3418" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="76"  y1="118" x2="76"  y2="140" stroke="#5a3418" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="87"  y1="120" x2="87"  y2="143" stroke="#5a3418" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="98"  y1="122" x2="98"  y2="145" stroke="#5a3418" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="109" y1="122" x2="109" y2="145" stroke="#5a3418" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="120" y1="120" x2="120" y2="143" stroke="#5a3418" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="131" y1="118" x2="131" y2="140" stroke="#5a3418" stroke-width="5" stroke-linecap="round"/>
+        <!-- Mustache -->
+        <line class="hair" x1="85"  y1="110" x2="85"  y2="124" stroke="#3a1e08" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="93"  y1="110" x2="93"  y2="126" stroke="#3a1e08" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="101" y1="110" x2="101" y2="126" stroke="#3a1e08" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="109" y1="110" x2="109" y2="124" stroke="#3a1e08" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="117" y1="110" x2="117" y2="122" stroke="#3a1e08" stroke-width="5" stroke-linecap="round"/>
+        <!-- Sideburns left -->
+        <line class="hair" x1="35"  y1="95"  x2="35"  y2="115" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="43"  y1="98"  x2="43"  y2="120" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="51"  y1="100" x2="51"  y2="122" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <!-- Sideburns right -->
+        <line class="hair" x1="165" y1="95"  x2="165" y2="115" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="157" y1="98"  x2="157" y2="120" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+        <line class="hair" x1="149" y1="100" x2="149" y2="122" stroke="#4a2c12" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <div id="razor">🪒</div>
+    </div>
+
+    <p id="progress-label">SHAVE IT ALL OFF</p>
+  </div>
+
+  <!-- ══ WIN SCREEN ════════════════════════════════ -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😊</div>
+    <p class="game-tagline">Smooth face.</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back to hub">71</a>
+      <button class="btn-icon" id="btn-shuffle-win" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share-win" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- ══ LOSE SCREEN ═══════════════════════════════ -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🧔</div>
+    <p class="game-tagline">Still stubbly.</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back to hub">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share-lose" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'shave';
+    const TIME_LIMIT = 7; // seconds
+
+    // Screen references
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+
+    function show(name) {
+      Object.values(screens).forEach(s => s.classList.add('hidden'));
+      screens[name].classList.remove('hidden');
+    }
+
+    // ── Game state ─────────────────────────────────
+
+    let hairs = [];
+    let shaved = 0;
+    let total = 0;
+    let timerStart = 0;
+    let timerRAF = 0;
+    let gameRunning = false;
+
+    function initGame() {
+      hairs = Array.from(document.querySelectorAll('.hair'));
+      hairs.forEach(h => { h.style.display = ''; h.dataset.shaved = '0'; });
+      total = hairs.length;
+      shaved = 0;
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const pct = Math.round((shaved / total) * 100);
+      document.getElementById('progress-label').textContent =
+        pct === 100 ? 'CLEAN!' : `${pct}% SHAVED`;
+    }
+
+    // ── Swipe / touch detection ────────────────────
+
+    const gameArea  = document.getElementById('game-area');
+    const faceSVG   = document.getElementById('face-svg');
+    const razorEl   = document.getElementById('razor');
+    let lastY = null;
+
+    function getSVGPoint(clientX, clientY) {
+      const pt = faceSVG.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      return pt.matrixTransform(faceSVG.getScreenCTM().inverse());
+    }
+
+    function checkHairsAtPoint(svgPt) {
+      let hit = false;
+      hairs.forEach(h => {
+        if (h.dataset.shaved === '1') return;
+        const x1 = +h.getAttribute('x1'), y1 = +h.getAttribute('y1');
+        const x2 = +h.getAttribute('x2'), y2 = +h.getAttribute('y2');
+        const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+        const dist = Math.hypot(svgPt.x - cx, svgPt.y - cy);
+        if (dist < 18) {
+          h.dataset.shaved = '1';
+          h.style.display = 'none';
+          shaved++;
+          hit = true;
+        }
+      });
+      if (hit) {
+        updateProgress();
+        if (shaved >= total) triggerWin();
+      }
+    }
+
+    function moveRazor(clientX, clientY) {
+      const rect = gameArea.getBoundingClientRect();
+      razorEl.style.left = (clientX - rect.left) + 'px';
+      razorEl.style.top  = (clientY - rect.top)  + 'px';
+      razorEl.style.opacity = '1';
+    }
+
+    gameArea.addEventListener('touchstart', e => {
+      if (!gameRunning) return;
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      lastY = t.clientY;
+      moveRazor(t.clientX, t.clientY);
+    }, { passive: false });
+
+    gameArea.addEventListener('touchmove', e => {
+      if (!gameRunning) return;
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      const dy = t.clientY - lastY;
+      lastY = t.clientY;
+      if (dy > 0) { // must be swiping down
+        const svgPt = getSVGPoint(t.clientX, t.clientY);
+        checkHairsAtPoint(svgPt);
+      }
+      moveRazor(t.clientX, t.clientY);
+    }, { passive: false });
+
+    gameArea.addEventListener('touchend', () => {
+      razorEl.style.opacity = '0';
+      lastY = null;
+    });
+
+    // Mouse support for desktop testing
+    let mouseDown = false;
+    gameArea.addEventListener('mousedown', e => { if (gameRunning) { mouseDown = true; lastY = e.clientY; moveRazor(e.clientX, e.clientY); } });
+    gameArea.addEventListener('mousemove', e => {
+      if (!gameRunning || !mouseDown) return;
+      const dy = e.clientY - lastY;
+      lastY = e.clientY;
+      if (dy > 0) checkHairsAtPoint(getSVGPoint(e.clientX, e.clientY));
+      moveRazor(e.clientX, e.clientY);
+    });
+    gameArea.addEventListener('mouseup', () => { mouseDown = false; razorEl.style.opacity = '0'; });
+
+    // ── Timer ──────────────────────────────────────
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      const remaining = Math.max(0, 1 - elapsed / TIME_LIMIT);
+      document.getElementById('timer-bar').style.width = (remaining * 100) + '%';
+      if (elapsed >= TIME_LIMIT) {
+        triggerLose();
+      } else if (gameRunning) {
+        timerRAF = requestAnimationFrame(runTimer);
+      }
+    }
+
+    // ── Win / Lose ─────────────────────────────────
+
+    function triggerWin() {
+      gameRunning = false;
+      cancelAnimationFrame(timerRAF);
+      // Happy mouth
+      document.getElementById('face-mouth').setAttribute('d', 'M82,118 Q100,135 118,118');
+      setTimeout(() => show('win'), 400);
+    }
+
+    function triggerLose() {
+      gameRunning = false;
+      show('lose');
+    }
+
+    // ── Start / restart ────────────────────────────
+
+    function startGame() {
+      initGame();
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    // ── Button wiring ──────────────────────────────
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(state => {
+      document.getElementById(`btn-shuffle-${state}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${state}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

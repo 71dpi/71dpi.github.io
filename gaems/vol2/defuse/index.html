@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>DEFUSE</title>
+  <meta name="theme-color" content="#FF0062">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF0062; --color-accent: #FFF200; }
+
+    #game-screen { overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      padding: 1rem;
+      padding-top: 3rem;
+    }
+
+    #note {
+      background: #FFFBCC;
+      border: 4px solid #000;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 4px 4px 0 #000;
+      text-align: center;
+      max-width: 280px;
+    }
+
+    #note .note-top {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #666;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    #note .note-instruction {
+      font-size: 1.6rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    #wires {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .wire-btn {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border: 4px solid #000;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-size: 1.3rem;
+      font-weight: 900;
+      font-family: var(--font);
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #000;
+      text-transform: uppercase;
+      transition: transform 0.1s, box-shadow 0.1s;
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+    }
+
+    .wire-btn:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #000; }
+    .wire-btn.red    { background: #FF3232; }
+    .wire-btn.blue   { background: #0066FF; }
+    .wire-btn.yellow { background: #FFC200; color: #000; text-shadow: none; }
+    .wire-btn.green  { background: #00CC55; }
+
+    .wire-line {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.5);
+    }
+
+    .wire-btn.cut .wire-line {
+      background: repeating-linear-gradient(
+        90deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 8px,
+        transparent 8px, transparent 14px
+      );
+    }
+
+    #bomb-icon {
+      font-size: 3rem;
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.2); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">DEFUSE</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">💣</div>
+    <p class="game-tagline">Tap the wire that matches the note!<br>Win: Safe!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="bomb-icon">💣</div>
+      <div id="note">
+        <div class="note-top">⚠️ CUT THE WIRE ⚠️</div>
+        <div class="note-instruction" id="note-color">RED</div>
+      </div>
+      <div id="wires">
+        <button class="wire-btn red"    data-color="red">   <span>RED</span>   <span class="wire-line"></span></button>
+        <button class="wire-btn blue"   data-color="blue">  <span>BLUE</span>  <span class="wire-line"></span></button>
+        <button class="wire-btn yellow" data-color="yellow"><span>YELLOW</span><span class="wire-line"></span></button>
+        <button class="wire-btn green"  data-color="green"> <span>GREEN</span> <span class="wire-line"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😅</div>
+    <p class="game-tagline">Safe!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💣</div>
+    <p class="game-tagline">BOOM!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'defuse';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const COLORS = ['red', 'blue', 'yellow', 'green'];
+    const COLOR_LABELS = { red: 'RED', blue: 'BLUE', yellow: 'YELLOW', green: 'GREEN' };
+    let correctColor = 'red';
+
+    document.querySelectorAll('.wire-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!gameRunning) return;
+        const color = btn.dataset.color;
+        btn.classList.add('cut');
+        if (color === correctColor) {
+          triggerWin();
+        } else {
+          // explode!
+          btn.style.transform = 'scale(1.1)';
+          triggerLose();
+        }
+      });
+    });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+
+      // pick random correct color
+      correctColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+      document.getElementById('note-color').textContent = COLOR_LABELS[correctColor];
+      document.getElementById('note-color').style.color = correctColor === 'yellow' ? '#996600' : correctColor;
+
+      // reset wire styles
+      document.querySelectorAll('.wire-btn').forEach(btn => {
+        btn.classList.remove('cut');
+        btn.style.transform = '';
+      });
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

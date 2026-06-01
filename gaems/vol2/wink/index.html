@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>WINK</title>
+  <meta name="theme-color" content="#FFD6EC">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFD6EC; --color-accent: #C2185B; }
+    #game-area { position:relative; width:min(260px,75vw); height:min(260px,75vw); margin:0 auto; }
+    #face-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(260px,75vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #wink-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; text-align:center; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">WINK</h1>
+    <div class="game-subject">😉</div>
+    <p class="game-tagline">Tap the face when it looks at you<br>Win: 3 taps</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back to game hub">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="100" cy="100" r="80" fill="#FBBF6E" stroke="#000" stroke-width="4"/>
+        <!-- Left eye -->
+        <ellipse id="eye-l" cx="68" cy="85" rx="14" ry="14" fill="#fff" stroke="#000" stroke-width="3"/>
+        <circle id="pupil-l" cx="68" cy="85" r="7" fill="#000"/>
+        <!-- Right eye -->
+        <ellipse id="eye-r" cx="132" cy="85" rx="14" ry="14" fill="#fff" stroke="#000" stroke-width="3"/>
+        <circle id="pupil-r" cx="132" cy="85" r="7" fill="#000"/>
+        <!-- Mouth -->
+        <path id="face-mouth" d="M78,128 Q100,140 122,128" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <p id="wink-label">WAIT FOR IT...</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😉</div>
+    <p class="game-tagline">Eye contact!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">MISS!</p>
+    <div class="game-subject anim-shake">😑</div>
+    <p class="game-tagline">You tapped too soon!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='wink', TIME_LIMIT=10, TAPS_NEEDED=3;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let taps=0, lookingAtPlayer=false, gameRunning=false, timerStart=0, timerRAF=0, lookTimeout=null, nextTimeout=null;
+    const pupilL=document.getElementById('pupil-l'), pupilR=document.getElementById('pupil-r'), label=document.getElementById('wink-label');
+
+    const POSITIONS=[
+      {lx:68,ly:85,rx:132,ry:85,looking:true},   // looking at player (center)
+      {lx:58,ly:80,rx:122,ry:80,looking:false},   // looking left-up
+      {lx:78,ly:90,rx:142,ry:90,looking:false},   // looking right-down
+      {lx:62,ly:88,rx:126,ry:88,looking:false},   // looking left
+      {lx:74,ly:82,rx:138,ry:82,looking:false},   // looking right
+    ];
+
+    function setPupils(pos) {
+      pupilL.setAttribute('cx',pos.lx); pupilL.setAttribute('cy',pos.ly);
+      pupilR.setAttribute('cx',pos.rx); pupilR.setAttribute('cy',pos.ry);
+      lookingAtPlayer=pos.looking;
+      label.textContent=pos.looking?'NOW! TAP!':'WAIT FOR IT...';
+    }
+
+    function scheduleNextLook() {
+      if (!gameRunning) return;
+      const delay=1200+Math.random()*1800;
+      nextTimeout=setTimeout(()=>{
+        if (!gameRunning) return;
+        const lookDuration=600+Math.random()*400;
+        setPupils(POSITIONS[0]); // look at player
+        lookTimeout=setTimeout(()=>{
+          if (!gameRunning) return;
+          // look away
+          const away=POSITIONS[1+Math.floor(Math.random()*(POSITIONS.length-1))];
+          setPupils(away);
+          scheduleNextLook();
+        }, lookDuration);
+      }, delay);
+    }
+
+    document.getElementById('game-area').addEventListener('click',()=>{
+      if (!gameRunning) return;
+      if (lookingAtPlayer) {
+        taps++;
+        label.textContent=taps+' / '+TAPS_NEEDED+' ✓';
+        if (taps>=TAPS_NEEDED) triggerWin();
+      } else {
+        triggerLose();
+      }
+    });
+    document.getElementById('game-area').addEventListener('touchend',e=>{ e.preventDefault(); });
+
+    function runTimer() {
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if (elapsed>=TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);clearTimeout(lookTimeout);clearTimeout(nextTimeout);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(timerRAF);clearTimeout(lookTimeout);clearTimeout(nextTimeout);show('lose');}
+    function startGame(){
+      taps=0;lookingAtPlayer=false;clearTimeout(lookTimeout);clearTimeout(nextTimeout);
+      setPupils(POSITIONS[1]);
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+      scheduleNextLook();
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

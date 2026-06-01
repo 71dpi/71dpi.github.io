@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Sweep</title>
+  <meta name="theme-color" content="#FFB800">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFB800; --color-accent: #FF6B00; }
+    #game-screen { background: #e8c870; overflow: hidden; position: relative; touch-action: none; }
+    #floor {
+      position: absolute; bottom: 0; left: 0; right: 0; top: 0;
+      background: repeating-linear-gradient(
+        90deg, #d4b45e 0px, #d4b45e 60px, #c8a850 60px, #c8a850 120px
+      );
+    }
+    #dustpan {
+      position: absolute; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .dust {
+      position: absolute; width: 15px; height: 15px;
+      background: #999; border-radius: 50%;
+      pointer-events: none; z-index: 3;
+    }
+    #dust-count {
+      position: absolute; top: 60px; right: 16px;
+      font-size: 1.2rem; font-weight: 900; color: #7a3800;
+      z-index: 10; background: rgba(255,255,255,0.5); border-radius: 10px; padding: 4px 10px;
+    }
+    #broom-cursor {
+      position: absolute; font-size: 2.5rem; pointer-events: none; z-index: 5;
+      display: none; transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Sweep</h1>
+    <div class="game-subject">🧹</div>
+    <p class="game-tagline">Drag to sweep dust into the dustpan!<br>Win: Get all 10 pieces</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="floor"></div>
+    <div id="dustpan">🤲</div>
+    <div id="broom-cursor">🧹</div>
+    <div id="dust-count">10 left</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✨</div>
+    <p class="game-tagline">Clean floor!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🧹</div>
+    <p class="game-tagline">Still dusty!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'sweep';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+    let dustParticles, lastTouchX, lastTouchY;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    function getDustpanZone() {
+      const gs = document.getElementById('game-screen');
+      const r = gs.getBoundingClientRect();
+      return {
+        x: r.left + r.width / 2,
+        y: r.bottom - 60,
+        w: 100, h: 80
+      };
+    }
+
+    function spawnDust() {
+      const gs = document.getElementById('game-screen');
+      const r = gs.getBoundingClientRect();
+      dustParticles = [];
+      document.querySelectorAll('.dust').forEach(d => d.remove());
+      for (let i = 0; i < 10; i++) {
+        const d = document.createElement('div');
+        d.className = 'dust';
+        // Spread in upper 3/4 of screen, avoid dustpan area
+        const x = 20 + Math.random() * (r.width - 55);
+        const y = 60 + Math.random() * (r.height * 0.55);
+        d.style.left = x + 'px';
+        d.style.top  = y + 'px';
+        gs.appendChild(d);
+        dustParticles.push({ el: d, x, y, active: true });
+      }
+    }
+
+    function onMove(clientX, clientY) {
+      if (!gameRunning) return;
+      const gs = document.getElementById('game-screen');
+      const r = gs.getBoundingClientRect();
+      const tx = clientX - r.left;
+      const ty = clientY - r.top;
+
+      // Move broom cursor
+      const broom = document.getElementById('broom-cursor');
+      broom.style.display = 'block';
+      broom.style.left = tx + 'px';
+      broom.style.top  = ty + 'px';
+
+      const dx = lastTouchX !== undefined ? tx - lastTouchX : 0;
+      const dy = lastTouchY !== undefined ? ty - lastTouchY : 0;
+      lastTouchX = tx; lastTouchY = ty;
+
+      const zone = getDustpanZone();
+      let remaining = 0;
+
+      dustParticles.forEach(p => {
+        if (!p.active) return;
+        const pdx = tx - p.x, pdy = ty - p.y;
+        const dist = Math.sqrt(pdx * pdx + pdy * pdy);
+        if (dist < 40) {
+          // Push dust in drag direction
+          p.x += dx * 0.7;
+          p.y += dy * 0.7;
+          // Clamp
+          p.x = Math.max(0, Math.min(r.width - 15, p.x));
+          p.y = Math.max(50, Math.min(r.height - 15, p.y));
+          p.el.style.left = p.x + 'px';
+          p.el.style.top  = p.y + 'px';
+        }
+        // Check if in dustpan zone
+        if (Math.abs(p.x - (zone.x - r.left)) < zone.w / 2 &&
+            Math.abs(p.y - (zone.y - r.top))  < zone.h / 2) {
+          p.active = false;
+          p.el.style.display = 'none';
+        } else {
+          remaining++;
+        }
+      });
+
+      document.getElementById('dust-count').textContent = remaining + ' left';
+      if (remaining === 0) triggerWin();
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', (e) => {
+      if (!gameRunning) return;
+      const t = e.touches[0];
+      const r = gs.getBoundingClientRect();
+      lastTouchX = t.clientX - r.left;
+      lastTouchY = t.clientY - r.top;
+      document.getElementById('broom-cursor').style.display = 'block';
+      e.preventDefault();
+    }, { passive: false });
+    gs.addEventListener('touchmove', (e) => {
+      if (!gameRunning) return;
+      e.preventDefault();
+      onMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    gs.addEventListener('touchend', () => {
+      lastTouchX = undefined; lastTouchY = undefined;
+      document.getElementById('broom-cursor').style.display = 'none';
+    });
+    gs.addEventListener('mousemove', (e) => { if (gameRunning) onMove(e.clientX, e.clientY); });
+    gs.addEventListener('mouseenter', () => {
+      if (gameRunning) document.getElementById('broom-cursor').style.display = 'block';
+    });
+    gs.addEventListener('mouseleave', () => {
+      document.getElementById('broom-cursor').style.display = 'none';
+      lastTouchX = undefined; lastTouchY = undefined;
+    });
+
+    function startGame() {
+      cancelAnimationFrame(timerRAF);
+      lastTouchX = undefined; lastTouchY = undefined;
+      document.getElementById('broom-cursor').style.display = 'none';
+      show('game');
+      spawnDust();
+      document.getElementById('dust-count').textContent = '10 left';
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

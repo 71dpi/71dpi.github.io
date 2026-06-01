@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>UNLOCK</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; }
+    #pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 72px);
+      grid-template-rows: repeat(3, 72px);
+      gap: 16px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .dot {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #fff;
+      border: 4px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s;
+      user-select: none;
+    }
+    .dot.active {
+      background: #FF6B00;
+      color: #fff;
+      transform: scale(1.15);
+    }
+    .dot.preview {
+      background: #FF6B00;
+      color: #fff;
+    }
+    .dot.correct {
+      background: #00D66B;
+      transform: scale(1.2);
+    }
+    .dot.wrong {
+      background: #FF3232;
+      transform: scale(1.2);
+    }
+    #instruction {
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+      min-height: 1.5em;
+    }
+    #phone-display {
+      font-size: 4rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">UNLOCK</h1>
+    <div class="game-subject">📱</div>
+    <p class="game-tagline">Memorize the pattern, then repeat it!<br>Win: correct order</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="phone-display">📱</div>
+    <p id="instruction">MEMORIZE!</p>
+    <div id="pattern-grid">
+      <div class="dot" data-i="0">1</div>
+      <div class="dot" data-i="1">2</div>
+      <div class="dot" data-i="2">3</div>
+      <div class="dot" data-i="3">4</div>
+      <div class="dot" data-i="4">5</div>
+      <div class="dot" data-i="5">6</div>
+      <div class="dot" data-i="6">7</div>
+      <div class="dot" data-i="7">8</div>
+      <div class="dot" data-i="8">9</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🔓</div>
+    <p class="game-tagline">Access granted!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🔒</div>
+    <p class="game-tagline">Wrong pattern!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'unlock';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 9;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); setTimeout(()=>show('win'),400); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    // UNLOCK GAME
+    const dots = Array.from(document.querySelectorAll('.dot'));
+    const instruction = document.getElementById('instruction');
+
+    // Patterns (indices 0-8 = positions in 3x3 grid)
+    const PATTERNS = [
+      [0, 4, 8],  // diagonal
+      [0, 1, 2],  // top row
+      [6, 7, 8],  // bottom row
+      [0, 3, 6],  // left col
+      [2, 5, 8],  // right col
+      [0, 4, 6],  // reverse diagonal
+      [2, 4, 6],  // alt diagonal
+      [1, 4, 7],  // center col
+    ];
+
+    let correctPattern, playerPattern, phase;
+
+    function clearDots() {
+      dots.forEach(d => {
+        d.classList.remove('active', 'preview', 'correct', 'wrong');
+      });
+    }
+
+    function showPattern(pattern, delay) {
+      instruction.textContent = 'MEMORIZE!';
+      let i = 0;
+      const timer = setInterval(() => {
+        if (i > 0) dots[pattern[i-1]].classList.remove('preview');
+        if (i < pattern.length) {
+          dots[pattern[i]].classList.add('preview');
+          i++;
+        } else {
+          clearInterval(timer);
+          // Hide after 2 seconds
+          setTimeout(() => {
+            clearDots();
+            if (gameRunning) {
+              instruction.textContent = 'NOW YOU!';
+              phase = 'input';
+              playerPattern = [];
+              enableInput();
+            }
+          }, 600);
+        }
+      }, 500);
+    }
+
+    function enableInput() {
+      dots.forEach(d => {
+        d.addEventListener('click', onDotTap);
+      });
+    }
+
+    function disableInput() {
+      dots.forEach(d => {
+        d.removeEventListener('click', onDotTap);
+      });
+    }
+
+    function onDotTap(e) {
+      if (!gameRunning || phase !== 'input') return;
+      const i = parseInt(e.currentTarget.dataset.i);
+      const step = playerPattern.length;
+      const expected = correctPattern[step];
+
+      if (i === expected) {
+        playerPattern.push(i);
+        dots[i].classList.add('correct');
+        dots[i].style.transform = 'scale(1.2)';
+        setTimeout(() => { dots[i].style.transform = ''; }, 200);
+        if (playerPattern.length === correctPattern.length) {
+          disableInput();
+          triggerWin();
+        }
+      } else {
+        dots[i].classList.add('wrong');
+        dots[i].style.transform = 'scale(1.2)';
+        disableInput();
+        setTimeout(() => triggerLose(), 400);
+      }
+    }
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      clearDots();
+      phase = 'preview';
+      playerPattern = [];
+      correctPattern = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+      disableInput();
+      setTimeout(() => showPattern(correctPattern), 500);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

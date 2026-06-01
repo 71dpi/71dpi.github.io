@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>CLIP</title>
+  <meta name="theme-color" content="#FCE4EC">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FCE4EC; --color-accent: #C2185B; }
+    #game-area { position:relative; width:min(280px,80vw); height:min(280px,80vw); margin:0 auto; }
+    #nail-svg { width:100%; height:100%; touch-action:none; }
+    #timer-bar-wrap { width:min(280px,80vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #clip-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">CLIP</h1>
+    <div class="game-subject">✂️</div>
+    <p class="game-tagline">Tap when the clipper is over the nail!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="nail-svg" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="90" y="100" width="100" height="150" rx="16" fill="#FBBF6E" stroke="#000" stroke-width="3"/>
+        <rect x="100" y="100" width="80" height="50" rx="10" fill="#FFE0B2" stroke="#000" stroke-width="2"/>
+        <rect id="nail-rect" x="105" y="104" width="70" height="40" rx="8" fill="#F8BBD9" stroke="#E91E63" stroke-width="2"/>
+        <rect x="110" y="108" width="20" height="8" rx="4" fill="rgba(255,255,255,0.6)"/>
+        <g id="clipper" transform="translate(0,80)">
+          <rect x="60" y="0" width="60" height="28" rx="5" fill="#607D8B" stroke="#000" stroke-width="3"/>
+          <rect x="68" y="28" width="44" height="12" rx="2" fill="#455A64" stroke="#000" stroke-width="2"/>
+        </g>
+        <rect id="zone-indicator" x="100" y="78" width="80" height="12" rx="6" fill="#00E676" opacity="0"/>
+        <rect id="flash" x="90" y="95" width="100" height="60" rx="10" fill="#00E676" opacity="0"/>
+      </svg>
+    </div>
+    <p id="clip-label">TAP WHEN ALIGNED!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">SNIP!</p>
+    <div class="game-subject anim-bounce">✂️</div>
+    <p class="game-tagline">Clean cut!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">MISS!</p>
+    <div class="game-subject anim-shake">✂️</div>
+    <p class="game-tagline">Wrong spot!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='clip', TIME_LIMIT=8;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, animRAF=0;
+    const clipper=document.getElementById('clipper'), label=document.getElementById('clip-label');
+    const zoneIndicator=document.getElementById('zone-indicator'), flash=document.getElementById('flash');
+    let clipX=0, dir=1, speed=2, over=false, taps=0, TAPS_NEEDED=3;
+    function animClip(){
+      if(!gameRunning)return;
+      clipX+=dir*speed;
+      if(clipX>200){clipX=200;dir=-1;}
+      if(clipX<0){clipX=0;dir=1;}
+      clipper.setAttribute('transform','translate('+clipX+',80)');
+      const jLeft=clipX+60, jRight=clipX+120;
+      over=(jLeft<180&&jRight>100);
+      zoneIndicator.setAttribute('opacity',over?'0.7':'0');
+      if(gameRunning)animRAF=requestAnimationFrame(animClip);
+    }
+    function handleTap(){
+      if(!gameRunning)return;
+      if(over){
+        taps++;flash.setAttribute('opacity','0.6');
+        setTimeout(()=>flash.setAttribute('opacity',0),120);
+        label.textContent=taps+' / '+TAPS_NEEDED+' ✓';
+        if(taps>=TAPS_NEEDED)triggerWin();
+      } else {
+        label.textContent='NOT ALIGNED!';
+        setTimeout(()=>{if(gameRunning)label.textContent='TAP WHEN ALIGNED!';},500);
+      }
+    }
+    document.getElementById('game-area').addEventListener('click',handleTap);
+    document.getElementById('game-area').addEventListener('touchend',e=>{e.preventDefault();handleTap();},{passive:false});
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(animRAF);setTimeout(()=>show('win'),400);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      taps=0;over=false;clipX=0;dir=1;speed=2+Math.random();
+      clipper.setAttribute('transform','translate(0,80)');
+      zoneIndicator.setAttribute('opacity',0);flash.setAttribute('opacity',0);
+      label.textContent='TAP WHEN ALIGNED!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);animRAF=requestAnimationFrame(animClip);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

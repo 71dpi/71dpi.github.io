@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Lasso</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 60%, #6B8E23 100%); overflow: hidden; position: relative; touch-action: none; }
+    #cow {
+      position: absolute; font-size: 3.5rem;
+      top: 45%; transform: translateY(-50%);
+      animation: cow-run 2.5s linear infinite alternate;
+      user-select: none; pointer-events: none;
+    }
+    @keyframes cow-run {
+      from { left: 5%; }
+      to   { left: 75%; }
+    }
+    #lasso-canvas {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    #attempts-left-lasso {
+      position: absolute; top: 60px; right: 16px;
+      font-size: 1.1rem; font-weight: 900;
+      color: #7a2d00; background: rgba(255,255,255,0.5);
+      border-radius: 10px; padding: 4px 10px;
+    }
+    #lasso-hint {
+      position: absolute; bottom: 60px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9rem; font-weight: 900; color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Lasso</h1>
+    <div class="game-subject">🐄</div>
+    <p class="game-tagline">Draw a circle around the cow!<br>Win: Close the loop around it (3 tries)</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="cow">🐄</div>
+    <canvas id="lasso-canvas"></canvas>
+    <div id="attempts-left-lasso">3 tries</div>
+    <div id="lasso-hint">DRAW A CIRCLE AROUND THE COW</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🤠</div>
+    <p class="game-tagline">Caught!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🐄</div>
+    <p class="game-tagline">Yeehaw... missed!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'lasso';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    let attempts, drawing, path, clearTimer;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearTimeout(clearTimer); clearCanvas(); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; clearCanvas(); show('lose'); }
+
+    function getCowCenter() {
+      const cow = document.getElementById('cow');
+      const r = cow.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function sizeCanvas() {
+      const canvas = document.getElementById('lasso-canvas');
+      const gs = document.getElementById('game-screen');
+      const r = gs.getBoundingClientRect();
+      canvas.width  = r.width;
+      canvas.height = r.height;
+    }
+
+    function clearCanvas() {
+      const canvas = document.getElementById('lasso-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawPath() {
+      const canvas = document.getElementById('lasso-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (path.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(path[0].x, path[0].y);
+      path.forEach(p => ctx.lineTo(p.x, p.y));
+      ctx.strokeStyle = '#8B4513';
+      ctx.lineWidth = 4;
+      ctx.lineCap  = 'round';
+      ctx.lineJoin = 'round';
+      ctx.setLineDash([8, 4]);
+      ctx.stroke();
+    }
+
+    function pointInPath(px, py, pts) {
+      // Ray casting
+      let inside = false;
+      for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        const xi = pts[i].x, yi = pts[i].y;
+        const xj = pts[j].x, yj = pts[j].y;
+        const intersect = ((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    function onDrawStart(clientX, clientY) {
+      if (!gameRunning) return;
+      const canvas = document.getElementById('lasso-canvas');
+      const r = canvas.getBoundingClientRect();
+      clearTimeout(clearTimer);
+      drawing = true;
+      path = [{ x: clientX - r.left, y: clientY - r.top }];
+    }
+
+    function onDrawMove(clientX, clientY) {
+      if (!drawing || !gameRunning) return;
+      const canvas = document.getElementById('lasso-canvas');
+      const r = canvas.getBoundingClientRect();
+      path.push({ x: clientX - r.left, y: clientY - r.top });
+      drawPath();
+    }
+
+    function onDrawEnd(clientX, clientY) {
+      if (!drawing || !gameRunning) { drawing = false; return; }
+      drawing = false;
+      if (path.length < 10) { scheduleClear(); return; }
+
+      const canvas = document.getElementById('lasso-canvas');
+      const r = canvas.getBoundingClientRect();
+      const ex = clientX - r.left, ey = clientY - r.top;
+      const sx = path[0].x, sy = path[0].y;
+      const closeDist = Math.sqrt((ex - sx) ** 2 + (ey - sy) ** 2);
+
+      if (closeDist > 40) { scheduleClear(); return; }
+
+      // Check if cow center is inside
+      const cc = getCowCenter();
+      const cx = cc.x - r.left, cy = cc.y - r.top;
+      if (pointInPath(cx, cy, path)) {
+        triggerWin();
+      } else {
+        attempts--;
+        document.getElementById('attempts-left-lasso').textContent = attempts + ' tr' + (attempts === 1 ? 'y' : 'ies');
+        scheduleClear();
+        if (attempts <= 0) { setTimeout(() => { if (gameRunning) triggerLose(); }, 600); }
+      }
+    }
+
+    function scheduleClear() {
+      clearTimer = setTimeout(() => { clearCanvas(); path = []; }, 1500);
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      onDrawStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    gs.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      onDrawMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    gs.addEventListener('touchend', (e) => {
+      const t = e.changedTouches[0];
+      onDrawEnd(t.clientX, t.clientY);
+    }, { passive: false });
+    gs.addEventListener('mousedown', (e) => onDrawStart(e.clientX, e.clientY));
+    gs.addEventListener('mousemove', (e) => { if (e.buttons) onDrawMove(e.clientX, e.clientY); });
+    gs.addEventListener('mouseup', (e) => onDrawEnd(e.clientX, e.clientY));
+
+    function startGame() {
+      attempts = 3; drawing = false; path = [];
+      cancelAnimationFrame(timerRAF);
+      clearTimeout(clearTimer);
+      clearCanvas();
+      sizeCanvas();
+      document.getElementById('attempts-left-lasso').textContent = '3 tries';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

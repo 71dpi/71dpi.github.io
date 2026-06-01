@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>TOAST</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; }
+    #toaster-wrap {
+      position: relative;
+      width: 160px;
+      height: 260px;
+      margin: 0 auto;
+    }
+    #toaster-body {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 160px;
+      background: #888;
+      border: 4px solid #000;
+      border-radius: 12px 12px 8px 8px;
+      box-shadow: 4px 4px 0 #000;
+    }
+    #toaster-slot {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 56px;
+      height: 80px;
+      background: #333;
+      border: 3px solid #000;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    #bread {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      line-height: 1;
+      transition: bottom 0.1s;
+      cursor: pointer;
+      user-select: none;
+    }
+    #pop-zone {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 72px;
+      background: rgba(0,200,80,0.25);
+      border: 3px dashed #00C850;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: #00C850;
+      letter-spacing: 0.05em;
+    }
+    #pop-label {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #00C850;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    #tap-hint {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+      animation: pulse 1s ease infinite;
+    }
+    #passes-left {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #000;
+    }
+    .flash {
+      animation: breadFlash 0.2s ease;
+    }
+    @keyframes breadFlash {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.4); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+    @keyframes breadPop {
+      0% { transform: translateX(-50%) scale(1); }
+      30% { transform: translateX(-50%) scale(1.5) rotate(-10deg); }
+      60% { transform: translateX(-50%) scale(1.3) rotate(8deg); }
+      100% { transform: translateX(-50%) scale(1) rotate(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">TOAST</h1>
+    <div class="game-subject">🍞</div>
+    <p class="game-tagline">TAP when bread pops up!<br>Win: catch it in the green zone</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="pop-label">TAP IN THE GREEN ZONE!</p>
+    <div id="toaster-wrap">
+      <div id="pop-zone">POP!</div>
+      <div id="bread">🍞</div>
+      <div id="toaster-body"></div>
+    </div>
+    <p id="tap-hint">TAP THE BREAD ↑</p>
+    <p id="passes-left">Passes: 3</p>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🍞✨</div>
+    <p class="game-tagline">Golden brown!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🥴</div>
+    <p class="game-tagline">Too soggy!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'toast';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); clearInterval(riseInterval); setTimeout(()=>show('win'),300); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); clearInterval(riseInterval); show('lose'); }
+
+    // TOAST GAME
+    const bread = document.getElementById('bread');
+    const passesEl = document.getElementById('passes-left');
+    let breadBottom, rising, passesLeft, riseInterval, popPhase;
+
+    function resetBread() {
+      breadBottom = -10;
+      bread.style.bottom = breadBottom + 'px';
+      bread.textContent = '🍞';
+      rising = true;
+      popPhase = false;
+    }
+
+    function startRise() {
+      clearInterval(riseInterval);
+      // rise from -10px to 190px over 6 seconds = about 33px per 100ms
+      riseInterval = setInterval(() => {
+        if (!gameRunning) return;
+        if (rising) {
+          breadBottom += 3.3;
+          bread.style.bottom = breadBottom + 'px';
+          if (breadBottom >= 190) {
+            // bread has risen fully — start bouncing back down if not tapped
+            rising = false;
+            popPhase = false;
+          }
+        } else {
+          // sinking back
+          breadBottom -= 4;
+          bread.style.bottom = breadBottom + 'px';
+          if (breadBottom <= -10) {
+            if (passesLeft <= 0) {
+              triggerLose();
+            } else {
+              // start another rise
+              rising = true;
+              resetBread();
+            }
+          }
+        }
+      }, 100);
+    }
+
+    bread.addEventListener('click', () => {
+      if (!gameRunning) return;
+      // Pop zone: bread is fully out (bottom > 110px means top 20% of range 190px)
+      if (breadBottom >= 120) {
+        // Win!
+        clearInterval(riseInterval);
+        bread.classList.remove('flash');
+        bread.textContent = '🎉';
+        bread.style.animation = 'breadPop 0.4s ease';
+        triggerWin();
+      } else {
+        // too early — bounce visual feedback, cost a pass
+        passesLeft--;
+        passesEl.textContent = `Passes: ${passesLeft}`;
+        bread.classList.add('flash');
+        setTimeout(() => bread.classList.remove('flash'), 300);
+        if (passesLeft <= 0 && breadBottom < 120) {
+          // no more passes — they must wait for the right moment but already out of passes
+          // we won't immediately lose — they still need to tap at right moment
+          // but actually the spec says 3 passes then lose
+          // passes is "wrong taps", not "cycles". Lose if all 3 wrong taps used.
+          triggerLose();
+        }
+      }
+    });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      passesLeft = 3;
+      passesEl.textContent = 'Passes: 3';
+      resetBread();
+      startRise();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

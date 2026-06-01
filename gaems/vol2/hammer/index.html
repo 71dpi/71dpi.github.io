@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>HAMMER</title>
+  <meta name="theme-color" content="#FF4500">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF4500; --color-accent: #FFF200; }
+    #game-screen { background: #FF4500; touch-action: none; }
+
+    #hammer-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1rem 5rem;
+      touch-action: none;
+    }
+
+    #swing-container {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 260px;
+    }
+
+    #pivot {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: #333;
+      border-radius: 50%;
+      border: 3px solid #000;
+      z-index: 2;
+    }
+
+    #hammer-arm {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform-origin: 50% 0%;
+      transform: translateX(-50%) rotate(0deg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #hammer-handle {
+      width: 12px;
+      height: 160px;
+      background: #8B4513;
+      border-radius: 6px;
+      border: 2px solid #5D2E00;
+    }
+
+    #hammer-head {
+      width: 50px;
+      height: 30px;
+      background: #888;
+      border-radius: 6px;
+      border: 3px solid #444;
+      box-shadow: 2px 2px 0 #222;
+      margin-top: -2px;
+    }
+
+    #sweet-zone {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 200px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      background: rgba(255,255,0,0.2);
+      transition: opacity 0.15s;
+    }
+    #sweet-zone.active { opacity: 1; }
+
+    #board {
+      position: relative;
+      width: 240px;
+      height: 60px;
+      background: #A0522D;
+      border-radius: 8px;
+      border: 4px solid #5D2E00;
+      box-shadow: 4px 4px 0 #000;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    #nail {
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #nail-head {
+      width: 18px;
+      height: 8px;
+      background: #AAA;
+      border-radius: 50%;
+      border: 2px solid #666;
+    }
+    #nail-shaft {
+      width: 6px;
+      height: 30px;
+      background: #999;
+      border-radius: 3px;
+    }
+    #nail.driven #nail-shaft { height: 8px; }
+
+    #swings-display {
+      position: absolute;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 900;
+      background: rgba(255,255,255,0.85);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      border: 3px solid #000;
+      white-space: nowrap;
+    }
+
+    #tap-hint {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #FFF;
+      text-shadow: 2px 2px 0 #000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">HAMMER</h1>
+    <div class="game-subject">🔨</div>
+    <p class="game-tagline">Tap when the hammer is above the nail!<br>Win: Drive it in</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="swings-display">Swings: 0 / 4</div>
+    <div id="hammer-area">
+      <div id="swing-container">
+        <div id="pivot"></div>
+        <div id="sweet-zone"></div>
+        <div id="hammer-arm">
+          <div id="hammer-handle"></div>
+          <div id="hammer-head"></div>
+        </div>
+      </div>
+      <div id="board">
+        <div id="nail">
+          <div id="nail-head"></div>
+          <div id="nail-shaft"></div>
+        </div>
+      </div>
+      <div id="tap-hint">TAP WHEN ALIGNED! 🔨</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Driven in!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🔨</div>
+    <p class="game-tagline">Missed the nail!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'hammer';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(swingRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(swingRAF); show('lose'); }
+
+    const armEl = document.getElementById('hammer-arm');
+    const sweetZone = document.getElementById('sweet-zone');
+    const swingsDisplay = document.getElementById('swings-display');
+
+    const PERIOD = 1200; // ms per full swing
+    const MAX_ANGLE = 70; // degrees from center
+    const SWEET_ZONE = 15; // ±degrees for hit
+    const MAX_SWINGS = 4;
+
+    let swingRAF = null;
+    let swingStart = null;
+    let swingsCount = 0;
+    let currentAngle = 0;
+    let inSweetZone = false;
+    let swingPhase = 0; // tracks which swing we're on (for counting passes through center)
+    let lastCrossing = 0; // last time hammer crossed center
+
+    function swing(ts) {
+      if (!gameRunning) return;
+      if (!swingStart) swingStart = ts;
+      const elapsed = ts - swingStart;
+      currentAngle = Math.sin((elapsed / PERIOD) * Math.PI * 2) * MAX_ANGLE;
+      armEl.style.transform = `translateX(-50%) rotate(${currentAngle}deg)`;
+
+      // Detect sweet zone
+      const wasIn = inSweetZone;
+      inSweetZone = Math.abs(currentAngle) <= SWEET_ZONE;
+      sweetZone.classList.toggle('active', inSweetZone);
+
+      // Count swings: each time hammer crosses center from one side (half period)
+      const halfPeriod = PERIOD / 2;
+      const halfCount = Math.floor(elapsed / halfPeriod);
+      if (halfCount > lastCrossing) {
+        lastCrossing = halfCount;
+        swingsCount = Math.floor(halfCount / 2);
+        swingsDisplay.textContent = `Swings: ${swingsCount} / ${MAX_SWINGS}`;
+        if (swingsCount >= MAX_SWINGS) {
+          triggerLose();
+          return;
+        }
+      }
+
+      swingRAF = requestAnimationFrame(swing);
+    }
+
+    function onTap(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      if (inSweetZone) {
+        document.getElementById('nail').classList.add('driven');
+        triggerWin();
+      }
+      // wrong tap — no penalty, just continue (swings will run out)
+    }
+
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.addEventListener('touchstart', onTap, { passive: false });
+    gameScreen.addEventListener('mousedown', onTap);
+
+    function startGame() {
+      cancelAnimationFrame(swingRAF);
+      swingStart = null;
+      swingsCount = 0;
+      lastCrossing = 0;
+      currentAngle = 0;
+      inSweetZone = false;
+      armEl.style.transform = 'translateX(-50%) rotate(0deg)';
+      sweetZone.classList.remove('active');
+      swingsDisplay.textContent = 'Swings: 0 / 4';
+      document.getElementById('nail').classList.remove('driven');
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      swingRAF = requestAnimationFrame(swing);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

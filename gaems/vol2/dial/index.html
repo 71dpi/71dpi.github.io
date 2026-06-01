@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Dial</title>
+  <meta name="theme-color" content="#FFB800">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFB800; --color-accent: #FF6B00; }
+    #game-screen { background: #FFB800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+    #target-display {
+      font-size: 2rem; font-weight: 900; color: #fff;
+      background: #FF6B00; border-radius: 16px; padding: 8px 28px;
+      letter-spacing: 4px;
+    }
+    #progress-display { font-size: 1rem; font-weight: 800; color: #7a3800; }
+    #dial-container {
+      position: relative; width: 240px; height: 240px;
+      touch-action: none; user-select: none;
+    }
+    #dial-ring {
+      width: 240px; height: 240px; border-radius: 50%;
+      background: #2a2a2a;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+      position: absolute; top: 0; left: 0;
+    }
+    #dial-face {
+      position: absolute; top: 20px; left: 20px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: #f5e8c0;
+    }
+    #dial-rotor {
+      position: absolute; top: 0; left: 0;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      transform-origin: center center;
+    }
+    .dial-hole {
+      position: absolute; width: 28px; height: 28px;
+      border-radius: 50%; background: #2a2a2a;
+      display: flex; align-items: center; justify-content: center;
+      color: #f5e8c0; font-size: 0.7rem; font-weight: 900;
+      transform: translate(-50%, -50%);
+    }
+    .dial-hole.target { background: #FF6B00; color: #fff; box-shadow: 0 0 10px #FF6B00; }
+    #dial-finger-stop {
+      position: absolute; right: 10px; top: 50%;
+      transform: translateY(-50%);
+      width: 12px; height: 32px; background: #FF6B00;
+      border-radius: 6px; pointer-events: none;
+    }
+    #dial-center {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #888; pointer-events: none;
+    }
+    #instruction { font-size: 0.9rem; font-weight: 800; color: #7a3800; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Dial</h1>
+    <div class="game-subject">☎️</div>
+    <p class="game-tagline">Drag the hole clockwise, release at stop!<br>Win: Dial all 3 numbers</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="target-display">– – –</div>
+    <div id="progress-display">Number 1 of 3</div>
+    <div id="dial-container">
+      <div id="dial-ring"></div>
+      <div id="dial-face"></div>
+      <div id="dial-rotor"></div>
+      <div id="dial-finger-stop"></div>
+      <div id="dial-center"></div>
+    </div>
+    <div id="instruction">Drag hole clockwise → release</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">📞</div>
+    <p class="game-tagline">Calling!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">☎️</div>
+    <p class="game-tagline">Wrong number!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'dial';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // Dial positions: numbers 1-9 placed clockwise, starting from ~10 o'clock
+    // Number 1 is at top-left area, going clockwise: 1,2,3,4,5,6,7,8,9
+    // Angles (0=top, clockwise): evenly spaced in top 3/4 of circle
+    const NUM_ANGLES = {
+      1: -120, 2: -90, 3: -60, 4: -30, 5: 0,
+      6: 30,  7: 60,  8: 90,  9: 120
+    };
+    const R = 88; // radius for holes
+    const CX = 120, CY = 120; // center
+
+    let targets, currentIdx, rotorAngle, dragging, dragStartAngle, dragStartRot;
+    let holeDragged;
+
+    function degToRad(d) { return d * Math.PI / 180; }
+    function radToDeg(r) { return r * 180 / Math.PI; }
+
+    function buildDial(targetNum) {
+      const rotor = document.getElementById('dial-rotor');
+      rotor.innerHTML = '';
+      rotor.style.transform = 'rotate(0deg)';
+      rotorAngle = 0;
+
+      for (let n = 1; n <= 9; n++) {
+        const angle = NUM_ANGLES[n];
+        const rad = degToRad(angle - 90);
+        const x = CX + R * Math.cos(rad);
+        const y = CY + R * Math.sin(rad);
+        const hole = document.createElement('div');
+        hole.className = 'dial-hole' + (n === targetNum ? ' target' : '');
+        hole.textContent = n;
+        hole.style.left = x + 'px';
+        hole.style.top  = y + 'px';
+        hole.dataset.num = n;
+        rotor.appendChild(hole);
+      }
+    }
+
+    function getAngleFromCenter(clientX, clientY) {
+      const cont = document.getElementById('dial-container');
+      const r = cont.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top  + r.height / 2;
+      return radToDeg(Math.atan2(clientY - cy, clientX - cx));
+    }
+
+    function onDialDown(e) {
+      if (!gameRunning) return;
+      const t = e.touches ? e.touches[0] : e;
+      const angle = getAngleFromCenter(t.clientX, t.clientY);
+      dragging = true;
+      dragStartAngle = angle;
+      dragStartRot = rotorAngle;
+      e.preventDefault();
+    }
+
+    function onDialMove(e) {
+      if (!dragging || !gameRunning) return;
+      const t = e.touches ? e.touches[0] : e;
+      const angle = getAngleFromCenter(t.clientX, t.clientY);
+      let delta = angle - dragStartAngle;
+      // Normalize to clockwise only (positive delta = clockwise)
+      if (delta < -180) delta += 360;
+      if (delta > 180) delta -= 360;
+      // Only allow clockwise (positive)
+      let newRot = dragStartRot + Math.max(0, delta);
+      // Cap at 180 degrees (finger stop)
+      newRot = Math.min(newRot, 170);
+      rotorAngle = newRot;
+      document.getElementById('dial-rotor').style.transform = `rotate(${rotorAngle}deg)`;
+      e.preventDefault();
+    }
+
+    function onDialUp(e) {
+      if (!dragging || !gameRunning) return;
+      dragging = false;
+      if (rotorAngle >= 150) {
+        // Successful dial! Animate return
+        rotorAngle = 0;
+        document.getElementById('dial-rotor').style.transition = 'transform 0.3s ease-out';
+        document.getElementById('dial-rotor').style.transform = 'rotate(0deg)';
+        setTimeout(() => {
+          document.getElementById('dial-rotor').style.transition = '';
+          nextNumber();
+        }, 350);
+      } else {
+        // Snap back
+        document.getElementById('dial-rotor').style.transition = 'transform 0.2s ease-out';
+        document.getElementById('dial-rotor').style.transform = 'rotate(0deg)';
+        rotorAngle = 0;
+        setTimeout(() => { document.getElementById('dial-rotor').style.transition = ''; }, 250);
+      }
+    }
+
+    function nextNumber() {
+      currentIdx++;
+      if (currentIdx >= targets.length) {
+        triggerWin();
+        return;
+      }
+      updateTargetDisplay();
+      buildDial(targets[currentIdx]);
+    }
+
+    function updateTargetDisplay() {
+      const nums = targets.map((n, i) => i < currentIdx ? '✓' : n);
+      document.getElementById('target-display').textContent = nums.join('  ');
+      document.getElementById('progress-display').textContent =
+        currentIdx < targets.length ? `Number ${currentIdx + 1} of ${targets.length}` : 'Done!';
+    }
+
+    const dc = document.getElementById('dial-container');
+    dc.addEventListener('touchstart', onDialDown, { passive: false });
+    dc.addEventListener('touchmove',  onDialMove,  { passive: false });
+    dc.addEventListener('touchend',   onDialUp,    { passive: false });
+    dc.addEventListener('mousedown',  onDialDown);
+    window.addEventListener('mousemove', (e) => { if (dragging) onDialMove(e); });
+    window.addEventListener('mouseup',   (e) => { if (dragging) onDialUp(e); });
+
+    function pickTargets() {
+      const nums = [1,2,3,4,5,6,7,8,9];
+      const result = [];
+      for (let i = 0; i < 3; i++) {
+        const idx = Math.floor(Math.random() * nums.length);
+        result.push(nums.splice(idx, 1)[0]);
+      }
+      return result;
+    }
+
+    function startGame() {
+      cancelAnimationFrame(timerRAF);
+      dragging = false;
+      rotorAngle = 0;
+      targets = pickTargets();
+      currentIdx = 0;
+      buildDial(targets[0]);
+      updateTargetDisplay();
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>PEEL</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; touch-action: none; }
+
+    #peel-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+
+    #orange-emoji {
+      font-size: 8rem;
+      line-height: 1;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #peel-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    #peel-pct {
+      position: absolute;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #000;
+      background: rgba(255,255,255,0.85);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      border: 3px solid #000;
+      white-space: nowrap;
+    }
+
+    #peel-hint {
+      position: absolute;
+      bottom: 4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 700;
+      color: rgba(0,0,0,0.6);
+      text-align: center;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">PEEL</h1>
+    <div class="game-subject">🍊</div>
+    <p class="game-tagline">Drag to peel the orange!<br>Win: 300px peel path</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <canvas id="peel-canvas"></canvas>
+    <div id="peel-area">
+      <div id="orange-emoji">🍊</div>
+    </div>
+    <div id="peel-pct">PEEL 0%</div>
+    <div id="peel-hint">Drag your finger to peel!</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🍊✨</div>
+    <p class="game-tagline">One long peel!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🍊</div>
+    <p class="game-tagline">Stubby peel!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'peel';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const canvas = document.getElementById('peel-canvas');
+    const ctx = canvas.getContext('2d');
+    const pctDisplay = document.getElementById('peel-pct');
+    const hintEl = document.getElementById('peel-hint');
+
+    const TARGET_LENGTH = 300;
+    let totalLength = 0;
+    let lastPt = null;
+    let isDrawing = false;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function getPoint(e) {
+      const t = e.touches ? e.touches[0] : e;
+      return { x: t.clientX, y: t.clientY };
+    }
+
+    function onDown(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      const pt = getPoint(e);
+      lastPt = pt;
+      isDrawing = true;
+      hintEl.style.opacity = '0';
+
+      ctx.beginPath();
+      ctx.moveTo(pt.x, pt.y);
+    }
+
+    function onMove(e) {
+      if (!gameRunning || !isDrawing) return;
+      e.preventDefault();
+      const pt = getPoint(e);
+      const dx = pt.x - lastPt.x;
+      const dy = pt.y - lastPt.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      totalLength += dist;
+
+      ctx.lineTo(pt.x, pt.y);
+      ctx.strokeStyle = '#FF9933';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(pt.x, pt.y);
+
+      lastPt = pt;
+
+      const pct = Math.min(100, Math.round((totalLength / TARGET_LENGTH) * 100));
+      pctDisplay.textContent = `PEEL ${pct}%`;
+
+      if (totalLength >= TARGET_LENGTH) {
+        triggerWin();
+      }
+    }
+
+    function onUp() {
+      isDrawing = false;
+      lastPt = null;
+    }
+
+    canvas.addEventListener('touchstart', onDown, { passive: false });
+    canvas.addEventListener('touchmove', onMove, { passive: false });
+    canvas.addEventListener('touchend', onUp);
+    canvas.addEventListener('mousedown', onDown);
+    canvas.addEventListener('mousemove', e => { if (isDrawing) onMove(e); });
+    canvas.addEventListener('mouseup', onUp);
+
+    function startGame() {
+      resizeCanvas();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      totalLength = 0;
+      lastPt = null;
+      isDrawing = false;
+      pctDisplay.textContent = 'PEEL 0%';
+      hintEl.style.opacity = '1';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

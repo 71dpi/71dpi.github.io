@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SHARPEN</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; touch-action: none; }
+
+    #sharpen-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      touch-action: none;
+    }
+
+    #pencil-display {
+      font-size: 7rem;
+      line-height: 1;
+      transition: transform 0.05s;
+    }
+
+    #sharpener-device {
+      position: relative;
+      width: 100px;
+      height: 60px;
+      background: #888;
+      border-radius: 12px;
+      border: 4px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #sharpener-hole {
+      width: 20px;
+      height: 20px;
+      background: #333;
+      border-radius: 50%;
+      border: 3px solid #222;
+    }
+
+    #status-light {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 4px solid #000;
+      background: #FF3232;
+      box-shadow: 0 0 10px #FF3232;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    #status-light.green {
+      background: #00D66B;
+      box-shadow: 0 0 10px #00D66B;
+    }
+
+    #progress-wrap {
+      width: 80%;
+      max-width: 280px;
+      height: 24px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 12px;
+      border: 3px solid #000;
+      overflow: hidden;
+      position: relative;
+    }
+    #progress-fill {
+      height: 100%;
+      background: #FF6B00;
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.05s;
+    }
+
+    /* Sweet zone marker at 80% */
+    #sweet-marker {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 80%;
+      width: 3px;
+      background: #00D66B;
+      border-radius: 2px;
+    }
+
+    #hold-btn {
+      width: 140px;
+      height: 60px;
+      background: #FF6B00;
+      border: 4px solid #000;
+      border-radius: 16px;
+      box-shadow: 0 6px 0 #CC5500, 4px 4px 0 #000;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #fff;
+      cursor: pointer;
+      touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.05s, box-shadow 0.05s;
+    }
+    #hold-btn.pressed {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #CC5500, 1px 1px 0 #000;
+    }
+
+    #instruction-text {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SHARPEN</h1>
+    <div class="game-subject">✏️</div>
+    <p class="game-tagline">Hold to sharpen, release when green!<br>Win: Perfect point</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="sharpen-area">
+      <div id="pencil-display">✏️</div>
+      <div id="sharpener-device"><div id="sharpener-hole"></div></div>
+      <div id="status-light"></div>
+      <div id="progress-wrap">
+        <div id="progress-fill"></div>
+        <div id="sweet-marker"></div>
+      </div>
+      <div id="hold-btn">SHARPEN</div>
+      <div id="instruction-text">Hold SHARPEN, release when light turns green!</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Pointy!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">✏️</div>
+    <p class="game-tagline">Snapped!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'sharpen';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) { if (gameRunning) triggerLose(); }
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearInterval(fillInterval); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); clearInterval(fillInterval); show('lose'); }
+
+    const progressFill = document.getElementById('progress-fill');
+    const statusLight = document.getElementById('status-light');
+    const holdBtn = document.getElementById('hold-btn');
+    const pencilEl = document.getElementById('pencil-display');
+
+    const SWEET_START = 80;
+    const SWEET_END = 100;
+    let progress = 0;
+    let isHolding = false;
+    let fillInterval = null;
+    let snapped = false;
+
+    function updateLight() {
+      if (progress >= SWEET_START && progress < SWEET_END) {
+        statusLight.classList.add('green');
+      } else {
+        statusLight.classList.remove('green');
+      }
+    }
+
+    function onHoldStart(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      isHolding = true;
+      holdBtn.classList.add('pressed');
+      clearInterval(fillInterval);
+      fillInterval = setInterval(() => {
+        if (!isHolding || !gameRunning) { clearInterval(fillInterval); return; }
+        progress += 2;
+        progressFill.style.width = Math.min(100, progress) + '%';
+        progressFill.style.background = progress > SWEET_START ? '#00D66B' : '#FF6B00';
+        updateLight();
+
+        // Shake pencil while sharpening
+        pencilEl.style.transform = `rotate(${(Math.random() - 0.5) * 6}deg)`;
+
+        if (progress >= 100) {
+          // Oversharpened = snap!
+          clearInterval(fillInterval);
+          snapped = true;
+          pencilEl.textContent = '💥';
+          setTimeout(() => { if (gameRunning) triggerLose(); }, 400);
+        }
+      }, 60);
+    }
+
+    function onHoldEnd(e) {
+      if (!gameRunning || !isHolding) return;
+      isHolding = false;
+      holdBtn.classList.remove('pressed');
+      clearInterval(fillInterval);
+      pencilEl.style.transform = '';
+
+      if (!snapped) {
+        if (progress >= SWEET_START && progress < SWEET_END) {
+          triggerWin();
+        } else {
+          triggerLose();
+        }
+      }
+    }
+
+    holdBtn.addEventListener('touchstart', onHoldStart, { passive: false });
+    holdBtn.addEventListener('touchend', onHoldEnd);
+    holdBtn.addEventListener('mousedown', onHoldStart);
+    holdBtn.addEventListener('mouseup', onHoldEnd);
+    holdBtn.addEventListener('mouseleave', onHoldEnd);
+
+    function startGame() {
+      clearInterval(fillInterval);
+      progress = 0;
+      isHolding = false;
+      snapped = false;
+      progressFill.style.width = '0%';
+      progressFill.style.background = '#FF6B00';
+      statusLight.classList.remove('green');
+      pencilEl.textContent = '✏️';
+      pencilEl.style.transform = '';
+      holdBtn.classList.remove('pressed');
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

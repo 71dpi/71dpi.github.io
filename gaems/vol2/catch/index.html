@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>CATCH</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+
+    #game-screen { touch-action: none; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #ball {
+      position: absolute;
+      font-size: 3rem;
+      line-height: 1;
+      top: -60px;
+      pointer-events: none;
+      /* JS sets left; animation in startGame */
+    }
+
+    #ball.dropping {
+      animation: ball-drop var(--drop-dur) ease-in forwards;
+    }
+
+    @keyframes ball-drop {
+      from { transform: translateY(0); }
+      to   { transform: translateY(calc(100vh - 80px)); }
+    }
+
+    #glove {
+      position: absolute;
+      bottom: 80px;
+      font-size: 4rem;
+      line-height: 1;
+      pointer-events: none;
+      transition: left 0.05s linear;
+    }
+
+    #ground-line {
+      position: absolute;
+      bottom: 70px;
+      left: 0; right: 0;
+      height: 4px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 2px;
+    }
+
+    #slide-hint {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.6);
+      white-space: nowrap;
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.15); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">CATCH</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🧤</div>
+    <p class="game-tagline">Slide your finger left/right to catch the ball!<br>Win: Caught!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="ball">⚾</div>
+      <div id="ground-line"></div>
+      <div id="glove">🧤</div>
+      <div id="slide-hint">Slide ← → to move the glove</div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">⚾</div>
+    <p class="game-tagline">Caught!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😬</div>
+    <p class="game-tagline">Dropped!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'catch';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 7;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const ball  = document.getElementById('ball');
+    const glove = document.getElementById('glove');
+    const gameArea = document.getElementById('game-area');
+    let gloveX = 50; // percent
+    let judged = false;
+
+    function onMove(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const area = gameArea.getBoundingClientRect();
+      gloveX = ((clientX - area.left) / area.width) * 100;
+      gloveX = Math.max(5, Math.min(95, gloveX));
+      glove.style.left = `calc(${gloveX}% - 2rem)`;
+    }
+
+    document.getElementById('game-screen').addEventListener('touchmove', onMove, { passive: false });
+    document.getElementById('game-screen').addEventListener('mousemove', onMove);
+
+    function checkCatch() {
+      if (judged || !gameRunning) return;
+      judged = true;
+
+      const ballRect  = ball.getBoundingClientRect();
+      const gloveRect = glove.getBoundingClientRect();
+      const ballCX    = ballRect.left + ballRect.width / 2;
+      const gloveCX   = gloveRect.left + gloveRect.width / 2;
+      const dist = Math.abs(ballCX - gloveCX);
+
+      if (dist < 70) {
+        triggerWin();
+      } else {
+        triggerLose();
+      }
+    }
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      judged = false;
+
+      const area = gameArea.getBoundingClientRect();
+      const DROP_DUR = 3.5; // seconds, ease-in
+
+      // random X for ball (20–80%)
+      const pct = 20 + Math.random() * 60;
+      ball.style.left = `calc(${pct}% - 1.5rem)`;
+      ball.classList.remove('dropping');
+      ball.style.animation = 'none';
+      ball.style.top = '-60px';
+      ball.style.transform = '';
+      ball.offsetHeight; // reflow
+
+      ball.style.setProperty('--drop-dur', DROP_DUR + 's');
+      ball.classList.add('dropping');
+      ball.addEventListener('animationend', checkCatch, { once: true });
+
+      // glove starts centered
+      gloveX = 50;
+      glove.style.left = 'calc(50% - 2rem)';
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

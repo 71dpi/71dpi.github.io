@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>POUR</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+    #game-screen { background: #00D4FF; }
+    #glass-wrap {
+      position: relative;
+      width: 100px;
+      height: 200px;
+      margin: 0 auto;
+    }
+    #glass-body {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 180px;
+      background: rgba(255,255,255,0.25);
+      border: 4px solid #000;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 3px 3px 0 #000;
+      overflow: hidden;
+    }
+    #liquid {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 0%;
+      background: linear-gradient(180deg, #FFB800 0%, #FF6B00 100%);
+      transition: height 0.05s;
+    }
+    #target-line {
+      position: absolute;
+      left: -4px; right: -4px;
+      /* at 60% from bottom = 40% from top, inside 180px = 108px from bottom */
+      bottom: 60%;
+      height: 4px;
+      background: #FF0062;
+      z-index: 2;
+    }
+    #target-line::after {
+      content: '60%';
+      position: absolute;
+      right: 6px;
+      top: -18px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      color: #FF0062;
+    }
+    #glass-rim {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 20px;
+      background: rgba(255,255,255,0.5);
+      border: 4px solid #000;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+    }
+    #pour-btn {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #FF6B00;
+      border: 5px solid #000;
+      box-shadow: 5px 5px 0 #000;
+      font-size: 2rem;
+      font-weight: 900;
+      font-family: var(--font);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s, box-shadow 0.08s;
+      user-select: none;
+      gap: 0.25rem;
+    }
+    #pour-btn:active {
+      transform: translate(4px,4px) scale(0.92);
+      box-shadow: 1px 1px 0 #000;
+    }
+    #pour-icon { font-size: 2.5rem; }
+    #pour-label { font-size: 0.9rem; letter-spacing: 0.05em; }
+    #fill-pct {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+    #hint-text {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">POUR</h1>
+    <div class="game-subject">🍺</div>
+    <p class="game-tagline">Hold POUR to fill the glass.<br>Release at the red line!<br>Win: land within ±8% of 60%</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="hint-text">HOLD to pour, RELEASE to stop</p>
+    <div id="glass-wrap">
+      <div id="glass-rim"></div>
+      <div id="glass-body">
+        <div id="target-line"></div>
+        <div id="liquid"></div>
+      </div>
+    </div>
+    <p id="fill-pct">0%</p>
+    <button id="pour-btn">
+      <span id="pour-icon">🍺</span>
+      <span id="pour-label">POUR</span>
+    </button>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🍻</div>
+    <p class="game-tagline">Perfect pour!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💦</div>
+    <p class="game-tagline">Too much!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'pour';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); setTimeout(()=>show('win'),300); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    // POUR GAME
+    const liquid = document.getElementById('liquid');
+    const fillPct = document.getElementById('fill-pct');
+    const pourBtn = document.getElementById('pour-btn');
+    const hintText = document.getElementById('hint-text');
+
+    const TARGET = 60;
+    const TOLERANCE = 8;
+    const OVERFLOW = 90;
+    // Pour speed: 0-100% over about 5 seconds = 2% per 100ms
+    const POUR_RATE = 2.5;
+
+    let fillLevel = 0, pourInterval, pouring = false;
+
+    function setFill(pct) {
+      fillLevel = pct;
+      liquid.style.height = pct + '%';
+      fillPct.textContent = Math.round(pct) + '%';
+    }
+
+    function startPour() {
+      if (!gameRunning || pouring) return;
+      pouring = true;
+      pourBtn.style.background = '#FFF200';
+      pourBtn.style.color = '#000';
+      pourInterval = setInterval(() => {
+        if (!gameRunning) { stopPour(); return; }
+        setFill(fillLevel + POUR_RATE);
+        if (fillLevel >= OVERFLOW) {
+          stopPour();
+          // overflow — lose
+          liquid.style.background = 'linear-gradient(180deg,#60cfff 0%,#0090cc 100%)';
+          triggerLose();
+        }
+      }, 100);
+    }
+
+    function stopPour() {
+      if (!pouring) return;
+      pouring = false;
+      clearInterval(pourInterval);
+      pourBtn.style.background = '';
+      pourBtn.style.color = '';
+      if (!gameRunning) return;
+      // Check if in win zone
+      const diff = Math.abs(fillLevel - TARGET);
+      if (diff <= TOLERANCE) {
+        liquid.style.background = '#00D66B';
+        triggerWin();
+      } else if (fillLevel < TARGET - TOLERANCE) {
+        hintText.textContent = 'Not enough! Keep holding next time.';
+      } else {
+        triggerLose();
+      }
+    }
+
+    // Touch and mouse
+    pourBtn.addEventListener('mousedown', startPour);
+    pourBtn.addEventListener('touchstart', e => { e.preventDefault(); startPour(); }, { passive: false });
+    document.addEventListener('mouseup', stopPour);
+    document.addEventListener('touchend', stopPour);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      fillLevel = 0;
+      pouring = false;
+      clearInterval(pourInterval);
+      liquid.style.background = 'linear-gradient(180deg, #FFB800 0%, #FF6B00 100%)';
+      setFill(0);
+      hintText.textContent = 'HOLD to pour, RELEASE to stop';
+      pourBtn.style.background = '';
+      pourBtn.style.color = '';
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

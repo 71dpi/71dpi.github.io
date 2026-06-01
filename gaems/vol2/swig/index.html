@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SWIG</title>
+  <meta name="theme-color" content="#F44336">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFEBEE; --color-accent: #C62828; }
+    #game-area { position:relative; width:min(220px,65vw); height:min(320px,90vw); margin:0 auto; touch-action:none; }
+    #cup-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(220px,65vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #swig-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SWIG</h1>
+    <div class="game-subject">🥤</div>
+    <p class="game-tagline">Swipe UP to tilt and drink the soda<br>Win: drain it all</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="cup-svg" viewBox="0 0 220 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Cup outline -->
+        <path id="cup-body" d="M50,30 L30,300 L190,300 L170,30 Z" fill="#EF9A9A" stroke="#000" stroke-width="4"/>
+        <!-- Liquid fill (clip) -->
+        <defs>
+          <clipPath id="cup-clip">
+            <path d="M50,30 L30,300 L190,300 L170,30 Z"/>
+          </clipPath>
+        </defs>
+        <rect id="liquid" x="0" y="80" width="220" height="230" fill="#E53935" clip-path="url(#cup-clip)"/>
+        <rect id="foam" x="0" y="75" width="220" height="10" fill="rgba(255,255,255,0.7)" clip-path="url(#cup-clip)"/>
+        <!-- Cup rim -->
+        <rect x="45" y="25" width="130" height="18" rx="6" fill="#EF9A9A" stroke="#000" stroke-width="3"/>
+        <!-- Straw -->
+        <rect x="118" y="-10" width="12" height="200" rx="5" fill="#fff" stroke="#000" stroke-width="2"/>
+        <rect x="118" y="-10" width="6" height="200" rx="5" fill="#E53935"/>
+        <!-- Condensation drops -->
+        <ellipse cx="75" cy="150" rx="5" ry="8" fill="rgba(255,255,255,0.5)"/>
+        <ellipse cx="150" cy="200" rx="4" ry="7" fill="rgba(255,255,255,0.4)"/>
+        <ellipse cx="90" cy="220" rx="3" ry="6" fill="rgba(255,255,255,0.4)"/>
+        <!-- Drink level indicator line -->
+        <line x1="30" y1="200" x2="50" y2="200" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="4 4"/>
+      </svg>
+    </div>
+    <p id="swig-label">SWIPE UP TO DRINK!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🥤</div>
+    <p class="game-tagline">Bottoms up!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🥤</div>
+    <p class="game-tagline">Still thirsty!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='swig', TIME_LIMIT=7;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0;
+    const liquid=document.getElementById('liquid'), foam=document.getElementById('foam'), label=document.getElementById('swig-label');
+    const gameArea=document.getElementById('game-area');
+    // liquidY: 80=full, 300=empty
+    let liquidY=80, lastTouchY=null;
+
+    function setLiquid(y){
+      liquidY=Math.max(80,Math.min(310,y));
+      liquid.setAttribute('y',liquidY);
+      foam.setAttribute('y',liquidY-5);
+      const pct=Math.round((1-(liquidY-80)/230)*100);
+      label.textContent=pct+'% REMAINING';
+      if(liquidY>=305){triggerWin();}
+    }
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();lastTouchY=e.changedTouches[0].clientY;},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{
+      if(!gameRunning||lastTouchY===null)return;e.preventDefault();
+      const dy=lastTouchY-e.changedTouches[0].clientY; // upward swipe = positive dy
+      lastTouchY=e.changedTouches[0].clientY;
+      if(dy>0) setLiquid(liquidY+dy*1.5);
+    },{passive:false});
+    gameArea.addEventListener('touchend',()=>{lastTouchY=null;});
+
+    let mouseDown3=false, lastMouseY=null;
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;mouseDown3=true;lastMouseY=e.clientY;});
+    gameArea.addEventListener('mousemove',e=>{
+      if(!gameRunning||!mouseDown3)return;
+      const dy=lastMouseY-e.clientY;
+      lastMouseY=e.clientY;
+      if(dy>0) setLiquid(liquidY+dy*1.5);
+    });
+    gameArea.addEventListener('mouseup',()=>{mouseDown3=false;lastMouseY=null;});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      liquidY=80;liquid.setAttribute('y',80);foam.setAttribute('y',75);
+      label.textContent='SWIPE UP TO DRINK!';
+      lastTouchY=null;lastMouseY=null;mouseDown3=false;
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

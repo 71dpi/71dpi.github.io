@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>FISH</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+    #game-screen { background: #00D4FF; overflow: hidden; touch-action: none; }
+
+    #water {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 52%;
+      background: #0099CC;
+      overflow: hidden;
+    }
+    #water::before {
+      content: '';
+      position: absolute;
+      top: -18px; left: -50%;
+      width: 200%;
+      height: 36px;
+      background: radial-gradient(ellipse 80px 18px at center, #00BBEE 50%, transparent 51%);
+      background-size: 120px 36px;
+      background-repeat: repeat-x;
+      animation: wave 2.2s linear infinite;
+    }
+    #water::after {
+      content: '';
+      position: absolute;
+      top: -10px; left: -50%;
+      width: 200%;
+      height: 28px;
+      background: radial-gradient(ellipse 60px 12px at center, #00CCEE 50%, transparent 51%);
+      background-size: 90px 28px;
+      background-repeat: repeat-x;
+      animation: wave 1.6s linear infinite reverse;
+      opacity: 0.5;
+    }
+    @keyframes wave {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(50%); }
+    }
+
+    #sky {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 48%;
+      background: linear-gradient(to bottom, #87CEEB, #00D4FF);
+    }
+
+    #fishing-line {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      background: #333;
+      transform-origin: top center;
+      transform: translateX(-50%);
+    }
+
+    #bobber {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FF3232 50%, #FFF 50%);
+      border: 3px solid #333;
+      transform: translate(-50%, -50%);
+      transition: box-shadow 0.1s;
+    }
+    #bobber.dipping {
+      box-shadow: 0 0 0 6px rgba(255,50,50,0.4), 0 0 0 12px rgba(255,50,50,0.2);
+    }
+
+    #tap-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #FF3232;
+      text-shadow: 2px 2px 0 #000;
+      opacity: 0;
+      transition: opacity 0.1s;
+      pointer-events: none;
+    }
+    #tap-hint.visible { opacity: 1; }
+
+    #lives-display {
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.5rem;
+      letter-spacing: 0.2em;
+    }
+
+    #dips-display {
+      position: absolute;
+      top: 3.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 900;
+      color: #333;
+      background: rgba(255,255,255,0.8);
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">FISH</h1>
+    <div class="game-subject">🎣</div>
+    <p class="game-tagline">Tap when the bobber dips!<br>Win: Catch it before 4 dips</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="sky"></div>
+    <div id="water"></div>
+    <div id="fishing-line"></div>
+    <div id="bobber"></div>
+    <div id="tap-hint">TAP!</div>
+    <div id="lives-display">❤️❤️❤️</div>
+    <div id="dips-display">Dips: 0 / 4</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🐟</div>
+    <p class="game-tagline">Hooked!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🎣</div>
+    <p class="game-tagline">Got away!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'fish';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearAllTimers(); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); clearAllTimers(); show('lose'); }
+
+    // ── GAME STATE ──
+    let bobberY = 0, bobberBaseY = 0, sineT = 0;
+    let isDipping = false, dipCaught = false;
+    let lives = 3, dipsThrown = 0;
+    const MAX_DIPS = 4;
+    let dipTimeout = null, resetDipTimeout = null, nextDipTimeout = null;
+    let animRAF = null;
+
+    const bobberEl = document.getElementById('bobber');
+    const lineEl = document.getElementById('fishing-line');
+    const tapHint = document.getElementById('tap-hint');
+    const livesDisplay = document.getElementById('lives-display');
+    const dipsDisplay = document.getElementById('dips-display');
+
+    function clearAllTimers() {
+      clearTimeout(dipTimeout);
+      clearTimeout(resetDipTimeout);
+      clearTimeout(nextDipTimeout);
+      cancelAnimationFrame(animRAF);
+    }
+
+    function updateUI() {
+      livesDisplay.textContent = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+      dipsDisplay.textContent = `Dips: ${dipsThrown} / ${MAX_DIPS}`;
+    }
+
+    function getBobberCenter() {
+      const gs = document.getElementById('game-screen');
+      const waterTop = gs.offsetHeight * 0.48; // 48% is water boundary
+      return { cx: gs.offsetWidth / 2, waterY: waterTop };
+    }
+
+    function animateBobber() {
+      if (!gameRunning) return;
+      sineT += 0.04;
+      const { cx, waterY } = getBobberCenter();
+      const bobberNormalY = waterY - 14; // bobber sits just above water
+      let bobberAbsY;
+
+      if (isDipping) {
+        bobberAbsY = waterY + 16; // below water
+      } else {
+        bobberAbsY = bobberNormalY + Math.sin(sineT) * 6;
+      }
+
+      bobberEl.style.left = cx + 'px';
+      bobberEl.style.top = bobberAbsY + 'px';
+      lineEl.style.left = cx + 'px';
+      lineEl.style.height = bobberAbsY + 'px';
+
+      animRAF = requestAnimationFrame(animateBobber);
+    }
+
+    function startDip() {
+      if (!gameRunning) return;
+      isDipping = true;
+      dipsThrown++;
+      dipCaught = false;
+      bobberEl.classList.add('dipping');
+      tapHint.classList.add('visible');
+      updateUI();
+
+      // dip lasts 500ms
+      resetDipTimeout = setTimeout(() => {
+        if (!gameRunning) return;
+        if (!dipCaught) {
+          // missed this dip — check if we've run out
+          if (dipsThrown >= MAX_DIPS) {
+            triggerLose();
+            return;
+          }
+        }
+        isDipping = false;
+        bobberEl.classList.remove('dipping');
+        tapHint.classList.remove('visible');
+
+        // schedule next dip
+        if (gameRunning) {
+          const delay = 2000 + Math.random() * 3000;
+          nextDipTimeout = setTimeout(startDip, delay);
+        }
+      }, 500);
+    }
+
+    function handleTap(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      if (isDipping && !dipCaught) {
+        dipCaught = true;
+        triggerWin();
+      } else if (!isDipping) {
+        // wrong tap — lose a life
+        lives = Math.max(0, lives - 1);
+        updateUI();
+        if (lives <= 0) {
+          triggerLose();
+        }
+      }
+    }
+
+    function startGame() {
+      clearAllTimers();
+      isDipping = false;
+      dipCaught = false;
+      lives = 3;
+      dipsThrown = 0;
+      sineT = 0;
+      bobberEl.classList.remove('dipping');
+      tapHint.classList.remove('visible');
+      updateUI();
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+
+      animateBobber();
+
+      // first dip after 2–4s
+      const firstDelay = 2000 + Math.random() * 2000;
+      nextDipTimeout = setTimeout(startDip, firstDelay);
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', handleTap, { passive: false });
+    gs.addEventListener('mousedown', handleTap);
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

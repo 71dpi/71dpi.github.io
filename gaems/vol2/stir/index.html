@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>STIR</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; }
+
+    #stir-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      gap: 1rem;
+    }
+
+    #pot-wrap {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #pot-emoji {
+      font-size: 10rem;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #stir-canvas {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    #hud {
+      font-weight: 900;
+      font-size: 2rem;
+      color: #000;
+      text-align: center;
+    }
+
+    #arrow-hint {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #000;
+      opacity: 0.6;
+      text-align: center;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FFF200; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">STIR</h1>
+    <div class="game-subject">🥘</div>
+    <p class="game-tagline">Draw 5 circles around the pot!<br>Win: Blended!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="stir-area">
+      <div id="hud">0/5 stirs</div>
+      <div id="pot-wrap">
+        <div id="pot-emoji">🥘</div>
+        <canvas id="stir-canvas" width="220" height="220"></canvas>
+      </div>
+      <div id="arrow-hint">Circle the pot!</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😋</div>
+    <p class="game-tagline">Blended!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🥘</div>
+    <p class="game-tagline">Still lumpy!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'stir';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── STIR GAME ──
+    const canvas = document.getElementById('stir-canvas');
+    const ctx = canvas.getContext('2d');
+    const hud = document.getElementById('hud');
+    const stirArea = document.getElementById('stir-area');
+
+    const TARGET_STIRS = 5;
+    let stirCount = 0;
+    let path = [];
+    let lastAngle = null;
+    let totalRotation = 0;
+    let isDrawing = false;
+
+    function getPotCenter() {
+      const r = document.getElementById('pot-wrap').getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function angleFrom(cx, cy, px, py) {
+      return Math.atan2(py - cy, px - cx);
+    }
+
+    function angleDiff(a, b) {
+      let d = b - a;
+      while (d > Math.PI) d -= 2 * Math.PI;
+      while (d < -Math.PI) d += 2 * Math.PI;
+      return d;
+    }
+
+    function drawPath() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (path.length < 2) return;
+      const cx = 110, cy = 110;
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255,242,0,0.8)';
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      // Draw relative to canvas
+      const r = document.getElementById('pot-wrap').getBoundingClientRect();
+      ctx.moveTo(path[0].x - r.left, path[0].y - r.top);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i].x - r.left, path[i].y - r.top);
+      }
+      ctx.stroke();
+    }
+
+    function onMove(clientX, clientY) {
+      if (!gameRunning || !isDrawing) return;
+      const center = getPotCenter();
+      const angle = angleFrom(center.x, center.y, clientX, clientY);
+      path.push({ x: clientX, y: clientY });
+      if (path.length > 60) path.shift();
+      drawPath();
+
+      if (lastAngle !== null) {
+        const diff = angleDiff(lastAngle, angle);
+        totalRotation += diff;
+        if (Math.abs(totalRotation) >= 2 * Math.PI) {
+          stirCount++;
+          totalRotation = 0;
+          hud.textContent = `${stirCount}/${TARGET_STIRS} stirs`;
+          // Flash pot
+          document.getElementById('pot-emoji').style.transform = 'scale(1.15)';
+          setTimeout(() => { document.getElementById('pot-emoji').style.transform = ''; }, 150);
+          if (stirCount >= TARGET_STIRS) { triggerWin(); return; }
+        }
+      }
+      lastAngle = angle;
+    }
+
+    stirArea.addEventListener('touchstart', e => {
+      e.preventDefault();
+      isDrawing = true;
+      lastAngle = null;
+      totalRotation = 0;
+      path = [];
+    }, { passive: false });
+
+    stirArea.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      onMove(t.clientX, t.clientY);
+    }, { passive: false });
+
+    stirArea.addEventListener('touchend', () => { isDrawing = false; lastAngle = null; path = []; ctx.clearRect(0,0,canvas.width,canvas.height); });
+
+    stirArea.addEventListener('mousedown', e => {
+      isDrawing = true;
+      lastAngle = null;
+      totalRotation = 0;
+      path = [];
+    });
+    stirArea.addEventListener('mousemove', e => {
+      if (e.buttons === 1) onMove(e.clientX, e.clientY);
+    });
+    stirArea.addEventListener('mouseup', () => { isDrawing = false; lastAngle = null; path = []; ctx.clearRect(0,0,canvas.width,canvas.height); });
+
+    function startGame() {
+      stirCount = 0;
+      totalRotation = 0;
+      lastAngle = null;
+      isDrawing = false;
+      path = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hud.textContent = '0/5 stirs';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

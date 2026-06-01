@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>BLOW</title>
+  <meta name="theme-color" content="#FF3EDB">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF3EDB; --color-accent: #FFF200; }
+    #game-screen { background: #FF3EDB; touch-action: none; }
+
+    #blow-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      touch-action: none;
+    }
+
+    #cake-container {
+      position: relative;
+      cursor: pointer;
+      touch-action: none;
+      user-select: none;
+    }
+
+    #cake-emoji {
+      font-size: 7rem;
+      line-height: 1;
+      display: block;
+      pointer-events: none;
+    }
+
+    #candles-row {
+      position: absolute;
+      top: -3.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .candle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flame {
+      font-size: 1.4rem;
+      line-height: 1;
+      transition: opacity 0.2s, transform 0.2s;
+      animation: flicker 0.5s ease infinite alternate;
+    }
+    .flame.out {
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    @keyframes flicker {
+      from { transform: scale(1) translateY(0); }
+      to   { transform: scale(1.1) translateY(-2px); }
+    }
+
+    .candle-body {
+      width: 10px;
+      height: 20px;
+      background: linear-gradient(to bottom, #FFF 0%, #EEE 100%);
+      border-radius: 3px 3px 0 0;
+      border: 1px solid #CCC;
+    }
+
+    #candles-left {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #000;
+      background: rgba(255,255,255,0.8);
+      padding: 0.3rem 1rem;
+      border-radius: 12px;
+      border: 3px solid #000;
+    }
+
+    #tap-hint {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+
+    #mic-status {
+      font-size: 0.85rem;
+      color: rgba(0,0,0,0.6);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    #tap-flash {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.6);
+      border-radius: inherit;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.1s;
+    }
+    #tap-flash.visible { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">BLOW</h1>
+    <div class="game-subject">🎂</div>
+    <p class="game-tagline">Tap the cake to blow out candles!<br>Win: All 5 out</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="blow-area">
+      <div id="tap-hint">🎂 TAP THE CAKE TO BLOW!</div>
+      <div id="cake-container">
+        <div id="tap-flash"></div>
+        <div id="candles-row"></div>
+        <div id="cake-emoji">🎂</div>
+      </div>
+      <div id="candles-left">5 candles left</div>
+      <div id="mic-status"></div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🎉</div>
+    <p class="game-tagline">Wishes made!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🎂</div>
+    <p class="game-tagline">Still burning!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'blow';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); stopMic(); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); stopMic(); show('lose'); }
+
+    const candlesRow = document.getElementById('candles-row');
+    const candlesLeftEl = document.getElementById('candles-left');
+    const tapFlash = document.getElementById('tap-flash');
+    const micStatus = document.getElementById('mic-status');
+
+    const CANDLE_COUNT = 5;
+    let candlesOut = 0;
+    let lastTapTime = 0;
+    const MIN_TAP_GAP = 300; // ms between taps
+
+    // Mic / audio stuff
+    let micStream = null;
+    let audioCtx = null;
+    let analyser = null;
+    let micActive = false;
+    let micCheckRAF = null;
+
+    function buildCandles() {
+      candlesRow.innerHTML = '';
+      for (let i = 0; i < CANDLE_COUNT; i++) {
+        const div = document.createElement('div');
+        div.className = 'candle';
+        div.innerHTML = '<div class="flame">🔥</div><div class="candle-body"></div>';
+        div.dataset.index = i;
+        candlesRow.appendChild(div);
+      }
+    }
+
+    function blowOutCandle() {
+      if (!gameRunning || candlesOut >= CANDLE_COUNT) return;
+      const flames = candlesRow.querySelectorAll('.flame:not(.out)');
+      if (flames.length === 0) return;
+      flames[0].classList.add('out');
+      candlesOut++;
+      const left = CANDLE_COUNT - candlesOut;
+      candlesLeftEl.textContent = left === 0 ? '🎉 All out!' : `${left} candle${left !== 1 ? 's' : ''} left`;
+
+      // Flash
+      tapFlash.classList.add('visible');
+      setTimeout(() => tapFlash.classList.remove('visible'), 100);
+
+      if (candlesOut >= CANDLE_COUNT) {
+        setTimeout(triggerWin, 500);
+      }
+    }
+
+    function onCakeTap(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      const now = Date.now();
+      if (now - lastTapTime >= MIN_TAP_GAP) {
+        lastTapTime = now;
+        blowOutCandle();
+      }
+    }
+
+    const cakeContainer = document.getElementById('cake-container');
+    cakeContainer.addEventListener('touchstart', onCakeTap, { passive: false });
+    cakeContainer.addEventListener('mousedown', onCakeTap);
+
+    // Try mic
+    async function tryMic() {
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(micStream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 512;
+        source.connect(analyser);
+        micActive = true;
+        micStatus.textContent = '🎙️ Mic active — blow too!';
+        checkMic();
+      } catch (err) {
+        micStatus.textContent = '🎂 Tap the cake!';
+      }
+    }
+
+    let lastBlowTime = 0;
+    function checkMic() {
+      if (!gameRunning || !micActive) return;
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) sum += Math.abs(data[i] - 128);
+      const vol = sum / data.length;
+      const now = Date.now();
+      if (vol > 15 && now - lastBlowTime > 500) {
+        lastBlowTime = now;
+        blowOutCandle();
+      }
+      micCheckRAF = requestAnimationFrame(checkMic);
+    }
+
+    function stopMic() {
+      cancelAnimationFrame(micCheckRAF);
+      if (micStream) {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+      }
+      if (audioCtx) {
+        audioCtx.close();
+        audioCtx = null;
+      }
+      micActive = false;
+    }
+
+    function startGame() {
+      stopMic();
+      candlesOut = 0;
+      lastTapTime = 0;
+      lastBlowTime = 0;
+      buildCandles();
+      candlesLeftEl.textContent = `${CANDLE_COUNT} candles left`;
+      tapFlash.classList.remove('visible');
+      micStatus.textContent = '';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+
+      // Try mic after a short delay
+      setTimeout(tryMic, 500);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

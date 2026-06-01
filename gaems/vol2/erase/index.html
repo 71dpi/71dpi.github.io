@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>ERASE</title>
+  <meta name="theme-color" content="#FFF9C4">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFF9C4; --color-accent: #F57F17; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(280px,80vw); margin:0 auto; touch-action:none; }
+    #erase-canvas { display:block; border:var(--stroke) solid #000; border-radius:12px; box-shadow:var(--shadow); touch-action:none; cursor:cell; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #erase-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">ERASE</h1>
+    <div class="game-subject">📝</div>
+    <p class="game-tagline">Rub to erase the drawing</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <canvas id="erase-canvas" width="300" height="280"></canvas>
+    </div>
+    <p id="erase-label">RUB TO ERASE!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">CLEAN!</p>
+    <div class="game-subject anim-bounce">📝</div>
+    <p class="game-tagline">Erased it!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">📝</div>
+    <p class="game-tagline">Still there!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='erase', TIME_LIMIT=8;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0;
+    const canvas=document.getElementById('erase-canvas'), ctx=canvas.getContext('2d');
+    const W=300, H=280, BRUSH=22, label=document.getElementById('erase-label');
+    let totalInk=0, erasedInk=0;
+
+    function initCanvas(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#FFFDE7';ctx.fillRect(0,0,W,H);
+      // Draw a doodle to erase
+      ctx.strokeStyle='#4A148C';ctx.lineWidth=6;ctx.lineCap='round';
+      // Big star-ish shape
+      const pts=[];for(let i=0;i<10;i++){const a=(i/10)*Math.PI*2,r=i%2===0?80:40;pts.push({x:150+Math.cos(a)*r,y:140+Math.sin(a)*r});}
+      ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();ctx.stroke();
+      ctx.fillStyle='rgba(74,20,140,0.3)';ctx.fill();
+      // Some extra marks
+      ctx.strokeStyle='#6A1B9A';ctx.lineWidth=4;
+      ctx.beginPath();ctx.arc(150,140,55,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(60,60);ctx.bezierCurveTo(100,30,200,30,240,60);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(60,220);ctx.bezierCurveTo(100,250,200,250,240,220);ctx.stroke();
+      // measure ink pixels
+      const data=ctx.getImageData(0,0,W,H).data;
+      totalInk=0;
+      for(let i=3;i<data.length;i+=4){if(data[i]>30)totalInk++;}
+      erasedInk=0;
+    }
+
+    function erase(cx,cy){
+      ctx.globalCompositeOperation='destination-out';
+      ctx.beginPath();ctx.arc(cx,cy,BRUSH,0,Math.PI*2);ctx.fill();
+      ctx.globalCompositeOperation='source-over';
+      // Sample small area for progress (approximate)
+      erasedInk+=BRUSH*BRUSH*1.2;
+      const pct=Math.min(100,Math.round(erasedInk/totalInk*100));
+      label.textContent=pct+'% ERASED!';
+      if(pct>=90){triggerWin();}
+    }
+
+    const gameArea=document.getElementById('game-area');
+    function getPos(cX,cY){const rect=canvas.getBoundingClientRect();return{x:(cX-rect.left)/rect.width*W,y:(cY-rect.top)/rect.height*H};}
+    let down=false;
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();down=true;const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);erase(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning||!down)return;e.preventDefault();const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);erase(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchend',()=>{down=false;});
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;down=true;const p=getPos(e.clientX,e.clientY);erase(p.x,p.y);});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!down)return;const p=getPos(e.clientX,e.clientY);erase(p.x,p.y);});
+    gameArea.addEventListener('mouseup',()=>{down=false;});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      down=false;initCanvas();label.textContent='RUB TO ERASE!';
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

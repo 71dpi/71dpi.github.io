@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>PAINT</title>
+  <meta name="theme-color" content="#FF3EDB">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF3EDB; --color-accent: #FFF200; }
+    #game-screen { background: #FF3EDB; }
+
+    #paint-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      touch-action: none;
+    }
+
+    #canvas-wrap {
+      position: relative;
+      border: 6px solid #000;
+      border-radius: 12px;
+      box-shadow: 6px 6px 0 #000;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    #paint-canvas {
+      display: block;
+      touch-action: none;
+    }
+
+    #stencil-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      pointer-events: none;
+    }
+
+    #hud {
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #000;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FFF200; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">PAINT</h1>
+    <div class="game-subject">🖌️</div>
+    <p class="game-tagline">Fill in the star stencil 75%!<br>Win: Masterpiece!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="paint-area">
+      <div id="hud">0% painted</div>
+      <div id="canvas-wrap">
+        <canvas id="paint-canvas"></canvas>
+        <canvas id="stencil-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🎨</div>
+    <p class="game-tagline">Masterpiece!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🖌️</div>
+    <p class="game-tagline">Unfinished!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'paint';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── PAINT GAME ──
+    const paintCanvas = document.getElementById('paint-canvas');
+    const stencilCanvas = document.getElementById('stencil-canvas');
+    const hud = document.getElementById('hud');
+    const CANVAS_SIZE = Math.min(window.innerWidth - 40, 280);
+    const BRUSH_SIZE = 22;
+
+    paintCanvas.width = CANVAS_SIZE;
+    paintCanvas.height = CANVAS_SIZE;
+    stencilCanvas.width = CANVAS_SIZE;
+    stencilCanvas.height = CANVAS_SIZE;
+
+    const pCtx = paintCanvas.getContext('2d');
+    const sCtx = stencilCanvas.getContext('2d');
+
+    // Star path
+    function starPath(ctx, cx, cy, r, ir, pts) {
+      ctx.beginPath();
+      for (let i = 0; i < pts * 2; i++) {
+        const angle = (i * Math.PI / pts) - Math.PI / 2;
+        const radius = i % 2 === 0 ? r : ir;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+    }
+
+    const CX = CANVAS_SIZE / 2, CY = CANVAS_SIZE / 2;
+    const OUTER_R = CANVAS_SIZE * 0.42, INNER_R = CANVAS_SIZE * 0.18;
+
+    // Star mask: precompute which pixels are inside the star
+    let starMask = null;
+    let totalStarPixels = 0;
+
+    function buildMask() {
+      const offscreen = document.createElement('canvas');
+      offscreen.width = CANVAS_SIZE;
+      offscreen.height = CANVAS_SIZE;
+      const oc = offscreen.getContext('2d');
+      oc.fillStyle = '#000';
+      starPath(oc, CX, CY, OUTER_R, INNER_R, 5);
+      oc.fill();
+      const id = oc.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      starMask = id.data;
+      totalStarPixels = 0;
+      for (let i = 3; i < starMask.length; i += 4) {
+        if (starMask[i] > 0) totalStarPixels++;
+      }
+    }
+
+    function drawStencil() {
+      sCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      // Dashed border
+      sCtx.setLineDash([8, 5]);
+      sCtx.lineWidth = 4;
+      sCtx.strokeStyle = '#000';
+      starPath(sCtx, CX, CY, OUTER_R, INNER_R, 5);
+      sCtx.stroke();
+      sCtx.setLineDash([]);
+    }
+
+    function measureCoverage() {
+      const id = pCtx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      let painted = 0;
+      for (let i = 0; i < starMask.length; i += 4) {
+        if (starMask[i + 3] > 0 && id.data[i + 3] > 0) painted++;
+      }
+      return Math.round((painted / totalStarPixels) * 100);
+    }
+
+    let painting = false;
+    let lastPt = null;
+    let checkInterval = null;
+
+    function paint(x, y) {
+      if (!gameRunning) return;
+      pCtx.globalCompositeOperation = 'source-over';
+      pCtx.fillStyle = '#FFF200';
+
+      if (lastPt) {
+        // Draw filled circles along the stroke path
+        const dist = Math.hypot(x - lastPt.x, y - lastPt.y);
+        const steps = Math.max(1, Math.ceil(dist / 4));
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const px = lastPt.x + (x - lastPt.x) * t;
+          const py = lastPt.y + (y - lastPt.y) * t;
+          pCtx.beginPath();
+          pCtx.arc(px, py, BRUSH_SIZE, 0, Math.PI * 2);
+          pCtx.fill();
+        }
+      } else {
+        pCtx.beginPath();
+        pCtx.arc(x, y, BRUSH_SIZE, 0, Math.PI * 2);
+        pCtx.fill();
+      }
+      lastPt = { x, y };
+    }
+
+    function getPos(e) {
+      const r = paintCanvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return { x: src.clientX - r.left, y: src.clientY - r.top };
+    }
+
+    function updateCoverage() {
+      const pct = measureCoverage();
+      hud.textContent = `${pct}% painted`;
+      if (pct >= 75) triggerWin();
+    }
+
+    paintCanvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      painting = true;
+      lastPt = null;
+      const p = getPos(e);
+      paint(p.x, p.y);
+    }, { passive: false });
+
+    paintCanvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (!painting) return;
+      for (const t of e.touches) {
+        const r = paintCanvas.getBoundingClientRect();
+        paint(t.clientX - r.left, t.clientY - r.top);
+      }
+      updateCoverage();
+    }, { passive: false });
+
+    paintCanvas.addEventListener('touchend', () => { painting = false; lastPt = null; });
+
+    paintCanvas.addEventListener('mousedown', e => {
+      painting = true;
+      lastPt = null;
+      const p = getPos(e);
+      paint(p.x, p.y);
+    });
+    paintCanvas.addEventListener('mousemove', e => {
+      if (!painting || e.buttons !== 1) return;
+      const p = getPos(e);
+      paint(p.x, p.y);
+      updateCoverage();
+    });
+    paintCanvas.addEventListener('mouseup', () => { painting = false; lastPt = null; });
+
+    function startGame() {
+      painting = false;
+      lastPt = null;
+      pCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      buildMask();
+      drawStencil();
+      hud.textContent = '0% painted';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

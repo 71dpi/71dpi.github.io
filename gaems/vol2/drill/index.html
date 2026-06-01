@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>DRILL</title>
+  <meta name="theme-color" content="#FF4500">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF4500; --color-accent: #FFF200; }
+    #game-screen { background: #FF4500; }
+
+    #drill-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      touch-action: none;
+      user-select: none;
+    }
+
+    #board-wrap {
+      position: relative;
+      width: 260px;
+      height: 80px;
+      background: linear-gradient(180deg, #C68642 0%, #8B4513 100%);
+      border: 6px solid #000;
+      border-radius: 8px;
+      box-shadow: 6px 6px 0 #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #board-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 10px, rgba(0,0,0,0.08) 10px, rgba(0,0,0,0.08) 12px
+      );
+    }
+
+    #drill-hole {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px; height: 8px;
+      background: #000;
+      border-radius: 50%;
+      transition: width 0.1s, height 0.1s;
+    }
+
+    #drill-wrap {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: top 0.1s;
+    }
+
+    #drill-body {
+      font-size: 3.5rem;
+      line-height: 1;
+      filter: drop-shadow(3px 3px 0 #000);
+    }
+
+    .spinning #drill-body {
+      animation: drill-spin 0.2s linear infinite;
+    }
+
+    @keyframes drill-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    #drill-container {
+      position: relative;
+      width: 260px;
+      height: 160px;
+    }
+
+    #progress-wrap {
+      width: 260px;
+      height: 36px;
+      background: #fff;
+      border: 4px solid #000;
+      border-radius: 18px;
+      box-shadow: 4px 4px 0 #000;
+      overflow: hidden;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #FFF200, #FF6B00);
+      border-radius: 14px;
+      transition: width 0.1s linear;
+    }
+
+    #hud {
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: #000;
+    }
+
+    #hold-hint {
+      font-weight: 700;
+      font-size: 1rem;
+      color: rgba(0,0,0,0.6);
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FFF200; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">DRILL</h1>
+    <div class="game-subject">🔩</div>
+    <p class="game-tagline">Hold anywhere to drill through!<br>Win: Through!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="drill-area">
+      <div id="hud">0%</div>
+      <div id="drill-container">
+        <div id="drill-wrap">
+          <div id="drill-body">🔩</div>
+        </div>
+        <div id="board-wrap">
+          <div id="drill-hole"></div>
+        </div>
+      </div>
+      <div id="progress-wrap">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="hold-hint">HOLD to drill!</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Through!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🪵</div>
+    <p class="game-tagline">Not deep enough!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'drill';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── DRILL GAME ──
+    const drillWrap = document.getElementById('drill-wrap');
+    const drillArea = document.getElementById('drill-area');
+    const progressBar = document.getElementById('progress-bar');
+    const hud = document.getElementById('hud');
+    const drillHole = document.getElementById('drill-hole');
+
+    const FILL_RATE = 15; // % per second
+    let progress = 0;
+    let holding = false;
+    let drillRAF = null;
+    let lastTime = null;
+    let touchCount = 0;
+
+    function drillLoop(ts) {
+      if (!gameRunning) return;
+      if (!lastTime) lastTime = ts;
+      const dt = (ts - lastTime) / 1000;
+      lastTime = ts;
+
+      if (holding) {
+        progress = Math.min(100, progress + FILL_RATE * dt);
+        progressBar.style.width = progress + '%';
+        hud.textContent = Math.round(progress) + '%';
+        // Move drill down into board
+        const depth = (progress / 100) * 40;
+        drillWrap.style.top = (-60 + depth) + 'px';
+        // Grow hole
+        const holeSize = 8 + (progress / 100) * 30;
+        drillHole.style.width = holeSize + 'px';
+        drillHole.style.height = holeSize + 'px';
+
+        if (progress >= 100) { triggerWin(); return; }
+      } else {
+        lastTime = ts; // don't count stopped time
+      }
+      drillRAF = requestAnimationFrame(drillLoop);
+    }
+
+    function startHolding() {
+      if (!gameRunning) return;
+      touchCount++;
+      holding = true;
+      drillWrap.classList.add('spinning');
+      if (!drillRAF) {
+        lastTime = null;
+        drillRAF = requestAnimationFrame(drillLoop);
+      }
+    }
+
+    function stopHolding() {
+      touchCount = Math.max(0, touchCount - 1);
+      if (touchCount <= 0) {
+        touchCount = 0;
+        holding = false;
+        drillWrap.classList.remove('spinning');
+        lastTime = null;
+      }
+    }
+
+    drillArea.addEventListener('touchstart', e => {
+      e.preventDefault();
+      startHolding();
+    }, { passive: false });
+
+    drillArea.addEventListener('touchend', e => {
+      e.preventDefault();
+      stopHolding();
+    }, { passive: false });
+
+    drillArea.addEventListener('touchcancel', () => {
+      touchCount = 0;
+      holding = false;
+      drillWrap.classList.remove('spinning');
+    });
+
+    drillArea.addEventListener('mousedown', () => startHolding());
+    drillArea.addEventListener('mouseup', () => stopHolding());
+    drillArea.addEventListener('mouseleave', () => {
+      if (holding) stopHolding();
+    });
+
+    function startGame() {
+      cancelAnimationFrame(drillRAF);
+      drillRAF = null;
+      progress = 0;
+      holding = false;
+      touchCount = 0;
+      lastTime = null;
+      progressBar.style.width = '0%';
+      hud.textContent = '0%';
+      drillWrap.style.top = '-60px';
+      drillWrap.classList.remove('spinning');
+      drillHole.style.width = '8px';
+      drillHole.style.height = '8px';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      drillRAF = requestAnimationFrame(drillLoop);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

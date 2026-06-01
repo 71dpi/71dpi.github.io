@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SCARE</title>
+  <meta name="theme-color" content="#FF0062">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF0062; --color-accent: #FFF200; }
+    #game-screen { background: #FF0062; }
+    #fright-label {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+    #fright-wrap {
+      width: 240px;
+      height: 28px;
+      background: #fff;
+      border: 4px solid #000;
+      border-radius: 14px;
+      box-shadow: 3px 3px 0 #000;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    #fright-fill {
+      height: 100%;
+      width: 0%;
+      background: #FFF200;
+      border-radius: 10px;
+    }
+    #ghost-display {
+      font-size: 7rem;
+      text-align: center;
+      line-height: 1;
+      user-select: none;
+      transition: transform 0.1s;
+    }
+    #boo-btn {
+      width: 160px;
+      height: 80px;
+      background: #FFF200;
+      border: 5px solid #000;
+      border-radius: 16px;
+      box-shadow: 5px 5px 0 #000;
+      font-size: 2.5rem;
+      font-weight: 900;
+      font-family: var(--font);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s, box-shadow 0.08s;
+      letter-spacing: 0.05em;
+      animation: booAppear 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    #boo-btn:active {
+      transform: translate(4px,4px);
+      box-shadow: 1px 1px 0 #000;
+    }
+    @keyframes booAppear {
+      from { transform: scale(0) rotate(-10deg); opacity:0; }
+      to { transform: scale(1) rotate(0deg); opacity:1; }
+    }
+    #status-text {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+      min-height: 1.5em;
+    }
+    #too-soon-msg {
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+      min-height: 1.2em;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SCARE</h1>
+    <div class="game-subject">👻</div>
+    <p class="game-tagline">Wait for the meter to fill...<br>then tap BOO! Win: scare them!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="status-text">Fill the FRIGHT METER...</p>
+    <p id="fright-label">FRIGHT METER</p>
+    <div id="fright-wrap"><div id="fright-fill"></div></div>
+    <div id="ghost-display">👻</div>
+    <button id="boo-btn">BOO!</button>
+    <p id="too-soon-msg">TOO SOON! ⏳</p>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😱</div>
+    <p class="game-tagline">Startled!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😐</div>
+    <p class="game-tagline">They saw you coming!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'scare';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); clearTimeout(booWindow); setTimeout(()=>show('win'),300); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); clearTimeout(booWindow); show('lose'); }
+
+    // SCARE GAME
+    const frightFill = document.getElementById('fright-fill');
+    const booBtn = document.getElementById('boo-btn');
+    const statusText = document.getElementById('status-text');
+    const tooSoonMsg = document.getElementById('too-soon-msg');
+    const ghostDisplay = document.getElementById('ghost-display');
+
+    let frightRAF, frightStart, booReady, booWindow, booShown;
+
+    function fillMeter() {
+      const elapsed = (Date.now() - frightStart) / 1000;
+      const pct = Math.min(100, (elapsed / 5) * 100);
+      frightFill.style.width = pct + '%';
+      if (pct < 100) {
+        if (gameRunning) frightRAF = requestAnimationFrame(fillMeter);
+      } else {
+        // Meter full — show BOO button
+        showBoo();
+      }
+    }
+
+    function showBoo() {
+      if (!gameRunning) return;
+      booShown = Date.now();
+      booReady = true;
+      booBtn.style.display = 'flex';
+      booBtn.style.animation = 'booAppear 0.2s cubic-bezier(0.34,1.56,0.64,1) both';
+      statusText.textContent = 'NOW! TAP BOO! 👇';
+      ghostDisplay.textContent = '😨';
+
+      // Window: 1.5s
+      booWindow = setTimeout(() => {
+        if (gameRunning && booReady) triggerLose();
+      }, 1500);
+    }
+
+    function resetMeter() {
+      cancelAnimationFrame(frightRAF);
+      frightFill.style.width = '0%';
+      booBtn.style.display = 'none';
+      booReady = false;
+      booShown = null;
+      ghostDisplay.textContent = '👻';
+      statusText.textContent = 'Fill the FRIGHT METER...';
+    }
+
+    booBtn.addEventListener('click', () => {
+      if (!gameRunning) return;
+      if (!booReady) {
+        // Too soon
+        resetMeter();
+        tooSoonMsg.style.opacity = '1';
+        tooSoonMsg.textContent = 'TOO SOON! ⏳';
+        frightStart = Date.now();
+        frightRAF = requestAnimationFrame(fillMeter);
+        setTimeout(() => { tooSoonMsg.style.opacity = '0'; }, 1000);
+      } else {
+        clearTimeout(booWindow);
+        booReady = false;
+        ghostDisplay.textContent = '😱';
+        triggerWin();
+      }
+    });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      booReady = false;
+      booShown = null;
+      booBtn.style.display = 'none';
+      tooSoonMsg.style.opacity = '0';
+      ghostDisplay.textContent = '👻';
+      statusText.textContent = 'Fill the FRIGHT METER...';
+      frightFill.style.width = '0%';
+      frightStart = Date.now();
+      frightRAF = requestAnimationFrame(fillMeter);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Jump</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; overflow: hidden; position: relative; touch-action: none; }
+    #sky {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 65%; background: linear-gradient(to bottom, #a0e8ff, #7CFF00);
+    }
+    #ground-wrap {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+      overflow: hidden;
+    }
+    #ground {
+      position: absolute; bottom: 0; left: 0;
+      height: 100%; width: 200%;
+      background: repeating-linear-gradient(
+        90deg, #4a7c00 0px, #4a7c00 59px, #3a6000 60px, #3a6000 119px
+      );
+      animation: scroll-ground 1.5s linear infinite;
+    }
+    @keyframes scroll-ground {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-120px); }
+    }
+    .pit-gap {
+      position: absolute; bottom: 0;
+      height: 100%; background: #1a2a00;
+      border-left: 3px solid #000; border-right: 3px solid #000;
+    }
+    .pit-shadow {
+      position: absolute; bottom: 35%;
+      height: 16px; background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+      border-radius: 50%; animation: pit-approach 3s linear forwards;
+    }
+    @keyframes pit-approach {
+      from { left: 105%; width: 90px; }
+      to   { left: 8%; width: 90px; }
+    }
+    #character {
+      position: absolute;
+      font-size: 3rem;
+      left: 60px;
+      bottom: 35%;
+      transition: none;
+    }
+    #character.jumping {
+      animation: jump-arc 0.6s ease-in-out forwards;
+    }
+    @keyframes jump-arc {
+      0%   { transform: translateY(0); }
+      40%  { transform: translateY(-80px); }
+      100% { transform: translateY(0); }
+    }
+    #pits-survived {
+      position: absolute; top: 60px; right: 16px;
+      font-size: 1.2rem; font-weight: 900; color: #1a4000;
+      background: rgba(255,255,255,0.4); border-radius: 10px; padding: 4px 10px;
+    }
+    #tap-hint-jump {
+      position: absolute; bottom: 40%; left: 50%; transform: translateX(-50%);
+      font-size: 1rem; font-weight: 900; color: #1a4000;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Jump</h1>
+    <div class="game-subject">🧍</div>
+    <p class="game-tagline">Tap to jump over the pits!<br>Win: Survive 4 pits</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="sky"></div>
+    <div id="ground-wrap">
+      <div id="ground"></div>
+    </div>
+    <div id="character">🧍</div>
+    <div id="pits-survived">0 / 4</div>
+    <div id="tap-hint-jump">TAP TO JUMP</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🏆</div>
+    <p class="game-tagline">Landed!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💀</div>
+    <p class="game-tagline">Into the pit!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'jump';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    let isJumping, pitsSurvived, pitTimer, pitActive;
+    let pitStartTime, pitDuration = 3000; // 3s to cross screen
+    const PIT_WIDTH = 80;
+    const CHAR_X = 60;
+    const PIT_ZONE_START = CHAR_X - 10;
+    const PIT_ZONE_END   = CHAR_X + 50;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearTimeout(pitTimer); removePit(); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; clearTimeout(pitTimer); removePit(); show('lose'); }
+
+    function removePit() {
+      document.querySelectorAll('.pit-gap, .pit-shadow').forEach(e => e.remove());
+      pitActive = false;
+    }
+
+    function spawnPit() {
+      if (!gameRunning) return;
+      removePit();
+      pitActive = true;
+      pitStartTime = Date.now();
+
+      const gs = document.getElementById('game-screen');
+      const gsRect = gs.getBoundingClientRect();
+      const gw = gsRect.width;
+      const gh = gsRect.height;
+      const groundH = gh * 0.35;
+
+      // Shadow warning
+      const shadow = document.createElement('div');
+      shadow.className = 'pit-shadow';
+      shadow.style.width = PIT_WIDTH + 'px';
+      gs.appendChild(shadow);
+
+      // Pit gap in ground
+      const gap = document.createElement('div');
+      gap.className = 'pit-gap';
+      gap.style.width = PIT_WIDTH + 'px';
+      gap.style.right = 'auto';
+      document.getElementById('ground-wrap').appendChild(gap);
+
+      // Animate pit position
+      function animatePit() {
+        if (!gameRunning || !pitActive) return;
+        const elapsed = Date.now() - pitStartTime;
+        const progress = elapsed / pitDuration;
+        const pitX = gw - (gw + PIT_WIDTH) * progress;
+
+        gap.style.left = pitX + 'px';
+        shadow.style.left = pitX + 'px';
+
+        // Check collision with character
+        if (pitX < PIT_ZONE_END && (pitX + PIT_WIDTH) > PIT_ZONE_START && !isJumping) {
+          triggerLose();
+          return;
+        }
+
+        if (pitX + PIT_WIDTH < 0) {
+          removePit();
+          pitsSurvived++;
+          document.getElementById('pits-survived').textContent = pitsSurvived + ' / 4';
+          if (pitsSurvived >= 4) { triggerWin(); return; }
+          pitTimer = setTimeout(spawnPit, 500);
+          return;
+        }
+        requestAnimationFrame(animatePit);
+      }
+      requestAnimationFrame(animatePit);
+
+      // Warning hint disappears
+      document.getElementById('tap-hint-jump').style.display = 'none';
+    }
+
+    function doJump() {
+      if (!gameRunning || isJumping) return;
+      isJumping = true;
+      const char = document.getElementById('character');
+      char.classList.remove('jumping');
+      void char.offsetWidth;
+      char.classList.add('jumping');
+      setTimeout(() => {
+        char.classList.remove('jumping');
+        isJumping = false;
+      }, 600);
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', (e) => { e.preventDefault(); doJump(); }, { passive: false });
+    gs.addEventListener('click', doJump);
+
+    function startGame() {
+      isJumping = false; pitsSurvived = 0; pitActive = false;
+      cancelAnimationFrame(timerRAF);
+      clearTimeout(pitTimer);
+      removePit();
+      document.getElementById('character').classList.remove('jumping');
+      document.getElementById('pits-survived').textContent = '0 / 4';
+      document.getElementById('tap-hint-jump').style.display = '';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      pitTimer = setTimeout(spawnPit, 1500);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

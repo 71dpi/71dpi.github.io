@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SEAL</title>
+  <meta name="theme-color" content="#FFF8E7">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFF8E7; --color-accent: #FF6B00; }
+    #game-area { position:relative; width:min(320px,88vw); height:min(240px,66vw); margin:0 auto; touch-action:none; cursor:grab; }
+    #env-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(320px,88vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #seal-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SEAL</h1>
+    <div class="game-subject">✉️</div>
+    <p class="game-tagline">Swipe right across the envelope flap to seal it</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="env-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Envelope body -->
+        <rect x="20" y="60" width="280" height="170" rx="8" fill="#FFF9E6" stroke="#000" stroke-width="4"/>
+        <!-- Letter inside suggestion -->
+        <rect x="50" y="90" width="220" height="120" rx="4" fill="#fff" stroke="#ddd" stroke-width="2"/>
+        <line x1="70" y1="110" x2="250" y2="110" stroke="#eee" stroke-width="2"/>
+        <line x1="70" y1="125" x2="250" y2="125" stroke="#eee" stroke-width="2"/>
+        <line x1="70" y1="140" x2="200" y2="140" stroke="#eee" stroke-width="2"/>
+        <!-- Diagonal folds -->
+        <line x1="20" y1="60" x2="160" y2="135" stroke="#BDBDBD" stroke-width="2"/>
+        <line x1="300" y1="60" x2="160" y2="135" stroke="#BDBDBD" stroke-width="2"/>
+        <!-- Flap (open) -->
+        <path id="flap" d="M20,60 L160,10 L300,60 Z" fill="#FFE082" stroke="#000" stroke-width="4"/>
+        <!-- Seal strip / glue area -->
+        <rect id="glue-strip" x="20" y="52" width="280" height="16" rx="4" fill="#A5D6A7" opacity="0.4"/>
+        <!-- Swipe progress fill -->
+        <rect id="seal-progress" x="20" y="52" width="0" height="16" rx="4" fill="#43A047" opacity="0.8"/>
+        <!-- Stamp -->
+        <rect x="250" y="75" width="50" height="40" rx="4" fill="#EF9A9A" stroke="#000" stroke-width="2"/>
+        <text x="275" y="100" text-anchor="middle" fill="#000" font-size="18">✉</text>
+      </svg>
+    </div>
+    <p id="seal-label">SWIPE RIGHT TO SEAL!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✉️</div>
+    <p class="game-tagline">Sealed and delivered!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">✉️</div>
+    <p class="game-tagline">Envelope still open!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='seal', TIME_LIMIT=6;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0;
+    const gameArea=document.getElementById('game-area'), sealProgress=document.getElementById('seal-progress'), label=document.getElementById('seal-label');
+    const SVG_W=320; const SEAL_START=20, SEAL_END=300;
+    let swiping=false, startX=null, sealW=0;
+
+    function getSVGX(clientX){
+      const rect=gameArea.getBoundingClientRect();
+      return (clientX-rect.left)/rect.width*SVG_W;
+    }
+    function updateSeal(svgX){
+      // only accept rightward progress
+      const newW=Math.max(sealW,svgX-SEAL_START);
+      sealW=Math.min(newW,SEAL_END-SEAL_START);
+      sealProgress.setAttribute('width',sealW);
+      const pct=Math.round(sealW/(SEAL_END-SEAL_START)*100);
+      label.textContent=pct+'% SEALED';
+      if(sealW>=(SEAL_END-SEAL_START-4)){triggerWin();}
+    }
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();const x=getSVGX(e.changedTouches[0].clientX);if(x<SEAL_START+40){swiping=true;startX=x;}},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning||!swiping)return;e.preventDefault();updateSeal(getSVGX(e.changedTouches[0].clientX));},{passive:false});
+    gameArea.addEventListener('touchend',()=>{swiping=false;});
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;const x=getSVGX(e.clientX);swiping=true;startX=x;});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!swiping)return;updateSeal(getSVGX(e.clientX));});
+    gameArea.addEventListener('mouseup',()=>{swiping=false;});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      sealW=0;swiping=false;startX=null;
+      sealProgress.setAttribute('width',0);
+      label.textContent='SWIPE RIGHT TO SEAL!';
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

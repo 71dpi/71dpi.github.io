@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>LIGHT</title>
+  <meta name="theme-color" content="#FF7043">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFF3E0; --color-accent: #E64A19; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(300px,85vw); margin:0 auto; touch-action:none; cursor:grab; }
+    #match-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #light-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+    #speed-bar-wrap { width:min(300px,85vw); height:10px; background:#eee; border:2px solid #000; border-radius:99px; overflow:hidden; }
+    #speed-bar { height:100%; background:#FF7043; width:0%; transform-origin:left; transition: width 0.05s; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">LIGHT</h1>
+    <div class="game-subject">🔥</div>
+    <p class="game-tagline">Swipe the match fast against the box to light it!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="match-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Matchbox -->
+        <rect x="30" y="200" width="240" height="70" rx="8" fill="#E53935" stroke="#000" stroke-width="4"/>
+        <rect x="30" y="220" width="240" height="12" rx="4" fill="#B71C1C" stroke="#000" stroke-width="2"/>
+        <!-- Strike zone (rough side) -->
+        <rect id="strike-zone" x="40" y="214" width="220" height="24" rx="4" fill="#8D6E63"/>
+        <text x="150" y="230" text-anchor="middle" fill="#FFCC80" font-size="9" font-family="monospace" font-weight="bold">STRIKE HERE ◀▶</text>
+        <rect x="150" y="207" width="60" height="5" rx="2" fill="#FF8A65"/>
+        <!-- Matchbox label -->
+        <text x="150" y="257" text-anchor="middle" fill="#FFCC80" font-size="14" font-weight="900" font-family="Inter,sans-serif">MATCHES</text>
+        <!-- Match stick (draggable) -->
+        <g id="match-group" transform="translate(150,100)">
+          <rect id="match-stick" x="-4" y="0" width="8" height="100" rx="3" fill="#D7A97A" stroke="#8B4513" stroke-width="2"/>
+          <!-- Match head -->
+          <ellipse id="match-head" cx="0" cy="0" rx="10" ry="12" fill="#E53935" stroke="#000" stroke-width="2"/>
+          <!-- Flame (hidden) -->
+          <g id="flame" opacity="0">
+            <ellipse cx="0" cy="-22" rx="10" ry="16" fill="#FF6B00"/>
+            <ellipse cx="0" cy="-26" rx="7" ry="12" fill="#FFD600"/>
+            <ellipse cx="0" cy="-30" rx="4" ry="7" fill="#FFF9C4"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <p id="light-label">SWIPE THE MATCH FAST!</p>
+    <div id="speed-bar-wrap"><div id="speed-bar"></div></div>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🔥</div>
+    <p class="game-tagline">Lit it!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TOO SLOW!</p>
+    <div class="game-subject anim-shake">🔥</div>
+    <p class="game-tagline">Didn't catch fire!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='light', TIME_LIMIT=7, SPEED_NEEDED=18;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, dragging=false;
+    const gameArea=document.getElementById('game-area'), label=document.getElementById('light-label');
+    const matchGroup=document.getElementById('match-group'), flame=document.getElementById('flame');
+    const matchHead=document.getElementById('match-head'), speedBar=document.getElementById('speed-bar');
+    const SVG_W=300, SVG_H=300;
+    let matchX=150, matchY=100, lastX=null, lastY=null, lastTime=null, speed=0, heat=0;
+    const STRIKE_Y_SVG={min:205,max:245};
+
+    function getSVGPos(cX,cY){
+      const rect=gameArea.getBoundingClientRect();
+      return {x:cX/rect.width*SVG_W, y:cY/rect.height*SVG_H};
+    }
+    function isOnBox(svgY){return svgY>=STRIKE_Y_SVG.min&&svgY<=STRIKE_Y_SVG.max;}
+    function moveMatch(svgX,svgY,cTime){
+      const dx=lastX!==null?svgX-lastX:0, dy=lastY!==null?svgY-lastY:0;
+      const dt=lastTime!==null?cTime-lastTime:16;
+      speed=Math.hypot(dx,dy)/(dt||1)*16;
+      lastX=svgX;lastY=svgY;lastTime=cTime;
+      matchX=Math.max(20,Math.min(SVG_W-20,svgX));
+      matchY=Math.max(20,Math.min(SVG_H-30,svgY));
+      matchGroup.setAttribute('transform','translate('+matchX+','+matchY+')');
+      const onBox=isOnBox(svgY);
+      const displaySpeed=Math.min(speed,SPEED_NEEDED);
+      speedBar.style.width=(displaySpeed/SPEED_NEEDED*100)+'%';
+      if(onBox&&speed>SPEED_NEEDED){
+        heat+=speed*0.1;
+        matchHead.setAttribute('fill','#FF6B00');
+        if(heat>60){triggerWin();return;}
+        label.textContent='FASTER! '+(Math.round(heat/60*100))+'%';
+      } else {
+        heat=Math.max(0,heat-2);
+        matchHead.setAttribute('fill','#E53935');
+        label.textContent=onBox?'SWIPE FASTER!':'DRAG OVER THE BOX!';
+      }
+    }
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();dragging=true;const t=e.changedTouches[0];const p=getSVGPos(t.clientX,t.clientY);lastX=p.x;lastY=p.y;lastTime=Date.now();},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning||!dragging)return;e.preventDefault();const t=e.changedTouches[0];const p=getSVGPos(t.clientX,t.clientY);moveMatch(p.x,p.y,Date.now());},{passive:false});
+    gameArea.addEventListener('touchend',()=>{dragging=false;lastX=null;lastY=null;lastTime=null;speed=0;});
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;dragging=true;const p=getSVGPos(e.clientX,e.clientY);lastX=p.x;lastY=p.y;lastTime=Date.now();});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!dragging)return;const p=getSVGPos(e.clientX,e.clientY);moveMatch(p.x,p.y,Date.now());});
+    gameArea.addEventListener('mouseup',()=>{dragging=false;lastX=null;lastY=null;speed=0;});
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){
+      gameRunning=false;cancelAnimationFrame(timerRAF);
+      flame.setAttribute('opacity','1');
+      matchHead.setAttribute('fill','#FF6B00');
+      setTimeout(()=>show('win'),600);
+    }
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      heat=0;speed=0;dragging=false;lastX=null;lastY=null;
+      matchGroup.setAttribute('transform','translate(150,80)');
+      matchHead.setAttribute('fill','#E53935');
+      flame.setAttribute('opacity',0);
+      speedBar.style.width='0%';
+      label.textContent='SWIPE THE MATCH FAST!';
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

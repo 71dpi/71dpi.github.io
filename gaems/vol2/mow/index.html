@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>MOW</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; touch-action: none; }
+
+    #mow-canvas {
+      position: absolute;
+      inset: 40px 0 0 0;
+      width: 100%;
+      touch-action: none;
+    }
+
+    #counter-display {
+      position: absolute;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.1rem;
+      font-weight: 900;
+      background: rgba(255,255,255,0.85);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      border: 3px solid #000;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    #mow-hint {
+      position: absolute;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 700;
+      color: rgba(0,0,0,0.6);
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">MOW</h1>
+    <div class="game-subject">🌿</div>
+    <p class="game-tagline">Drag the mower over all the grass!<br>Win: 12 clumps cut</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="counter-display">12 left</div>
+    <canvas id="mow-canvas"></canvas>
+    <div id="mow-hint">🌀 Drag to mow!</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✂️</div>
+    <p class="game-tagline">Manicured!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🌿</div>
+    <p class="game-tagline">Still shaggy!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'mow';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const canvas = document.getElementById('mow-canvas');
+    const ctx = canvas.getContext('2d');
+    const counterEl = document.getElementById('counter-display');
+    const hintEl = document.getElementById('mow-hint');
+
+    const GRASS_COUNT = 12;
+    const MOW_RADIUS = 45;
+    let grassClumps = [];
+    let mowerX = -1, mowerY = -1;
+    let isDragging = false;
+    let cutCount = 0;
+
+    function resizeCanvas() {
+      const gs = document.getElementById('game-screen');
+      canvas.width = gs.offsetWidth;
+      canvas.height = gs.offsetHeight - 40; // subtract timer bar
+      canvas.style.top = '40px';
+    }
+
+    function placeGrass() {
+      grassClumps = [];
+      const margin = 60;
+      for (let i = 0; i < GRASS_COUNT; i++) {
+        let attempts = 0;
+        let gx, gy;
+        do {
+          gx = margin + Math.random() * (canvas.width - margin * 2);
+          gy = margin + Math.random() * (canvas.height - margin * 2 - 60);
+          attempts++;
+        } while (attempts < 50 && grassClumps.some(g => Math.hypot(g.x - gx, g.y - gy) < 55));
+        grassClumps.push({ x: gx, y: gy, cut: false });
+      }
+    }
+
+    function drawScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw lawn
+      ctx.fillStyle = '#5DBF00';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw cut trails (lighter green)
+      // Draw grass clumps
+      grassClumps.forEach(g => {
+        if (g.cut) return;
+        ctx.font = '2.5rem serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌿', g.x, g.y);
+      });
+
+      // Draw mower
+      if (mowerX > 0) {
+        ctx.font = '2.5rem serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌀', mowerX, mowerY);
+      }
+    }
+
+    function checkMow() {
+      let changed = false;
+      grassClumps.forEach(g => {
+        if (!g.cut && Math.hypot(g.x - mowerX, g.y - mowerY) < MOW_RADIUS) {
+          g.cut = true;
+          cutCount++;
+          changed = true;
+        }
+      });
+      if (changed) {
+        const left = GRASS_COUNT - cutCount;
+        counterEl.textContent = left === 0 ? '✅ ALL DONE!' : `${left} left`;
+        if (cutCount >= GRASS_COUNT) {
+          drawScene();
+          triggerWin();
+        }
+      }
+    }
+
+    function getPoint(e) {
+      const t = e.touches ? e.touches[0] : e;
+      const rect = canvas.getBoundingClientRect();
+      return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+    }
+
+    function onDown(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      isDragging = true;
+      hintEl.style.opacity = '0';
+      const pt = getPoint(e);
+      mowerX = pt.x;
+      mowerY = pt.y;
+      checkMow();
+      drawScene();
+    }
+
+    function onMove(e) {
+      if (!gameRunning || !isDragging) return;
+      e.preventDefault();
+      const pt = getPoint(e);
+      mowerX = pt.x;
+      mowerY = pt.y;
+      checkMow();
+      drawScene();
+    }
+
+    function onUp() {
+      isDragging = false;
+    }
+
+    canvas.addEventListener('touchstart', onDown, { passive: false });
+    canvas.addEventListener('touchmove', onMove, { passive: false });
+    canvas.addEventListener('touchend', onUp);
+    canvas.addEventListener('mousedown', onDown);
+    canvas.addEventListener('mousemove', e => { if (isDragging) onMove(e); });
+    canvas.addEventListener('mouseup', onUp);
+
+    function startGame() {
+      resizeCanvas();
+      cutCount = 0;
+      isDragging = false;
+      mowerX = -1;
+      mowerY = -1;
+      placeGrass();
+      counterEl.textContent = `${GRASS_COUNT} left`;
+      hintEl.style.opacity = '1';
+      drawScene();
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    window.addEventListener('resize', () => { if (gameRunning) { resizeCanvas(); drawScene(); } });
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Stack</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; overflow: hidden; position: relative; touch-action: none; }
+    #stack-area {
+      position: absolute; top: 50px; bottom: 0; left: 0; right: 0;
+    }
+    #platform {
+      position: absolute; bottom: 20px; left: 0; right: 0;
+      height: 30px; background: #FFF200;
+      border-top: 4px solid #b8aa00;
+    }
+    .stacked-block {
+      position: absolute;
+      height: 30px; background: #FFF200;
+      border: 3px solid #b8aa00; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 0.8rem; color: #7a2d00;
+    }
+    #sliding-block {
+      position: absolute; top: 20px;
+      height: 30px; background: #FFF200;
+      border: 3px solid #b8aa00; border-radius: 4px;
+      transition: none;
+    }
+    #blocks-stacked {
+      position: absolute; top: 60px; right: 16px;
+      font-size: 1.2rem; font-weight: 900; color: #FFF200;
+    }
+    #drop-hint {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.1rem; font-weight: 900; color: rgba(255,255,255,0.7);
+      pointer-events: none;
+    }
+    .miss-flash {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-size: 2rem; font-weight: 900; color: #fff;
+      pointer-events: none; animation: flash-out 0.5s ease-out forwards;
+    }
+    @keyframes flash-out {
+      from { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+      to   { opacity: 0; transform: translate(-50%,-70%) scale(1.3); }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Stack</h1>
+    <div class="game-subject">🧱</div>
+    <p class="game-tagline">Tap to drop the block!<br>Win: Stack 4 blocks perfectly</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="stack-area">
+      <div id="sliding-block"></div>
+      <div id="platform"></div>
+    </div>
+    <div id="blocks-stacked">0 / 4</div>
+    <div id="drop-hint">TAP TO DROP</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🏗️</div>
+    <p class="game-tagline">Standing!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🧱</div>
+    <p class="game-tagline">Toppled!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'stack';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    let slideRAF, blocksStacked;
+    let blockWidth, blockLeft, baseLeft, baseWidth, blockDir, blockSpeed;
+    const BLOCK_H = 30;
+    const COLORS = ['#FFF200','#FF6B00','#FF4500','#FFB800'];
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(slideRAF); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(slideRAF); show('lose'); }
+
+    function getArea() {
+      const sa = document.getElementById('stack-area');
+      return sa.getBoundingClientRect();
+    }
+
+    function getStackTop() {
+      // Returns the bottom (in px from top of stack-area) of the topmost stacked element
+      const area = getArea();
+      const platform = document.getElementById('platform');
+      const pr = platform.getBoundingClientRect();
+      // Stack top = bottom of area - platform height - stacked blocks
+      let top = area.height - 20 - BLOCK_H; // platform base
+      if (blocksStacked > 0) {
+        top = area.height - 20 - BLOCK_H * (blocksStacked + 1);
+      }
+      return top;
+    }
+
+    function launchSlider() {
+      const area = getArea();
+      const w = area.width;
+      blockDir = 1;
+      blockSpeed = 3.5 + blocksStacked * 0.5;
+      blockLeft = 0;
+      const slider = document.getElementById('sliding-block');
+      slider.style.width = blockWidth + 'px';
+      slider.style.left  = blockLeft + 'px';
+      slider.style.top   = getStackTop() + 'px';
+      slider.style.background = COLORS[blocksStacked % COLORS.length];
+      slider.style.display = 'block';
+
+      function animate() {
+        if (!gameRunning) return;
+        const areaW = getArea().width;
+        blockLeft += blockDir * blockSpeed;
+        if (blockLeft + blockWidth >= areaW) { blockLeft = areaW - blockWidth; blockDir = -1; }
+        if (blockLeft <= 0) { blockLeft = 0; blockDir = 1; }
+        slider.style.left = blockLeft + 'px';
+        slideRAF = requestAnimationFrame(animate);
+      }
+      slideRAF = requestAnimationFrame(animate);
+    }
+
+    function onDrop() {
+      if (!gameRunning) return;
+      cancelAnimationFrame(slideRAF);
+      document.getElementById('drop-hint').style.display = 'none';
+
+      const areaW = getArea().width;
+      // Overlap check
+      const blockRight  = blockLeft + blockWidth;
+      const overlapLeft  = Math.max(blockLeft, baseLeft);
+      const overlapRight = Math.min(blockRight, baseLeft + baseWidth);
+      const overlap = overlapRight - overlapLeft;
+
+      if (overlap < 50) {
+        // Miss
+        const miss = document.createElement('div');
+        miss.className = 'miss-flash';
+        miss.textContent = 'MISS!';
+        document.getElementById('game-screen').appendChild(miss);
+        miss.addEventListener('animationend', () => miss.remove());
+        triggerLose();
+        return;
+      }
+
+      // Place block
+      const sa = document.getElementById('stack-area');
+      const placed = document.createElement('div');
+      placed.className = 'stacked-block';
+      placed.style.left   = overlapLeft + 'px';
+      placed.style.width  = overlap + 'px';
+      placed.style.bottom = (20 + BLOCK_H * blocksStacked) + 'px';
+      placed.style.background = COLORS[blocksStacked % COLORS.length];
+      placed.textContent = ['🧱','📦','🟨','🔶'][blocksStacked % 4];
+      sa.appendChild(placed);
+
+      blocksStacked++;
+      baseLeft  = overlapLeft;
+      baseWidth = overlap;
+      blockWidth = Math.max(40, overlap); // next block is the overlap width
+
+      document.getElementById('blocks-stacked').textContent = blocksStacked + ' / 4';
+
+      if (blocksStacked >= 4) {
+        document.getElementById('sliding-block').style.display = 'none';
+        triggerWin();
+        return;
+      }
+      launchSlider();
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', (e) => { e.preventDefault(); onDrop(); }, { passive: false });
+    gs.addEventListener('click', onDrop);
+
+    function startGame() {
+      cancelAnimationFrame(timerRAF);
+      cancelAnimationFrame(slideRAF);
+      document.querySelectorAll('.stacked-block').forEach(b => b.remove());
+      document.querySelectorAll('.miss-flash').forEach(b => b.remove());
+
+      const areaW = getArea().width;
+      blocksStacked = 0;
+      baseLeft  = 0;
+      baseWidth = areaW;
+      blockWidth = 80;
+      document.getElementById('blocks-stacked').textContent = '0 / 4';
+      document.getElementById('drop-hint').style.display = '';
+      document.getElementById('sliding-block').style.display = 'none';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      launchSlider();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

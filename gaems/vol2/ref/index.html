@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>REF</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF0062; }
+    #game-screen { background: #7CFF00; }
+    #field {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+    #foul-banner {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #FF0062;
+      text-align: center;
+      min-height: 3rem;
+      transition: opacity 0.1s;
+      text-shadow: 2px 2px 0 #000;
+      letter-spacing: 0.05em;
+      opacity: 0;
+    }
+    #foul-banner.visible {
+      opacity: 1;
+      animation: foulFlash 0.2s ease;
+    }
+    @keyframes foulFlash {
+      0% { transform: scale(0.5); opacity: 0; }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    #whistle-btn {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #FF0062;
+      border: 5px solid #000;
+      box-shadow: 5px 5px 0 #000;
+      font-size: 3.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.08s;
+      user-select: none;
+      opacity: 0.5;
+    }
+    #whistle-btn.active {
+      opacity: 1;
+    }
+    #whistle-btn:active {
+      transform: translate(4px,4px) scale(0.9);
+      box-shadow: 1px 1px 0 #000;
+    }
+    #status-text {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+      min-height: 1.5em;
+    }
+    #timer-feedback {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-align: center;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">REF</h1>
+    <div class="game-subject">⚽</div>
+    <p class="game-tagline">Wait for the FOUL! Then tap the whistle fast!<br>Win: blow within 1.5s</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="field">
+      <span>🏃</span><span>⚽</span><span>🏃</span>
+    </div>
+    <div id="foul-banner">FOUL!</div>
+    <p id="status-text">Watch for a foul...</p>
+    <button id="whistle-btn">📯</button>
+    <p id="timer-feedback">&nbsp;</p>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🟡</div>
+    <p class="game-tagline">Fair play!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😤</div>
+    <p class="game-tagline">Missed the call!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'ref';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 9;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); clearTimeout(foulTimer); clearTimeout(windowTimer); setTimeout(()=>show('win'),300); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); clearTimeout(foulTimer); clearTimeout(windowTimer); show('lose'); }
+
+    // REF GAME
+    const foulBanner = document.getElementById('foul-banner');
+    const whistleBtn = document.getElementById('whistle-btn');
+    const statusText = document.getElementById('status-text');
+    const timerFeedback = document.getElementById('timer-feedback');
+
+    let foulTime = null, foulTimer, windowTimer, foulActive;
+
+    function showFoul() {
+      foulActive = true;
+      foulTime = Date.now();
+      foulBanner.classList.add('visible');
+      statusText.textContent = 'BLOW THE WHISTLE!';
+      whistleBtn.classList.add('active');
+      // flash background
+      document.getElementById('game-screen').style.background = '#FF0062';
+      setTimeout(() => {
+        if (gameRunning) document.getElementById('game-screen').style.background = '';
+      }, 200);
+
+      // Window closes after 1.5s
+      windowTimer = setTimeout(() => {
+        if (gameRunning) {
+          foulActive = false;
+          triggerLose();
+        }
+      }, 1500);
+    }
+
+    whistleBtn.addEventListener('click', () => {
+      if (!gameRunning) return;
+      if (!foulActive && foulTime === null) {
+        // tapped before foul
+        statusText.textContent = 'TOO EARLY! 🚫';
+        whistleBtn.style.background = '#888';
+        setTimeout(() => {
+          if (gameRunning) {
+            whistleBtn.style.background = '';
+            statusText.textContent = 'Watch for a foul...';
+          }
+        }, 600);
+        return;
+      }
+      if (foulActive) {
+        const reaction = Date.now() - foulTime;
+        timerFeedback.textContent = `Reaction: ${reaction}ms`;
+        clearTimeout(windowTimer);
+        foulActive = false;
+        // Win!
+        whistleBtn.textContent = '✅';
+        triggerWin();
+      }
+    });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      foulActive = false;
+      foulTime = null;
+      foulBanner.classList.remove('visible');
+      whistleBtn.classList.remove('active');
+      whistleBtn.textContent = '📯';
+      whistleBtn.style.background = '';
+      statusText.textContent = 'Watch for a foul...';
+      timerFeedback.textContent = ' ';
+      document.getElementById('game-screen').style.background = '';
+
+      // Foul appears at random 2–6s
+      const foulDelay = 2000 + Math.random() * 4000;
+      foulTimer = setTimeout(() => {
+        if (gameRunning) showFoul();
+      }, foulDelay);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

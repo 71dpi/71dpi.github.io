@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>DUCK</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; overflow: hidden; touch-action: none; }
+
+    #game-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 60px;
+    }
+
+    #ground {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: #4CAF00;
+      border-top: 4px solid #2D7A00;
+    }
+
+    #character {
+      position: absolute;
+      left: 60px;
+      bottom: 60px;
+      font-size: 3.5rem;
+      line-height: 1;
+      transition: transform 0.15s ease;
+      transform-origin: bottom center;
+    }
+    #character.ducking {
+      transform: scaleY(0.5) translateY(50%);
+    }
+
+    #projectile-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .projectile {
+      position: absolute;
+      font-size: 2.5rem;
+      transition: left 0.05s linear;
+    }
+
+    .warning-arrow {
+      position: absolute;
+      right: 20px;
+      font-size: 2rem;
+      animation: flash 0.3s ease infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes flash {
+      from { opacity: 1; }
+      to   { opacity: 0.3; }
+    }
+
+    #status-bar {
+      position: absolute;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 900;
+      background: rgba(0,0,0,0.2);
+      color: #000;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    #duck-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">DUCK</h1>
+    <div class="game-subject">🧍</div>
+    <p class="game-tagline">Swipe DOWN to duck!<br>Win: Survive 6 objects</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="status-bar">Objects: 0 / 6</div>
+    <div id="duck-hint">👇 SWIPE DOWN TO DUCK</div>
+    <div id="game-area">
+      <div id="ground"></div>
+      <div id="character">🧍</div>
+      <div id="projectile-container"></div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😎</div>
+    <p class="game-tagline">Safe!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💀</div>
+    <p class="game-tagline">Ouch!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'duck';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearAllTimers(); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); clearAllTimers(); show('lose'); }
+
+    const charEl = document.getElementById('character');
+    const projContainer = document.getElementById('projectile-container');
+    const statusBar = document.getElementById('status-bar');
+    const hintEl = document.getElementById('duck-hint');
+
+    const OBJECTS = ['🥏','💥','🪨'];
+    let isDucking = false, duckTimer = null;
+    let objectsLaunched = 0, objectsAvoided = 0;
+    const TOTAL_OBJECTS = 6;
+    let launchTimers = [];
+
+    let touchStartY = null;
+
+    function clearAllTimers() {
+      clearTimeout(duckTimer);
+      launchTimers.forEach(t => clearTimeout(t));
+      launchTimers = [];
+    }
+
+    function duck() {
+      if (!gameRunning) return;
+      charEl.classList.add('ducking');
+      charEl.textContent = '🫅';
+      isDucking = true;
+      clearTimeout(duckTimer);
+      duckTimer = setTimeout(() => {
+        isDucking = false;
+        charEl.classList.remove('ducking');
+        charEl.textContent = '🧍';
+      }, 1000);
+    }
+
+    function getCharBounds() {
+      const rect = charEl.getBoundingClientRect();
+      return rect;
+    }
+
+    function launchObject(index) {
+      if (!gameRunning) return;
+      const isHigh = Math.random() > 0.5; // high = hits standing char
+      const emoji = OBJECTS[index % OBJECTS.length];
+
+      // Warning arrow
+      const arrow = document.createElement('div');
+      arrow.className = 'warning-arrow';
+      arrow.textContent = isHigh ? '⬅️' : '⬅️';
+      const gs = document.getElementById('game-screen');
+      const bottomPct = isHigh ? 55 : 25; // high vs low as % from bottom
+      arrow.style.bottom = bottomPct + '%';
+      projContainer.appendChild(arrow);
+
+      let warnTimer = setTimeout(() => {
+        if (!gameRunning) { arrow.remove(); return; }
+        arrow.remove();
+
+        // Launch projectile
+        const proj = document.createElement('div');
+        proj.className = 'projectile';
+        proj.textContent = emoji;
+        proj.style.right = '0';
+        proj.style.bottom = bottomPct + '%';
+        proj.style.position = 'absolute';
+        projContainer.appendChild(proj);
+
+        const screenWidth = gs.offsetWidth;
+        let x = screenWidth;
+        const speed = 420; // px/s
+        let lastT = Date.now();
+        let hitRegistered = false;
+
+        function moveProj() {
+          if (!gameRunning) { proj.remove(); return; }
+          const now = Date.now();
+          const dt = (now - lastT) / 1000;
+          lastT = now;
+          x -= speed * dt;
+          proj.style.right = (document.getElementById('game-screen').offsetWidth - x) + 'px';
+
+          if (!hitRegistered && x < 130 && x > 50) {
+            // Check collision zone
+            const charHitHigh = isHigh && !isDucking;
+            const charHitLow = !isHigh && isDucking; // ducked into low one
+            if (charHitHigh) {
+              hitRegistered = true;
+              proj.remove();
+              triggerLose();
+              return;
+            }
+          }
+
+          if (x < -80) {
+            proj.remove();
+            objectsAvoided++;
+            statusBar.textContent = `Objects: ${objectsAvoided} / ${TOTAL_OBJECTS}`;
+            if (objectsAvoided >= TOTAL_OBJECTS) {
+              triggerWin();
+            }
+            return;
+          }
+          requestAnimationFrame(moveProj);
+        }
+        requestAnimationFrame(moveProj);
+      }, 500);
+      launchTimers.push(warnTimer);
+    }
+
+    function onTouchStart(e) {
+      if (!gameRunning) return;
+      touchStartY = e.touches ? e.touches[0].clientY : e.clientY;
+    }
+
+    function onTouchEnd(e) {
+      if (!gameRunning || touchStartY === null) return;
+      const endY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      if (endY - touchStartY > 30) {
+        duck();
+        hintEl.style.opacity = '0';
+      }
+      touchStartY = null;
+    }
+
+    const gs2 = document.getElementById('game-screen');
+    gs2.addEventListener('touchstart', onTouchStart, { passive: true });
+    gs2.addEventListener('touchend', onTouchEnd, { passive: true });
+    gs2.addEventListener('mousedown', e => { touchStartY = e.clientY; });
+    gs2.addEventListener('mouseup', e => {
+      if (touchStartY !== null && e.clientY - touchStartY > 30) {
+        duck();
+        hintEl.style.opacity = '0';
+      }
+      touchStartY = null;
+    });
+
+    function startGame() {
+      clearAllTimers();
+      isDucking = false;
+      objectsLaunched = 0;
+      objectsAvoided = 0;
+      charEl.classList.remove('ducking');
+      charEl.textContent = '🧍';
+      projContainer.innerHTML = '';
+      statusBar.textContent = 'Objects: 0 / 6';
+      hintEl.style.opacity = '0.7';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+
+      // Launch 6 objects spaced 1.2s apart
+      for (let i = 0; i < TOTAL_OBJECTS; i++) {
+        const t = setTimeout(() => launchObject(i), 1200 * i + 800);
+        launchTimers.push(t);
+      }
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

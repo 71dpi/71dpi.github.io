@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>FLIP</title>
+  <meta name="theme-color" content="#FFB800">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFB800; --color-accent: #FF3EDB; }
+    #game-screen { background: #FFB800; touch-action: none; overflow: hidden; }
+
+    #flip-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 40px;
+      touch-action: none;
+    }
+
+    #pan {
+      position: relative;
+      width: 200px;
+      height: 80px;
+      margin-bottom: 0;
+    }
+
+    #pan-body {
+      position: absolute;
+      bottom: 0; left: 10px; right: 10px;
+      height: 55px;
+      background: #444;
+      border-radius: 50% 50% 10px 10px / 30px 30px 10px 10px;
+      border: 4px solid #222;
+    }
+
+    #pan-handle {
+      position: absolute;
+      bottom: 16px;
+      right: -70px;
+      width: 70px;
+      height: 14px;
+      background: #333;
+      border-radius: 7px;
+      border: 3px solid #111;
+    }
+
+    #landing-zone {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 30px;
+      border: 3px dashed rgba(255,255,255,0.5);
+      border-radius: 50%;
+    }
+
+    #pancake {
+      position: absolute;
+      font-size: 3rem;
+      transition: none;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #tries-display {
+      position: absolute;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 900;
+      background: rgba(255,255,255,0.8);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      border: 3px solid #000;
+    }
+
+    #swipe-hint {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+      text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">FLIP</h1>
+    <div class="game-subject">🥞</div>
+    <p class="game-tagline">Swipe UP to flip the pancake!<br>Win: Land it in the pan</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="tries-display">Try 1 of 2</div>
+    <div id="swipe-hint">⬆️ SWIPE UP!</div>
+    <div id="flip-area">
+      <div id="pan">
+        <div id="pan-body"></div>
+        <div id="pan-handle"></div>
+        <div id="landing-zone"></div>
+      </div>
+    </div>
+    <div id="pancake">🥞</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😄</div>
+    <p class="game-tagline">Landed!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🫠</div>
+    <p class="game-tagline">Splat!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'flip';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    const pancakeEl = document.getElementById('pancake');
+    const triesDisplay = document.getElementById('tries-display');
+    const hintEl = document.getElementById('swipe-hint');
+
+    let tries = 0;
+    const MAX_TRIES = 2;
+    let isFlying = false;
+    let swipeStartY = null, swipeStartTime = null, swipeStartX = null;
+
+    function getPanCenter() {
+      const pan = document.getElementById('pan-body');
+      const rect = pan.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
+
+    function resetPancake() {
+      const center = getPanCenter();
+      pancakeEl.style.left = center.x + 'px';
+      pancakeEl.style.top = center.y + 'px';
+    }
+
+    function launchPancake(speedY, deviation) {
+      if (isFlying) return;
+      isFlying = true;
+      hintEl.style.opacity = '0';
+
+      const center = getPanCenter();
+      let px = center.x;
+      let py = center.y;
+
+      // Physics: upward velocity with slight angle deviation
+      const angle = (Math.random() * 30 - 15 + deviation) * Math.PI / 180;
+      let vx = Math.sin(angle) * Math.abs(speedY) * 0.3;
+      let vy = -Math.min(Math.abs(speedY), 900); // cap upward speed
+      const gravity = 1800;
+      let lastT = null;
+      let flipped = false;
+
+      function flyLoop(ts) {
+        if (!gameRunning) return;
+        if (!lastT) lastT = ts;
+        const dt = (ts - lastT) / 1000;
+        lastT = ts;
+
+        vy += gravity * dt;
+        px += vx * dt;
+        py += vy * dt;
+
+        pancakeEl.style.left = px + 'px';
+        pancakeEl.style.top = py + 'px';
+
+        // Flip animation
+        const elapsed = (ts - (lastT - dt * 1000));
+        pancakeEl.style.transform = `translate(-50%,-50%) rotate(${(ts / 5) % 360}deg)`;
+
+        // Check if landed back near pan
+        if (vy > 0 && py >= center.y) {
+          // Check X alignment
+          const dx = Math.abs(px - center.x);
+          if (dx < 55) {
+            pancakeEl.style.transform = 'translate(-50%,-50%)';
+            pancakeEl.style.left = center.x + 'px';
+            pancakeEl.style.top = center.y + 'px';
+            triggerWin();
+          } else {
+            tries++;
+            isFlying = false;
+            pancakeEl.style.transform = 'translate(-50%,-50%)';
+            // Reset pancake off screen briefly then back to pan
+            pancakeEl.style.opacity = '0.4';
+            setTimeout(() => {
+              if (!gameRunning) return;
+              if (tries >= MAX_TRIES) {
+                triggerLose();
+              } else {
+                triesDisplay.textContent = `Try ${tries + 1} of ${MAX_TRIES}`;
+                resetPancake();
+                pancakeEl.style.opacity = '1';
+                hintEl.style.opacity = '1';
+              }
+            }, 600);
+          }
+          return;
+        }
+
+        requestAnimationFrame(flyLoop);
+      }
+      requestAnimationFrame(flyLoop);
+    }
+
+    function onTouchStart(e) {
+      if (!gameRunning || isFlying) return;
+      const pt = e.touches ? e.touches[0] : e;
+      swipeStartY = pt.clientY;
+      swipeStartX = pt.clientX;
+      swipeStartTime = Date.now();
+    }
+
+    function onTouchEnd(e) {
+      if (!gameRunning || isFlying || swipeStartY === null) return;
+      const pt = e.changedTouches ? e.changedTouches[0] : e;
+      const dy = swipeStartY - pt.clientY;
+      const dx = pt.clientX - swipeStartX;
+      const elapsed = (Date.now() - swipeStartTime) / 1000;
+
+      if (dy > 40) {
+        const speedY = dy / elapsed;
+        const deviation = (dx / (window.innerWidth / 2)) * 20;
+        launchPancake(speedY, deviation);
+      }
+      swipeStartY = null;
+    }
+
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.addEventListener('touchstart', onTouchStart, { passive: true });
+    gameScreen.addEventListener('touchend', onTouchEnd, { passive: true });
+    gameScreen.addEventListener('mousedown', onTouchStart);
+    gameScreen.addEventListener('mouseup', onTouchEnd);
+
+    function startGame() {
+      tries = 0;
+      isFlying = false;
+      swipeStartY = null;
+      triesDisplay.textContent = 'Try 1 of 2';
+      hintEl.style.opacity = '1';
+      pancakeEl.style.opacity = '1';
+      pancakeEl.style.transform = 'translate(-50%,-50%)';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      requestAnimationFrame(() => resetPancake());
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

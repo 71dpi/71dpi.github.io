@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>BRUSH</title>
+  <meta name="theme-color" content="#E0F7FA">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #E0F7FA; --color-accent: #00838F; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(280px,80vw); margin:0 auto; touch-action:none; }
+    #brush-canvas { display:block; border:var(--stroke) solid #000; border-radius:12px; box-shadow:var(--shadow); touch-action:none; cursor:pointer; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #brush-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">BRUSH</h1>
+    <div class="game-subject">🦷</div>
+    <p class="game-tagline">Swipe back and forth to brush all the teeth</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <canvas id="brush-canvas" width="300" height="280"></canvas>
+    </div>
+    <p id="brush-label">BRUSH THE TEETH!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">SPARKLE!</p>
+    <div class="game-subject anim-bounce">🦷</div>
+    <p class="game-tagline">Perfectly clean!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🦷</div>
+    <p class="game-tagline">Still dirty!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='brush', TIME_LIMIT=8;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0;
+    const canvas=document.getElementById('brush-canvas'), ctx=canvas.getContext('2d');
+    const W=300, H=280, label=document.getElementById('brush-label');
+    const TEETH=[{x:30},{x:65},{x:100},{x:135},{x:170},{x:205},{x:240}];
+    const TW=28, TH=70, BRUSH_R=18;
+    let toothDirt, brushX=W/2, brushY=H/2;
+    let dragging=false;
+
+    function initTeeth(){toothDirt=TEETH.map(()=>100);}
+
+    function drawScene(){
+      ctx.clearRect(0,0,W,H);
+      // Mouth/gum
+      ctx.fillStyle='#FFCDD2';ctx.fillRect(0,100,W,160);
+      ctx.fillStyle='#EF9A9A';ctx.beginPath();ctx.arc(W/2,100,W/2+20,0,Math.PI);ctx.fill();
+      // Teeth
+      TEETH.forEach((t,i)=>{
+        const dirtLevel=toothDirt[i]/100;
+        const color=`rgb(${Math.round(255-dirtLevel*60)},${Math.round(255-dirtLevel*80)},${Math.round(255-dirtLevel*100)})`;
+        ctx.fillStyle=color;ctx.strokeStyle='#000';ctx.lineWidth=2;
+        ctx.beginPath();ctx.roundRect(t.x,115,TW,TH,6);ctx.fill();ctx.stroke();
+        // Dirt marks
+        if(dirtLevel>0.1){
+          ctx.fillStyle=`rgba(150,100,50,${dirtLevel*0.5})`;
+          ctx.beginPath();ctx.arc(t.x+8,125,4,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.arc(t.x+20,140,3,0,Math.PI*2);ctx.fill();
+        }
+      });
+      // Toothbrush
+      ctx.fillStyle='#00838F';ctx.beginPath();ctx.roundRect(brushX-8,brushY-35,16,60,4);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
+      // Brush head
+      ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(brushX-14,brushY-45,28,24,5);ctx.fill();ctx.stroke();
+      // Bristles
+      for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(brushX-12+i*6,brushY-45);ctx.lineTo(brushX-12+i*6,brushY-38);ctx.strokeStyle='#80DEEA';ctx.lineWidth=2;ctx.stroke();}
+    }
+
+    function brushTeeth(x,y){
+      TEETH.forEach((t,i)=>{
+        const cx=t.x+TW/2, cy=130+TH/2;
+        if(Math.abs(x-cx)<BRUSH_R+TW/2&&Math.abs(y-cy)<BRUSH_R+TH/2){
+          toothDirt[i]=Math.max(0,toothDirt[i]-4);
+        }
+      });
+      const cleaned=toothDirt.filter(d=>d<5).length;
+      const pct=Math.round(cleaned/TEETH.length*100);
+      label.textContent=pct+'% CLEAN!';
+      if(cleaned>=TEETH.length){triggerWin();}
+    }
+
+    const gameArea=document.getElementById('game-area');
+    function getPos(cX,cY){const rect=canvas.getBoundingClientRect();return{x:(cX-rect.left)/rect.width*W,y:(cY-rect.top)/rect.height*H};}
+    let lastBrushX=null;
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();dragging=true;const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);brushX=p.x;brushY=150;lastBrushX=p.x;},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning||!dragging)return;e.preventDefault();const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);brushX=p.x;brushY=150;brushTeeth(p.x,150);lastBrushX=p.x;},{passive:false});
+    gameArea.addEventListener('touchend',()=>{dragging=false;});
+    let mdown=false;
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;mdown=true;dragging=true;const p=getPos(e.clientX,e.clientY);brushX=p.x;brushY=150;});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!mdown)return;const p=getPos(e.clientX,e.clientY);brushX=p.x;brushY=150;brushTeeth(p.x,150);});
+    gameArea.addEventListener('mouseup',()=>{mdown=false;dragging=false;});
+
+    let animRAF=0;
+    function animLoop(){if(!gameRunning)return;drawScene();animRAF=requestAnimationFrame(animLoop);}
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(animRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      initTeeth();dragging=false;mdown=false;brushX=W/2;
+      label.textContent='BRUSH THE TEETH!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);animRAF=requestAnimationFrame(animLoop);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

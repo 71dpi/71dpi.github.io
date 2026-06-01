@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>FEED</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; }
+
+    #feed-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 1rem 5rem;
+      touch-action: none;
+      overflow: hidden;
+    }
+
+    #dog-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    #dog-emoji {
+      font-size: 7rem;
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    #dog-mouth-target {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px dashed rgba(255,255,255,0.5);
+      pointer-events: none;
+    }
+
+    #dog-mouth-target.near {
+      border-color: #FFF200;
+      box-shadow: 0 0 12px rgba(255,242,0,0.6);
+    }
+
+    #bone-wrap {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 10;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
+    #bone-emoji {
+      font-size: 4rem;
+      line-height: 1;
+      filter: drop-shadow(3px 3px 0 #000);
+      pointer-events: none;
+    }
+
+    #wag-label {
+      font-weight: 900;
+      font-size: 1rem;
+      color: #000;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #wag-label.show { opacity: 1; }
+
+    #hint {
+      position: absolute;
+      bottom: 12px;
+      left: 0; right: 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: rgba(0,0,0,0.5);
+    }
+
+    @keyframes wag {
+      0%,100% { transform: rotate(0deg); transform-origin: bottom center; }
+      25%      { transform: rotate(15deg); transform-origin: bottom center; }
+      75%      { transform: rotate(-15deg); transform-origin: bottom center; }
+    }
+
+    .dog-wag #dog-emoji { animation: wag 0.3s ease infinite; }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FFF200; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">FEED</h1>
+    <div class="game-subject">🐕</div>
+    <p class="game-tagline">Drag the bone to the dog's mouth!<br>Win: Fed!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="feed-area">
+      <div id="dog-wrap">
+        <div id="dog-emoji">🐕</div>
+        <div id="dog-mouth-target"></div>
+      </div>
+      <div id="wag-label">*tail wagging intensifies*</div>
+      <div id="bone-wrap">
+        <div id="bone-emoji">🦴</div>
+      </div>
+      <div id="hint">Drag the bone up!</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😄</div>
+    <p class="game-tagline">Fed!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🐕</div>
+    <p class="game-tagline">Hungry pup!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'feed';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── FEED GAME ──
+    const boneWrap = document.getElementById('bone-wrap');
+    const dogWrap = document.getElementById('dog-wrap');
+    const mouthTarget = document.getElementById('dog-mouth-target');
+    const wagLabel = document.getElementById('wag-label');
+    const feedArea = document.getElementById('feed-area');
+
+    let dragging = false, dragOX = 0, dragOY = 0, boneX = 0, boneY = 0;
+    let fed = false;
+
+    function getMouthCenter() {
+      const r = mouthTarget.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    function getBoneCenter() {
+      const r = boneWrap.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function getEvt(e) {
+      return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                       : { x: e.clientX, y: e.clientY };
+    }
+
+    function onDown(e) {
+      if (!gameRunning || fed) return;
+      const p = getEvt(e);
+      const r = boneWrap.getBoundingClientRect();
+      if (p.x < r.left - 30 || p.x > r.right + 30 || p.y < r.top - 30 || p.y > r.bottom + 30) return;
+      dragging = true;
+      const bc = getBoneCenter();
+      dragOX = p.x - bc.x;
+      dragOY = p.y - bc.y;
+      e.preventDefault();
+    }
+
+    function onMove(e) {
+      if (!dragging || !gameRunning || fed) return;
+      const p = getEvt(e);
+      const area = feedArea.getBoundingClientRect();
+      const newX = p.x - dragOX;
+      const newY = p.y - dragOY;
+
+      // Update bone position
+      boneWrap.style.left = (newX - area.left) + 'px';
+      boneWrap.style.top = (newY - area.top) + 'px';
+      boneWrap.style.bottom = 'auto';
+      boneWrap.style.transform = 'translate(-50%, -50%)';
+
+      // Check proximity to mouth
+      const mouth = getMouthCenter();
+      const bone = getBoneCenter();
+      const d = Math.hypot(bone.x - mouth.x, bone.y - mouth.y);
+
+      if (d < 80) {
+        mouthTarget.classList.add('near');
+        dogWrap.classList.add('dog-wag');
+        wagLabel.classList.add('show');
+      } else {
+        mouthTarget.classList.remove('near');
+        dogWrap.classList.remove('dog-wag');
+        wagLabel.classList.remove('show');
+      }
+
+      if (d < 60) {
+        fed = true;
+        dragging = false;
+        boneWrap.style.opacity = '0';
+        triggerWin();
+      }
+
+      e.preventDefault();
+    }
+
+    function onUp() { dragging = false; }
+
+    feedArea.addEventListener('touchstart', onDown, { passive: false });
+    feedArea.addEventListener('touchmove', onMove, { passive: false });
+    feedArea.addEventListener('touchend', onUp);
+    feedArea.addEventListener('mousedown', onDown);
+    feedArea.addEventListener('mousemove', onMove);
+    feedArea.addEventListener('mouseup', onUp);
+
+    function startGame() {
+      dragging = false;
+      fed = false;
+      boneWrap.style.opacity = '1';
+      boneWrap.style.left = '50%';
+      boneWrap.style.bottom = '100px';
+      boneWrap.style.top = 'auto';
+      boneWrap.style.transform = 'translate(-50%, 0)';
+      mouthTarget.classList.remove('near');
+      dogWrap.classList.remove('dog-wag');
+      wagLabel.classList.remove('show');
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

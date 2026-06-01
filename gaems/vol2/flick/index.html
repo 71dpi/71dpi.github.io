@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>FLICK</title>
+  <meta name="theme-color" content="#E8F5E9">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #E8F5E9; --color-accent: #2E7D32; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(300px,85vw); margin:0 auto; touch-action:none; overflow:hidden; border-radius:12px; border:var(--stroke) solid #000; box-shadow:var(--shadow); }
+    #flick-canvas { display:block; touch-action:none; cursor:grab; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #flick-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">FLICK</h1>
+    <div class="game-subject">🐞</div>
+    <p class="game-tagline">Flick the ladybug off the blanket!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area"><canvas id="flick-canvas" width="300" height="300"></canvas></div>
+    <p id="flick-label">FLICK THE BUG!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">FLICK!</p>
+    <div class="game-subject anim-bounce">🐞</div>
+    <p class="game-tagline">Bug gone!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🐞</div>
+    <p class="game-tagline">Still crawling!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='flick', TIME_LIMIT=7;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, animRAF=0;
+    const canvas=document.getElementById('flick-canvas'), ctx=canvas.getContext('2d');
+    const W=300, H=300, label=document.getElementById('flick-label');
+    let bugX, bugY, bugVX=0, bugVY=0, dragging=false, dragStartX, dragStartY, prevX, prevY, offScreen=false;
+    const BUG_R=22;
+
+    function drawFrame(){
+      ctx.clearRect(0,0,W,H);
+      // Blanket
+      ctx.fillStyle='#FFCC80';ctx.fillRect(0,0,W,H);
+      // Blanket pattern
+      for(let x=0;x<W;x+=40){ctx.fillStyle='rgba(255,160,50,0.3)';ctx.fillRect(x,0,2,H);}
+      for(let y=0;y<H;y+=40){ctx.fillStyle='rgba(255,160,50,0.3)';ctx.fillRect(0,y,W,2);}
+      // Bug trail when moving
+      if(Math.abs(bugVX)+Math.abs(bugVY)>2){
+        ctx.beginPath();ctx.arc(bugX-bugVX*2,bugY-bugVY*2,BUG_R*0.5,0,Math.PI*2);
+        ctx.fillStyle='rgba(200,50,50,0.2)';ctx.fill();
+      }
+      if(!offScreen){
+        // Bug body
+        ctx.beginPath();ctx.arc(bugX,bugY,BUG_R,0,Math.PI*2);
+        ctx.fillStyle='#D32F2F';ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.stroke();
+        // Head
+        ctx.beginPath();ctx.arc(bugX,bugY-BUG_R+5,10,0,Math.PI*2);
+        ctx.fillStyle='#212121';ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
+        // Dots
+        [[bugX-8,bugY-4],[bugX+8,bugY-4],[bugX-8,bugY+8],[bugX+8,bugY+8],[bugX,bugY+2]].forEach(([dx,dy])=>{
+          ctx.beginPath();ctx.arc(dx,dy,4,0,Math.PI*2);ctx.fillStyle='#000';ctx.fill();
+        });
+        // Wings line
+        ctx.beginPath();ctx.moveTo(bugX,bugY-BUG_R+14);ctx.lineTo(bugX,bugY+BUG_R-2);ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
+        // Antennae
+        ctx.beginPath();ctx.moveTo(bugX-5,bugY-BUG_R+5);ctx.lineTo(bugX-15,bugY-BUG_R-12);ctx.strokeStyle='#212121';ctx.lineWidth=2;ctx.stroke();
+        ctx.beginPath();ctx.moveTo(bugX+5,bugY-BUG_R+5);ctx.lineTo(bugX+15,bugY-BUG_R-12);ctx.strokeStyle='#212121';ctx.lineWidth=2;ctx.stroke();
+      }
+      if(offScreen){
+        bugX+=bugVX; bugY+=bugVY; bugVX*=0.98; bugVY*=0.98;
+        if(Math.abs(bugX-W/2)>W||Math.abs(bugY-H/2)>H){triggerWin();return;}
+      } else if(dragging){
+        // bug follows finger
+      } else {
+        // bug wanders
+        bugX+=Math.sin(Date.now()/600)*0.5;
+        bugY+=Math.cos(Date.now()/700)*0.5;
+        bugX=Math.max(BUG_R,Math.min(W-BUG_R,bugX));
+        bugY=Math.max(BUG_R,Math.min(H-BUG_R,bugY));
+      }
+      if(gameRunning)animRAF=requestAnimationFrame(drawFrame);
+    }
+
+    function getPos(cX,cY){const rect=canvas.getBoundingClientRect();return{x:(cX-rect.left)/rect.width*W,y:(cY-rect.top)/rect.height*H};}
+
+    canvas.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);const dx=p.x-bugX,dy=p.y-bugY;if(Math.hypot(dx,dy)<BUG_R+10){dragging=true;dragStartX=p.x;dragStartY=p.y;prevX=p.x;prevY=p.y;}},{passive:false});
+    canvas.addEventListener('touchmove',e=>{if(!gameRunning||!dragging)return;e.preventDefault();const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);bugVX=p.x-prevX;bugVY=p.y-prevY;prevX=bugX;prevY=bugY;bugX=p.x;bugY=p.y;},{passive:false});
+    canvas.addEventListener('touchend',e=>{if(dragging){dragging=false;const speed=Math.hypot(bugVX,bugVY);if(speed>8){offScreen=true;label.textContent='FLYYYY! 🚀';}else{bugVX=0;bugVY=0;}}},{passive:false});
+
+    let mouseDown=false;
+    canvas.addEventListener('mousedown',e=>{if(!gameRunning)return;const p=getPos(e.clientX,e.clientY);const dx=p.x-bugX,dy=p.y-bugY;if(Math.hypot(dx,dy)<BUG_R+10){mouseDown=true;dragging=true;prevX=p.x;prevY=p.y;}});
+    canvas.addEventListener('mousemove',e=>{if(!gameRunning||!mouseDown)return;const p=getPos(e.clientX,e.clientY);bugVX=p.x-prevX;bugVY=p.y-prevY;prevX=bugX;prevY=bugY;bugX=p.x;bugY=p.y;});
+    canvas.addEventListener('mouseup',e=>{if(mouseDown){mouseDown=false;dragging=false;const speed=Math.hypot(bugVX,bugVY);if(speed>8){offScreen=true;label.textContent='FLYYYY! 🚀';}else{bugVX=0;bugVY=0;}}});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      bugX=W/2;bugY=H/2;bugVX=0;bugVY=0;dragging=false;offScreen=false;mouseDown=false;
+      label.textContent='FLICK THE BUG!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);animRAF=requestAnimationFrame(drawFrame);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

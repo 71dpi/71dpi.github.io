@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SCORE</title>
+  <meta name="theme-color" content="#E3F2FD">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #E3F2FD; --color-accent: #0D47A1; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(280px,80vw); margin:0 auto; touch-action:none; overflow:hidden; border-radius:8px; border:var(--stroke) solid #000; box-shadow:var(--shadow); }
+    #ice-canvas { display:block; touch-action:none; cursor:grab; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #score-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SCORE</h1>
+    <div class="game-subject">🏒</div>
+    <p class="game-tagline">Swipe the puck past the goalie!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area"><canvas id="ice-canvas" width="300" height="280"></canvas></div>
+    <p id="score-label">SWIPE THE PUCK!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">GOAL!</p>
+    <div class="game-subject anim-bounce">🏒</div>
+    <p class="game-tagline">Scored!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">BLOCKED!</p>
+    <div class="game-subject anim-shake">🏒</div>
+    <p class="game-tagline">Goalie got it!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='score', TIME_LIMIT=7;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, animRAF=0;
+    const canvas=document.getElementById('ice-canvas'), ctx=canvas.getContext('2d');
+    const W=300, H=280, label=document.getElementById('score-label');
+    const PUCK_R=14, GOALIE_W=50, GOALIE_H=20;
+    let puckX=W/2, puckY=H-40, puckVX=0, puckVY=0, goalieX=W/2, goalieDir=1, goalieSpeed=2;
+    let dragging=false, prevX, prevY, flicked=false;
+
+    function drawFrame(){
+      // Ice
+      ctx.fillStyle='#E3F2FD';ctx.fillRect(0,0,W,H);
+      // Ice lines
+      ctx.strokeStyle='rgba(13,71,161,0.2)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+      ctx.beginPath();ctx.arc(W/2,H/2,40,0,Math.PI*2);ctx.stroke();
+      // Goal net
+      ctx.fillStyle='#fff';ctx.fillRect(90,5,120,30);
+      ctx.strokeStyle='#E53935';ctx.lineWidth=3;ctx.strokeRect(90,5,120,30);
+      // Net lines
+      ctx.strokeStyle='rgba(229,57,53,0.3)';ctx.lineWidth=1;
+      for(let x=90;x<=210;x+=15){ctx.beginPath();ctx.moveTo(x,5);ctx.lineTo(x,35);ctx.stroke();}
+      for(let y=5;y<=35;y+=10){ctx.beginPath();ctx.moveTo(90,y);ctx.lineTo(210,y);ctx.stroke();}
+      // Goalie
+      goalieX+=goalieDir*goalieSpeed;
+      if(goalieX>210-GOALIE_W/2){goalieX=210-GOALIE_W/2;goalieDir=-1;}
+      if(goalieX<90+GOALIE_W/2){goalieX=90+GOALIE_W/2;goalieDir=1;}
+      ctx.fillStyle='#0D47A1';ctx.beginPath();ctx.roundRect(goalieX-GOALIE_W/2,30,GOALIE_W,GOALIE_H,4);ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+      // Puck
+      ctx.beginPath();ctx.arc(puckX,puckY,PUCK_R,0,Math.PI*2);ctx.fillStyle='#212121';ctx.fill();
+      ctx.strokeStyle='#555';ctx.lineWidth=2;ctx.stroke();
+      if(flicked){
+        puckX+=puckVX;puckY+=puckVY;
+        puckVX*=0.995;puckVY*=0.995;
+        if(puckX<PUCK_R){puckX=PUCK_R;puckVX=Math.abs(puckVX);}
+        if(puckX>W-PUCK_R){puckX=W-PUCK_R;puckVX=-Math.abs(puckVX);}
+        // Goalie block
+        if(puckY<30+GOALIE_H+PUCK_R&&puckY>25&&Math.abs(puckX-goalieX)<GOALIE_W/2+PUCK_R){puckVY=Math.abs(puckVY);label.textContent='BLOCKED! TRY AGAIN';setTimeout(()=>{if(gameRunning)triggerLose();},500);return;}
+        // Goal!
+        if(puckY<5+PUCK_R&&puckX>90&&puckX<210){triggerWin();return;}
+        if(puckY>H+PUCK_R){flicked=false;puckX=W/2;puckY=H-40;puckVX=0;puckVY=0;label.textContent='SWIPE AGAIN!';}
+      }
+      if(gameRunning)animRAF=requestAnimationFrame(drawFrame);
+    }
+
+    function getPos(cX,cY){const rect=canvas.getBoundingClientRect();return{x:(cX-rect.left)/rect.width*W,y:(cY-rect.top)/rect.height*H};}
+    canvas.addEventListener('touchstart',e=>{if(!gameRunning||flicked)return;e.preventDefault();const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);if(Math.hypot(p.x-puckX,p.y-puckY)<PUCK_R+12){dragging=true;prevX=p.x;prevY=p.y;}},{passive:false});
+    canvas.addEventListener('touchmove',e=>{if(!gameRunning||!dragging)return;e.preventDefault();const p=getPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);puckVX=p.x-prevX;puckVY=p.y-prevY;prevX=puckX;prevY=puckY;puckX=p.x;puckY=p.y;},{passive:false});
+    canvas.addEventListener('touchend',()=>{if(dragging){dragging=false;const speed=Math.hypot(puckVX,puckVY);if(speed>3){flicked=true;puckVX*=2.5;puckVY*=2.5;}else{puckVX=0;puckVY=0;}}});
+    let mdown=false;
+    canvas.addEventListener('mousedown',e=>{if(!gameRunning||flicked)return;const p=getPos(e.clientX,e.clientY);if(Math.hypot(p.x-puckX,p.y-puckY)<PUCK_R+12){mdown=true;dragging=true;prevX=p.x;prevY=p.y;}});
+    canvas.addEventListener('mousemove',e=>{if(!gameRunning||!mdown)return;const p=getPos(e.clientX,e.clientY);puckVX=p.x-prevX;puckVY=p.y-prevY;prevX=puckX;prevY=puckY;puckX=p.x;puckY=p.y;});
+    canvas.addEventListener('mouseup',()=>{if(mdown){mdown=false;dragging=false;const s=Math.hypot(puckVX,puckVY);if(s>3){flicked=true;puckVX*=2.5;puckVY*=2.5;}else{puckVX=0;puckVY=0;}}});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(animRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      puckX=W/2;puckY=H-40;puckVX=0;puckVY=0;flicked=false;dragging=false;mdown=false;
+      goalieX=W/2;goalieDir=1;goalieSpeed=2+Math.random();
+      label.textContent='SWIPE THE PUCK!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);animRAF=requestAnimationFrame(drawFrame);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

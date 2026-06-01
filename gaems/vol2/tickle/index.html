@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Tickle</title>
+  <meta name="theme-color" content="#FF3EDB">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF3EDB; --color-accent: #FFF200; }
+    #game-screen { background: #FF3EDB; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; touch-action: none; }
+    #foot {
+      font-size: 8rem; line-height: 1; user-select: none;
+      transition: transform 0.1s;
+    }
+    #foot.wobble { animation: wobble-foot 0.3s infinite alternate; }
+    @keyframes wobble-foot {
+      from { transform: rotate(-8deg) scale(1.05); }
+      to   { transform: rotate(8deg)  scale(0.95); }
+    }
+    #foot-zone {
+      cursor: crosshair;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px;
+      border-radius: 20px;
+    }
+    #meter-wrap {
+      width: 200px; height: 24px; background: rgba(0,0,0,0.2);
+      border-radius: 12px; overflow: hidden;
+    }
+    #laugh-meter {
+      height: 100%; width: 0%; background: #FFF200;
+      border-radius: 12px; transition: width 0.1s;
+    }
+    #tickle-count { font-size: 1rem; font-weight: 900; color: #fff; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Tickle</h1>
+    <div class="game-subject">🦶</div>
+    <p class="game-tagline">Rub back and forth on the foot!<br>Win: 15 direction changes</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="foot-zone">
+      <div id="foot">🦶</div>
+      <div id="meter-wrap"><div id="laugh-meter"></div></div>
+      <div id="tickle-count">0 / 15 tickles</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😂</div>
+    <p class="game-tagline">Giggles!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😐</div>
+    <p class="game-tagline">Tickle proof!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'tickle';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    let tickleCount, lastX, lastDir;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    function onTickleMove(clientX) {
+      if (!gameRunning) return;
+      if (lastX === undefined) { lastX = clientX; return; }
+      const dx = clientX - lastX;
+      if (Math.abs(dx) < 8) return;
+      const dir = dx > 0 ? 1 : -1;
+      if (lastDir !== undefined && dir !== lastDir) {
+        tickleCount++;
+        const foot = document.getElementById('foot');
+        foot.classList.add('wobble');
+        clearTimeout(foot._wobbleTimer);
+        foot._wobbleTimer = setTimeout(() => { if (!gameRunning) return; foot.classList.remove('wobble'); }, 400);
+        const pct = Math.min(tickleCount / 15 * 100, 100);
+        document.getElementById('laugh-meter').style.width = pct + '%';
+        document.getElementById('tickle-count').textContent = tickleCount + ' / 15 tickles';
+        if (tickleCount >= 15) triggerWin();
+      }
+      lastDir = dir;
+      lastX = clientX;
+    }
+
+    const footZone = document.getElementById('foot-zone');
+    footZone.addEventListener('touchstart', (e) => {
+      lastX = e.touches[0].clientX; lastDir = undefined;
+      e.preventDefault();
+    }, { passive: false });
+    footZone.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      onTickleMove(e.touches[0].clientX);
+    }, { passive: false });
+    footZone.addEventListener('touchend', () => { lastX = undefined; lastDir = undefined; });
+    footZone.addEventListener('mousedown', (e) => { lastX = e.clientX; lastDir = undefined; });
+    footZone.addEventListener('mousemove', (e) => { if (e.buttons) onTickleMove(e.clientX); });
+    footZone.addEventListener('mouseup', () => { lastX = undefined; lastDir = undefined; });
+
+    function startGame() {
+      tickleCount = 0; lastX = undefined; lastDir = undefined;
+      cancelAnimationFrame(timerRAF);
+      document.getElementById('laugh-meter').style.width = '0%';
+      document.getElementById('tickle-count').textContent = '0 / 15 tickles';
+      document.getElementById('foot').classList.remove('wobble');
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

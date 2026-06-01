@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>CRUSH</title>
+  <meta name="theme-color" content="#FF4500">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF4500; --color-accent: #FFF200; }
+    #game-screen { background: #FF4500; }
+    #press-area {
+      position: relative;
+      width: min(360px, 95vw);
+      height: 200px;
+      margin: 0 auto;
+    }
+    /* Press arm — fixed center top */
+    #press-arm {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      text-align: center;
+      font-size: 3.5rem;
+      line-height: 1;
+      pointer-events: none;
+      transition: top 0.12s cubic-bezier(0.34,1.56,0.64,1);
+      filter: drop-shadow(2px 2px 0 #000);
+    }
+    #press-arm.slam {
+      top: 80px;
+    }
+    /* Target zone — center 80px wide */
+    #target-zone {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 50px;
+      border: 3px dashed #FFF200;
+      border-radius: 6px;
+      background: rgba(255,242,0,0.15);
+    }
+    /* Conveyor belt */
+    #conveyor {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: #555;
+      border: 3px solid #000;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    #conveyor-stripes {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, #555 0px, #555 20px, #333 20px, #333 40px);
+      animation: conveyorMove 0.5s linear infinite;
+    }
+    @keyframes conveyorMove {
+      from { background-position: 0 0; }
+      to { background-position: 40px 0; }
+    }
+    #box {
+      position: absolute;
+      bottom: 40px;
+      font-size: 3rem;
+      line-height: 1;
+      transition: left 0.05s linear;
+      user-select: none;
+      pointer-events: none;
+    }
+    #crush-flash {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-size: 3rem;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    #tap-btn {
+      width: 160px;
+      height: 80px;
+      background: #FFF200;
+      border: 5px solid #000;
+      border-radius: 16px;
+      box-shadow: 5px 5px 0 #000;
+      font-size: 1.75rem;
+      font-weight: 900;
+      font-family: var(--font);
+      color: #000;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: transform 0.08s, box-shadow 0.08s;
+    }
+    #tap-btn:active {
+      transform: translate(4px,4px);
+      box-shadow: 1px 1px 0 #000;
+    }
+    #chances-display {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+    #hint-text {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+      animation: pulse 0.8s ease infinite;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">CRUSH</h1>
+    <div class="game-subject">🔨</div>
+    <p class="game-tagline">Drop the press when the box is centered!<br>Win: Flattened!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="hint-text">TAP WHEN BOX IS CENTERED!</p>
+    <div id="press-area">
+      <div id="press-arm">🔨</div>
+      <div id="target-zone"></div>
+      <div id="box">📦</div>
+      <div id="conveyor"><div id="conveyor-stripes"></div></div>
+      <div id="crush-flash">💥</div>
+    </div>
+    <p id="chances-display">Chances: 3</p>
+    <button id="tap-btn">CRUSH!</button>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">💥</div>
+    <p class="game-tagline">Flattened!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😬</div>
+    <p class="game-tagline">Missed!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'crush';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 9;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(boxRAF); setTimeout(()=>show('win'),500); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(boxRAF); show('lose'); }
+
+    // CRUSH GAME
+    const box = document.getElementById('box');
+    const pressArm = document.getElementById('press-arm');
+    const crushFlash = document.getElementById('crush-flash');
+    const chancesDisplay = document.getElementById('chances-display');
+    const tapBtn = document.getElementById('tap-btn');
+    const pressArea = document.getElementById('press-area');
+
+    let boxX, boxSpeed, boxRAF, chances, slamming;
+
+    function getBoxCenter() {
+      return boxX + 24; // box is ~48px wide
+    }
+
+    function isCentered() {
+      const areaW = pressArea.clientWidth;
+      const center = areaW / 2;
+      return Math.abs(getBoxCenter() - center) < 40;
+    }
+
+    function moveBox() {
+      boxX += boxSpeed;
+      const areaW = pressArea.clientWidth;
+      if (boxX > areaW + 10) { boxX = -60; }
+      else if (boxX < -60) { boxX = areaW + 10; }
+      box.style.left = boxX + 'px';
+      if (gameRunning) boxRAF = requestAnimationFrame(moveBox);
+    }
+
+    function doSlam(hit) {
+      if (slamming) return;
+      slamming = true;
+      pressArm.classList.add('slam');
+      setTimeout(() => {
+        pressArm.classList.remove('slam');
+        slamming = false;
+      }, 250);
+
+      if (hit) {
+        box.textContent = '💥';
+        crushFlash.textContent = '💥';
+        crushFlash.style.opacity = '1';
+        crushFlash.style.fontSize = '4rem';
+        setTimeout(() => { crushFlash.style.opacity = '0'; }, 500);
+        triggerWin();
+      } else {
+        chances--;
+        chancesDisplay.textContent = `Chances: ${chances}`;
+        crushFlash.textContent = '❌';
+        crushFlash.style.opacity = '1';
+        setTimeout(() => { crushFlash.style.opacity = '0'; }, 400);
+        if (chances <= 0) setTimeout(() => triggerLose(), 300);
+        else {
+          // Speed up slightly after a miss
+          boxSpeed *= (boxSpeed > 0 ? 1.2 : -1.2);
+        }
+      }
+    }
+
+    tapBtn.addEventListener('click', () => {
+      if (!gameRunning || slamming) return;
+      doSlam(isCentered());
+    });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      chances = 3;
+      chancesDisplay.textContent = 'Chances: 3';
+      slamming = false;
+      crushFlash.style.opacity = '0';
+      box.textContent = '📦';
+      pressArm.classList.remove('slam');
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      boxSpeed = dir * (2.0 + Math.random() * 1.5);
+      boxX = Math.random() < 0.5 ? 20 : pressArea.clientWidth - 80;
+      moveBox();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

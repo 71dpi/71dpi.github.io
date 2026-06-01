@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>TOSS</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; }
+
+    #toss-area {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #arc-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #bin {
+      position: absolute;
+      top: 60px;
+      right: 40px;
+      font-size: 3.5rem;
+      line-height: 1;
+      filter: drop-shadow(3px 3px 0 #000);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #bin-target {
+      position: absolute;
+      top: 80px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      pointer-events: none;
+      /* debug: border: 2px dashed red; */
+    }
+
+    #ball {
+      position: absolute;
+      font-size: 3rem;
+      line-height: 1;
+      filter: drop-shadow(2px 2px 0 #000);
+      pointer-events: none;
+      user-select: none;
+      z-index: 10;
+    }
+
+    #hud {
+      position: absolute;
+      top: 18px; left: 0; right: 0;
+      text-align: center;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: #000;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    #throw-hint {
+      position: absolute;
+      bottom: 160px; left: 0; right: 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: rgba(0,0,0,0.5);
+      pointer-events: none;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 30;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FF6B00; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">TOSS</h1>
+    <div class="game-subject">🗑️</div>
+    <p class="game-tagline">Swipe the paper into the bin!<br>Win: Clean! (2 of 3)</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="toss-area">
+      <canvas id="arc-canvas"></canvas>
+      <div id="bin">🗑️</div>
+      <div id="bin-target"></div>
+      <div id="ball">🗞️</div>
+      <div id="hud">0/3 in</div>
+      <div id="throw-hint">Swipe UP toward the bin!</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🎯</div>
+    <p class="game-tagline">Clean!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🗑️</div>
+    <p class="game-tagline">Airball!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'toss';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) endRound();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── TOSS GAME ──
+    const tossArea = document.getElementById('toss-area');
+    const arcCanvas = document.getElementById('arc-canvas');
+    const arcCtx = arcCanvas.getContext('2d');
+    const ball = document.getElementById('ball');
+    const binTarget = document.getElementById('bin-target');
+    const hud = document.getElementById('hud');
+    const hint = document.getElementById('throw-hint');
+
+    const TOTAL_THROWS = 3;
+    const NEED_IN = 2;
+    let score = 0;
+    let throwsLeft = TOTAL_THROWS;
+    let throwing = false;
+    let inFlight = false;
+    let swipeStart = null;
+    let animFrame = null;
+
+    function resizeCanvas() {
+      arcCanvas.width = tossArea.offsetWidth;
+      arcCanvas.height = tossArea.offsetHeight;
+    }
+
+    function getBallStart() {
+      const W = tossArea.offsetWidth;
+      const H = tossArea.offsetHeight;
+      return { x: W * 0.25, y: H * 0.82 };
+    }
+
+    function getBinCenter() {
+      const r = binTarget.getBoundingClientRect();
+      const ar = tossArea.getBoundingClientRect();
+      return { x: r.left + r.width / 2 - ar.left, y: r.top + r.height / 2 - ar.top };
+    }
+
+    function placeBall() {
+      const p = getBallStart();
+      ball.style.left = p.x + 'px';
+      ball.style.top = p.y + 'px';
+      ball.style.transform = 'translate(-50%, -50%)';
+      ball.style.opacity = '1';
+      ball.style.fontSize = '3rem';
+    }
+
+    function drawArcGuide(bx, by, vx, vy) {
+      arcCtx.clearRect(0, 0, arcCanvas.width, arcCanvas.height);
+      arcCtx.beginPath();
+      arcCtx.setLineDash([6, 6]);
+      arcCtx.strokeStyle = 'rgba(0,0,0,0.35)';
+      arcCtx.lineWidth = 3;
+      let x = bx, y = by;
+      const g = 0.4;
+      let dvx = vx * 0.08, dvy = vy * 0.08;
+      arcCtx.moveTo(x, y);
+      for (let i = 0; i < 25; i++) {
+        x += dvx;
+        y += dvy;
+        dvy += g;
+        arcCtx.lineTo(x, y);
+      }
+      arcCtx.stroke();
+      arcCtx.setLineDash([]);
+    }
+
+    function throwBall(vx, vy) {
+      if (inFlight) return;
+      inFlight = true;
+      hint.style.opacity = '0';
+      arcCtx.clearRect(0, 0, arcCanvas.width, arcCanvas.height);
+
+      let x = getBallStart().x;
+      let y = getBallStart().y;
+      const g = 0.45;
+      let dvx = vx * 0.1, dvy = vy * 0.1;
+
+      function animate() {
+        x += dvx;
+        y += dvy;
+        dvy += g;
+
+        ball.style.left = x + 'px';
+        ball.style.top = y + 'px';
+
+        // Check bin hit
+        const bin = getBinCenter();
+        const d = Math.hypot(x - bin.x, y - bin.y);
+        if (d < 60) {
+          score++;
+          throwsLeft--;
+          hud.textContent = `${score}/3 in`;
+          ball.style.opacity = '0';
+          inFlight = false;
+          if (score >= NEED_IN) { triggerWin(); return; }
+          if (throwsLeft <= 0) { triggerLose(); return; }
+          setTimeout(() => { placeBall(); inFlight = false; hint.style.opacity = '1'; }, 400);
+          return;
+        }
+
+        // Out of bounds
+        const W = tossArea.offsetWidth, H = tossArea.offsetHeight;
+        if (x < -60 || x > W + 60 || y > H + 60) {
+          throwsLeft--;
+          hud.textContent = `${score}/3 in`;
+          ball.style.opacity = '0';
+          inFlight = false;
+          if (throwsLeft <= 0) { triggerLose(); return; }
+          setTimeout(() => { placeBall(); inFlight = false; hint.style.opacity = '1'; }, 400);
+          return;
+        }
+
+        animFrame = requestAnimationFrame(animate);
+      }
+      animFrame = requestAnimationFrame(animate);
+    }
+
+    function endRound() {
+      if (!gameRunning) return;
+      gameRunning = false;
+      cancelAnimationFrame(animFrame);
+      if (score >= NEED_IN) show('win'); else show('lose');
+    }
+
+    tossArea.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!gameRunning || inFlight) return;
+      const t = e.touches[0];
+      const ar = tossArea.getBoundingClientRect();
+      swipeStart = { x: t.clientX - ar.left, y: t.clientY - ar.top, time: Date.now() };
+    }, { passive: false });
+
+    tossArea.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (!swipeStart || inFlight) return;
+      const t = e.touches[0];
+      const ar = tossArea.getBoundingClientRect();
+      const cx = t.clientX - ar.left, cy = t.clientY - ar.top;
+      const vx = cx - swipeStart.x, vy = cy - swipeStart.y;
+      const bs = getBallStart();
+      drawArcGuide(bs.x, bs.y, vx, vy);
+    }, { passive: false });
+
+    tossArea.addEventListener('touchend', e => {
+      e.preventDefault();
+      if (!swipeStart || !gameRunning || inFlight) return;
+      const t = e.changedTouches[0];
+      const ar = tossArea.getBoundingClientRect();
+      const ex = t.clientX - ar.left, ey = t.clientY - ar.top;
+      const vx = ex - swipeStart.x;
+      const vy = ey - swipeStart.y;
+      swipeStart = null;
+      arcCtx.clearRect(0, 0, arcCanvas.width, arcCanvas.height);
+      if (Math.abs(vx) > 5 || Math.abs(vy) > 5) throwBall(vx, vy);
+    }, { passive: false });
+
+    // Mouse support
+    let mouseDown = false;
+    tossArea.addEventListener('mousedown', e => {
+      if (!gameRunning || inFlight) return;
+      const ar = tossArea.getBoundingClientRect();
+      swipeStart = { x: e.clientX - ar.left, y: e.clientY - ar.top };
+      mouseDown = true;
+    });
+    tossArea.addEventListener('mousemove', e => {
+      if (!mouseDown || !swipeStart || inFlight) return;
+      const ar = tossArea.getBoundingClientRect();
+      const cx = e.clientX - ar.left, cy = e.clientY - ar.top;
+      const vx = cx - swipeStart.x, vy = cy - swipeStart.y;
+      const bs = getBallStart();
+      drawArcGuide(bs.x, bs.y, vx, vy);
+    });
+    tossArea.addEventListener('mouseup', e => {
+      mouseDown = false;
+      if (!swipeStart || !gameRunning || inFlight) return;
+      const ar = tossArea.getBoundingClientRect();
+      const ex = e.clientX - ar.left, ey = e.clientY - ar.top;
+      const vx = ex - swipeStart.x, vy = ey - swipeStart.y;
+      swipeStart = null;
+      arcCtx.clearRect(0, 0, arcCanvas.width, arcCanvas.height);
+      if (Math.abs(vx) > 5 || Math.abs(vy) > 5) throwBall(vx, vy);
+    });
+
+    function startGame() {
+      cancelAnimationFrame(animFrame);
+      score = 0;
+      throwsLeft = TOTAL_THROWS;
+      inFlight = false;
+      swipeStart = null;
+      mouseDown = false;
+      hud.textContent = '0/3 in';
+      hint.style.opacity = '1';
+      resizeCanvas();
+      placeBall();
+      arcCtx.clearRect(0, 0, arcCanvas.width, arcCanvas.height);
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

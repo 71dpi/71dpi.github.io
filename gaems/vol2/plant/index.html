@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>PLANT</title>
+  <meta name="theme-color" content="#C8E6C9">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #C8E6C9; --color-accent: #2E7D32; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(280px,80vw); margin:0 auto; touch-action:none; }
+    #garden-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #plant-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">PLANT</h1>
+    <div class="game-subject">🌱</div>
+    <p class="game-tagline">Tap each hole, then drag seeds into them<br>Win: plant all 3 seeds</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="garden-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Soil -->
+        <rect x="0" y="150" width="300" height="130" fill="#8B4513"/>
+        <rect x="0" y="145" width="300" height="12" fill="#6D3410" rx="0"/>
+        <!-- Sky -->
+        <rect x="0" y="0" width="300" height="150" fill="#C8E6C9"/>
+        <!-- Holes (tap targets) -->
+        <ellipse id="hole-0" cx="70" cy="155" rx="22" ry="10" fill="#5C2A0A" stroke="#3E1A06" stroke-width="2"/>
+        <ellipse id="hole-1" cx="150" cy="155" rx="22" ry="10" fill="#5C2A0A" stroke="#3E1A06" stroke-width="2"/>
+        <ellipse id="hole-2" cx="230" cy="155" rx="22" ry="10" fill="#5C2A0A" stroke="#3E1A06" stroke-width="2"/>
+        <!-- Hole labels -->
+        <text id="hlbl-0" x="70" y="153" text-anchor="middle" fill="#C8E6C9" font-size="10" font-weight="900" font-family="Inter,sans-serif">TAP</text>
+        <text id="hlbl-1" x="150" y="153" text-anchor="middle" fill="#C8E6C9" font-size="10" font-weight="900" font-family="Inter,sans-serif">TAP</text>
+        <text id="hlbl-2" x="230" y="153" text-anchor="middle" fill="#C8E6C9" font-size="10" font-weight="900" font-family="Inter,sans-serif">TAP</text>
+        <!-- Check marks for planted seeds -->
+        <text id="chk-0" x="70" y="145" text-anchor="middle" fill="#69F0AE" font-size="18" font-weight="900" font-family="Inter,sans-serif" opacity="0">🌱</text>
+        <text id="chk-1" x="150" y="145" text-anchor="middle" fill="#69F0AE" font-size="18" font-weight="900" font-family="Inter,sans-serif" opacity="0">🌱</text>
+        <text id="chk-2" x="230" y="145" text-anchor="middle" fill="#69F0AE" font-size="18" font-weight="900" font-family="Inter,sans-serif" opacity="0">🌱</text>
+        <!-- Seeds (draggable) at bottom -->
+        <ellipse id="seed-0" cx="70" cy="240" rx="14" ry="10" fill="#8BC34A" stroke="#558B2F" stroke-width="2"/>
+        <text x="70" y="244" text-anchor="middle" fill="#fff" font-size="9" font-family="Inter,sans-serif">SEED</text>
+        <ellipse id="seed-1" cx="150" cy="240" rx="14" ry="10" fill="#8BC34A" stroke="#558B2F" stroke-width="2"/>
+        <text x="150" y="244" text-anchor="middle" fill="#fff" font-size="9" font-family="Inter,sans-serif">SEED</text>
+        <ellipse id="seed-2" cx="230" cy="240" rx="14" ry="10" fill="#8BC34A" stroke="#558B2F" stroke-width="2"/>
+        <text x="230" y="244" text-anchor="middle" fill="#fff" font-size="9" font-family="Inter,sans-serif">SEED</text>
+      </svg>
+    </div>
+    <p id="plant-label">TAP HOLES, THEN DRAG SEEDS!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🌱</div>
+    <p class="game-tagline">Garden growing!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🌱</div>
+    <p class="game-tagline">Garden not planted!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='plant', TIME_LIMIT=10;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0;
+    const gameArea=document.getElementById('game-area'), label=document.getElementById('plant-label');
+    const SVG_W=300, SVG_H=280;
+    const HOLES=[{cx:70,cy:155},{cx:150,cy:155},{cx:230,cy:155}];
+    const SEEDS_START=[{cx:70,cy:240},{cx:150,cy:240},{cx:230,cy:240}];
+    let holesOpen=[false,false,false], seedPlanted=[false,false,false];
+    let draggingIdx=null, dragX=0, dragY=0;
+
+    function getSVGPos(cX,cY){const rect=gameArea.getBoundingClientRect();return{x:cX/rect.width*SVG_W,y:cY/rect.height*SVG_H};}
+
+    function handleTap(svgX,svgY){
+      if(!gameRunning)return;
+      // Check hole taps
+      HOLES.forEach((h,i)=>{
+        if(!holesOpen[i]&&Math.hypot(svgX-h.cx,svgY-h.cy)<28){
+          holesOpen[i]=true;
+          document.getElementById('hole-'+i).setAttribute('fill','#3E1A06');
+          document.getElementById('hlbl-'+i).textContent='DROP';
+          updateLabel();
+        }
+      });
+    }
+
+    function startDrag(svgX,svgY){
+      if(!gameRunning)return;
+      SEEDS_START.forEach((s,i)=>{
+        if(!seedPlanted[i]&&Math.hypot(svgX-s.cx,svgY-s.cy)<20){
+          draggingIdx=i;dragX=svgX;dragY=svgY;
+        }
+      });
+    }
+    function moveDrag(svgX,svgY){
+      if(draggingIdx===null)return;
+      dragX=svgX;dragY=svgY;
+      const seed=document.getElementById('seed-'+draggingIdx);
+      seed.setAttribute('cx',svgX);seed.setAttribute('cy',svgY);
+      // Move text too
+      const texts=document.querySelectorAll('#garden-svg text');
+    }
+    function endDrag(){
+      if(draggingIdx===null)return;
+      const i=draggingIdx;
+      // Snap to open hole?
+      const planted=HOLES.some((h,j)=>{
+        if(holesOpen[j]&&!seedPlanted[j]&&Math.hypot(dragX-h.cx,dragY-h.cy)<30){
+          seedPlanted[j]=true;
+          // Hide seed, show sprout
+          document.getElementById('seed-'+i).setAttribute('opacity',0);
+          document.getElementById('chk-'+j).setAttribute('opacity',1);
+          updateLabel();
+          if(seedPlanted.every(Boolean))triggerWin();
+          return true;
+        }
+        return false;
+      });
+      if(!planted){
+        // Return seed to start
+        const seed=document.getElementById('seed-'+i);
+        seed.setAttribute('cx',SEEDS_START[i].cx);seed.setAttribute('cy',SEEDS_START[i].cy);
+      }
+      draggingIdx=null;
+    }
+
+    function updateLabel(){
+      const oCount=holesOpen.filter(Boolean).length;
+      const pCount=seedPlanted.filter(Boolean).length;
+      if(pCount>0)label.textContent=pCount+'/3 PLANTED!';
+      else if(oCount>0)label.textContent='NOW DRAG SEEDS INTO HOLES!';
+      else label.textContent='TAP HOLES, THEN DRAG SEEDS!';
+    }
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);handleTap(p.x,p.y);startDrag(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);moveDrag(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchend',e=>{endDrag();},{passive:false});
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;const p=getSVGPos(e.clientX,e.clientY);handleTap(p.x,p.y);startDrag(p.x,p.y);});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||draggingIdx===null)return;const p=getSVGPos(e.clientX,e.clientY);moveDrag(p.x,p.y);});
+    gameArea.addEventListener('mouseup',()=>endDrag());
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),400);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      holesOpen=[false,false,false];seedPlanted=[false,false,false];draggingIdx=null;
+      [0,1,2].forEach(i=>{
+        document.getElementById('hole-'+i).setAttribute('fill','#5C2A0A');
+        document.getElementById('hlbl-'+i).textContent='TAP';
+        document.getElementById('chk-'+i).setAttribute('opacity',0);
+        const s=document.getElementById('seed-'+i);
+        s.setAttribute('cx',SEEDS_START[i].cx);s.setAttribute('cy',SEEDS_START[i].cy);s.setAttribute('opacity',1);
+      });
+      updateLabel();
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

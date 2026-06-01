@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>VACUUM</title>
+  <meta name="theme-color" content="#FFB800">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFB800; --color-accent: #FF6B00; }
+    #game-screen { background: #FFB800; touch-action: none; overflow: hidden; }
+    #carpet {
+      position: relative;
+      width: min(340px, 90vw);
+      height: min(340px, 50vh);
+      background: #c8994a;
+      border: 4px solid #000;
+      border-radius: 12px;
+      box-shadow: 4px 4px 0 #000;
+      margin: 0 auto;
+      overflow: hidden;
+      cursor: none;
+    }
+    .dirt {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #6b4226;
+      border: 2px solid #3d2112;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .dirt.sucked {
+      transform: scale(0);
+      opacity: 0;
+    }
+    #vac {
+      position: absolute;
+      font-size: 2.5rem;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: left 0.05s, top 0.05s;
+      filter: drop-shadow(2px 2px 0 #000);
+      user-select: none;
+    }
+    #dirt-count {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+    }
+    #drag-hint {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+      animation: pulse 1s ease infinite;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">VACUUM</h1>
+    <div class="game-subject">🌀</div>
+    <p class="game-tagline">Drag the vacuum over all the dirt!<br>Win: clean carpet!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="drag-hint">DRAG THE VACUUM!</p>
+    <div id="carpet">
+      <div id="vac">🌀</div>
+    </div>
+    <p id="dirt-count">Dirt: 8 / 8</p>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✨</div>
+    <p class="game-tagline">Clean floor!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🤧</div>
+    <p class="game-tagline">Still dirty!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'vacuum';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); setTimeout(()=>show('win'),300); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    // VACUUM GAME
+    const carpet = document.getElementById('carpet');
+    const vac = document.getElementById('vac');
+    const dirtCount = document.getElementById('dirt-count');
+    const SUCK_RADIUS = 40;
+    let dirtEls, remaining;
+
+    function spawnDirt() {
+      carpet.querySelectorAll('.dirt').forEach(d => d.remove());
+      const cw = carpet.clientWidth;
+      const ch = carpet.clientHeight;
+      dirtEls = [];
+      remaining = 8;
+      for (let i = 0; i < 8; i++) {
+        const d = document.createElement('div');
+        d.className = 'dirt';
+        d.style.left = (16 + Math.random() * (cw - 48)) + 'px';
+        d.style.top = (16 + Math.random() * (ch - 48)) + 'px';
+        dirtEls.push({ el: d, sucked: false });
+        carpet.appendChild(d);
+      }
+      updateCount();
+    }
+
+    function updateCount() {
+      dirtCount.textContent = `Dirt: ${remaining} / 8`;
+    }
+
+    function checkSuck(px, py) {
+      const rect = carpet.getBoundingClientRect();
+      const cx = px - rect.left;
+      const cy = py - rect.top;
+      // Move vacuum
+      vac.style.left = cx + 'px';
+      vac.style.top = cy + 'px';
+      // Check each dirt
+      dirtEls.forEach(d => {
+        if (d.sucked) return;
+        const dx = parseFloat(d.el.style.left) + 12 - cx;
+        const dy = parseFloat(d.el.style.top) + 12 - cy;
+        if (Math.hypot(dx, dy) < SUCK_RADIUS) {
+          d.sucked = true;
+          d.el.classList.add('sucked');
+          remaining--;
+          updateCount();
+          if (remaining <= 0) triggerWin();
+        }
+      });
+    }
+
+    carpet.addEventListener('mousemove', e => {
+      if (!gameRunning) return;
+      checkSuck(e.clientX, e.clientY);
+    });
+
+    carpet.addEventListener('touchmove', e => {
+      if (!gameRunning) return;
+      e.preventDefault();
+      checkSuck(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    carpet.addEventListener('touchstart', e => {
+      if (!gameRunning) return;
+      e.preventDefault();
+      checkSuck(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      vac.style.left = '50%';
+      vac.style.top = '50%';
+      spawnDirt();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

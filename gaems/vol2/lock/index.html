@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>LOCK</title>
+  <meta name="theme-color" content="#FFF8E1">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FFF8E1; --color-accent: #E65100; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(300px,85vw); margin:0 auto; touch-action:none; }
+    #lock-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #lock-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">LOCK</h1>
+    <div class="game-subject">🗝️</div>
+    <p class="game-tagline">Drag the key to the lock, then rotate!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="lock-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Lock body -->
+        <rect x="85" y="130" width="130" height="120" rx="12" fill="#BDBDBD" stroke="#000" stroke-width="4"/>
+        <!-- Lock shackle -->
+        <path id="shackle" d="M110,130 L110,95 Q110,60 150,60 Q190,60 190,95 L190,130" fill="none" stroke="#9E9E9E" stroke-width="14" stroke-linecap="round"/>
+        <!-- Keyhole -->
+        <circle cx="150" cy="185" r="14" fill="#424242" stroke="#000" stroke-width="2"/>
+        <rect x="146" y="185" width="8" height="22" rx="4" fill="#424242"/>
+        <!-- Lock label -->
+        <text x="150" y="230" text-anchor="middle" fill="#fff" font-size="10" font-weight="700" font-family="Inter,sans-serif" opacity="0.6">INSERT KEY</text>
+        <!-- Key (draggable) -->
+        <g id="key-group" transform="translate(60,260)">
+          <!-- Key bow (head) -->
+          <circle cx="0" cy="0" r="16" fill="#FFD600" stroke="#000" stroke-width="3"/>
+          <circle cx="0" cy="0" r="8" fill="none" stroke="#000" stroke-width="3"/>
+          <!-- Key blade -->
+          <rect x="16" y="-6" width="50" height="12" rx="3" fill="#FFD600" stroke="#000" stroke-width="2.5"/>
+          <!-- Teeth -->
+          <rect x="30" y="6" width="6" height="10" rx="2" fill="#FFD600" stroke="#000" stroke-width="2"/>
+          <rect x="44" y="6" width="6" height="8" rx="2" fill="#FFD600" stroke="#000" stroke-width="2"/>
+          <rect x="58" y="6" width="6" height="12" rx="2" fill="#FFD600" stroke="#000" stroke-width="2"/>
+        </g>
+        <!-- Success flash -->
+        <rect id="success-flash" x="85" y="130" width="130" height="120" rx="12" fill="#00E676" opacity="0"/>
+      </svg>
+    </div>
+    <p id="lock-label">DRAG KEY TO LOCK!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">CLICK!</p>
+    <div class="game-subject anim-bounce">🗝️</div>
+    <p class="game-tagline">Unlocked!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🗝️</div>
+    <p class="game-tagline">Key doesn't fit!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='lock', TIME_LIMIT=8;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0;
+    const gameArea=document.getElementById('game-area'), label=document.getElementById('lock-label');
+    const keyGroup=document.getElementById('key-group'), shackle=document.getElementById('shackle'), flash=document.getElementById('success-flash');
+    const SVG_W=300, SVG_H=300, LOCK_CX=150, LOCK_CY=185;
+    let keyX=60, keyY=260, keyAngle=0, dragging=false, inserted=false, rotateStart=null;
+
+    function getSVGPos(cX,cY){const rect=gameArea.getBoundingClientRect();return{x:cX/rect.width*SVG_W,y:cY/rect.height*SVG_H};}
+    function updateKey(){
+      const rot=inserted?keyAngle:0;
+      keyGroup.setAttribute('transform','translate('+keyX+','+keyY+') rotate('+rot+')');
+    }
+    function checkInsert(){
+      const dx=keyX-LOCK_CX, dy=keyY-LOCK_CY;
+      if(Math.hypot(dx,dy)<22){
+        inserted=true;keyX=LOCK_CX;keyY=LOCK_CY;
+        label.textContent='NOW ROTATE! 🔄';
+        rotateStart=null;
+      }
+    }
+    function checkRotate(){
+      if(Math.abs(keyAngle)>85){
+        // Shackle opens
+        shackle.setAttribute('d','M110,130 L110,75 Q110,40 150,40 Q190,40 190,75 L190,130');
+        flash.setAttribute('opacity','0.6');
+        setTimeout(()=>triggerWin(),400);
+      }
+    }
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);if(!inserted&&Math.hypot(p.x-keyX,p.y-keyY)<30)dragging=true;else if(inserted){rotateStart={x:p.x,y:p.y};}},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);if(dragging&&!inserted){keyX=p.x;keyY=p.y;updateKey();checkInsert();}else if(inserted&&rotateStart){const dx=p.x-rotateStart.x;keyAngle=Math.max(-120,Math.min(120,dx*1.5));updateKey();checkRotate();}},{passive:false});
+    gameArea.addEventListener('touchend',()=>{dragging=false;});
+    let mdown=false;
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;const p=getSVGPos(e.clientX,e.clientY);if(!inserted&&Math.hypot(p.x-keyX,p.y-keyY)<30){mdown=true;dragging=true;}else if(inserted){mdown=true;rotateStart={x:p.x,y:p.y};}});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!mdown)return;const p=getSVGPos(e.clientX,e.clientY);if(dragging&&!inserted){keyX=p.x;keyY=p.y;updateKey();checkInsert();}else if(inserted&&rotateStart){const dx=p.x-rotateStart.x;keyAngle=Math.max(-120,Math.min(120,dx*1.5));updateKey();checkRotate();}});
+    gameArea.addEventListener('mouseup',()=>{mdown=false;dragging=false;});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),400);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      keyX=60;keyY=260;keyAngle=0;inserted=false;dragging=false;mdown=false;rotateStart=null;
+      keyGroup.setAttribute('transform','translate(60,260)');
+      shackle.setAttribute('d','M110,130 L110,95 Q110,60 150,60 Q190,60 190,95 L190,130');
+      flash.setAttribute('opacity',0);
+      label.textContent='DRAG KEY TO LOCK!';
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

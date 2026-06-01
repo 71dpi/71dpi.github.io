@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>KNOCK</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; }
+
+    #knock-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    #door-wrap {
+      position: relative;
+      width: 180px;
+      height: 260px;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    #door-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(4px 4px 0 #000);
+      transition: transform 0.05s;
+    }
+
+    #door-wrap.knocked {
+      animation: door-shake 0.15s ease;
+    }
+
+    @keyframes door-shake {
+      0%,100% { transform: translateX(0); }
+      33%      { transform: translateX(-6px); }
+      66%      { transform: translateX(6px); }
+    }
+
+    #pattern-display {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 1.5rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 16px;
+    }
+
+    .beat-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      border: 3px solid rgba(255,255,255,0.6);
+      transition: background 0.1s;
+    }
+
+    .beat-dot.active { background: #FFF200; border-color: #FFF200; }
+    .beat-dot.gap    { background: transparent; border-color: rgba(255,255,255,0.2); }
+
+    #phase-label {
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: #000;
+      text-align: center;
+    }
+
+    #hud {
+      font-weight: 900;
+      font-size: 1rem;
+      color: #000;
+      text-align: center;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+    #timer-bar { height: 100%; width: 100%; background: #FFF200; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">KNOCK</h1>
+    <div class="game-subject">🚪</div>
+    <p class="game-tagline">Watch the pattern, then copy it!<br>Win: Come in!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="knock-area">
+      <div id="phase-label">Watch the pattern...</div>
+      <div id="pattern-display"></div>
+      <div id="door-wrap">
+        <svg id="door-svg" viewBox="0 0 180 260" xmlns="http://www.w3.org/2000/svg">
+          <!-- Door frame -->
+          <rect x="5" y="5" width="170" height="250" rx="4" fill="#8B4513" stroke="#000" stroke-width="6"/>
+          <!-- Door panel -->
+          <rect x="15" y="15" width="150" height="230" rx="4" fill="#A0522D" stroke="#000" stroke-width="3"/>
+          <!-- Top panel -->
+          <rect x="25" y="25" width="130" height="90" rx="4" fill="#CD853F" stroke="#000" stroke-width="2"/>
+          <!-- Bottom panel -->
+          <rect x="25" y="130" width="130" height="100" rx="4" fill="#CD853F" stroke="#000" stroke-width="2"/>
+          <!-- Knocker -->
+          <circle cx="140" cy="130" r="12" fill="#FFD700" stroke="#000" stroke-width="3"/>
+          <circle cx="140" cy="130" r="6" fill="#B8860B" stroke="#000" stroke-width="2"/>
+          <!-- Keyhole -->
+          <ellipse cx="145" cy="155" rx="5" ry="7" fill="#000"/>
+        </svg>
+      </div>
+      <div id="hud">Tap the door!</div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🎉</div>
+    <p class="game-tagline">Come in!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🚪</div>
+    <p class="game-tagline">Wrong rhythm!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'knock';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // ── KNOCK GAME ──
+    // Pattern: array of {tap: bool, duration: ms}
+    // TAP_DUR = tap beat, GAP_DUR = gap between
+    const TAP_DUR = 300;
+    const GAP_DUR = 500;
+
+    // Predefined patterns: arrays of true/false (true=tap, false=gap)
+    const PATTERNS = [
+      [true, false, true, true],        // knock ▪ knock knock
+      [true, true, false, true],        // knock knock ▪ knock
+      [true, false, false, true, true], // knock ▪▪ knock knock
+      [true, true, true, false, true],  // knock knock knock ▪ knock
+      [true, false, true, false, true], // knock ▪ knock ▪ knock
+    ];
+
+    let pattern = [];
+    let patternTimings = []; // absolute ms offsets when each tap should occur
+    let playerTaps = [];
+    let showingPattern = true;
+    let patternTimeout = null;
+    let listenStart = null;
+
+    const doorWrap = document.getElementById('door-wrap');
+    const patternDisplay = document.getElementById('pattern-display');
+    const phaseLabel = document.getElementById('phase-label');
+    const hud = document.getElementById('hud');
+
+    function buildPattern() {
+      pattern = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+      // Build timings: each true = tap, each false = gap
+      patternTimings = [];
+      let t = 0;
+      pattern.forEach(isTap => {
+        if (isTap) { patternTimings.push(t); t += TAP_DUR; }
+        else { t += GAP_DUR; }
+      });
+    }
+
+    function renderPatternDots() {
+      patternDisplay.innerHTML = '';
+      pattern.forEach(isTap => {
+        const d = document.createElement('div');
+        d.className = 'beat-dot' + (isTap ? '' : ' gap');
+        patternDisplay.appendChild(d);
+      });
+    }
+
+    function flashDoor() {
+      doorWrap.classList.remove('knocked');
+      void doorWrap.offsetWidth;
+      doorWrap.classList.add('knocked');
+      setTimeout(() => doorWrap.classList.remove('knocked'), 200);
+    }
+
+    function playPattern() {
+      showingPattern = true;
+      phaseLabel.textContent = 'Watch the pattern...';
+      hud.textContent = '';
+      // Highlight dots as they play
+      const dots = patternDisplay.querySelectorAll('.beat-dot');
+      let tapIdx = 0;
+      patternTimings.forEach((t, i) => {
+        setTimeout(() => {
+          if (!gameRunning) return;
+          flashDoor();
+          if (dots[tapIdx]) { dots[tapIdx].classList.add('active'); }
+          tapIdx++;
+        }, t);
+      });
+
+      const totalTime = patternTimings[patternTimings.length - 1] + TAP_DUR + 500;
+      patternTimeout = setTimeout(() => {
+        if (!gameRunning) return;
+        showingPattern = false;
+        phaseLabel.textContent = 'Now YOU knock!';
+        hud.textContent = 'Tap the door!';
+        patternDisplay.innerHTML = '';
+        playerTaps = [];
+        listenStart = Date.now();
+      }, totalTime);
+    }
+
+    // Tolerance for matching: each player tap must be within 500ms of corresponding pattern tap
+    function evaluateTaps() {
+      if (playerTaps.length !== patternTimings.length) { triggerLose(); return; }
+      const maxDiff = 500;
+      for (let i = 0; i < patternTimings.length; i++) {
+        const diff = Math.abs(playerTaps[i] - patternTimings[i]);
+        if (diff > maxDiff) { triggerLose(); return; }
+      }
+      triggerWin();
+    }
+
+    let evalTimeout = null;
+
+    function onDoorTap(e) {
+      e.preventDefault();
+      if (!gameRunning || showingPattern) return;
+      const now = Date.now() - listenStart;
+      playerTaps.push(now);
+      flashDoor();
+
+      clearTimeout(evalTimeout);
+      // If we have enough taps, evaluate after a short wait
+      if (playerTaps.length >= patternTimings.length) {
+        evalTimeout = setTimeout(evaluateTaps, 400);
+      } else {
+        // Wait 1.5s after last tap to see if they're done
+        evalTimeout = setTimeout(() => {
+          if (playerTaps.length < patternTimings.length) triggerLose();
+        }, 1500);
+      }
+    }
+
+    doorWrap.addEventListener('touchstart', onDoorTap, { passive: false });
+    doorWrap.addEventListener('mousedown', onDoorTap);
+
+    function startGame() {
+      clearTimeout(patternTimeout);
+      clearTimeout(evalTimeout);
+      showingPattern = true;
+      playerTaps = [];
+      buildPattern();
+      renderPatternDots();
+      phaseLabel.textContent = 'Watch the pattern...';
+      hud.textContent = '';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      // Show pattern after a brief delay
+      setTimeout(() => { if (gameRunning) playPattern(); }, 800);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

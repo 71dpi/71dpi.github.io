@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>PADDLE</title>
+  <meta name="theme-color" content="#E1F5FE">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #E1F5FE; --color-accent: #0277BD; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(320px,90vw); margin:0 auto; touch-action:none; overflow:hidden; border-radius:8px; border:var(--stroke) solid #000; box-shadow:var(--shadow); }
+    #pp-canvas { display:block; touch-action:none; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #paddle-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">PADDLE</h1>
+    <div class="game-subject">🏓</div>
+    <p class="game-tagline">Swipe to hit the ping pong ball back<br>Win: 5 returns</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area"><canvas id="pp-canvas" width="300" height="320"></canvas></div>
+    <p id="paddle-label">SWIPE TO RETURN!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🏓</div>
+    <p class="game-tagline">5 returns!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">MISS!</p>
+    <div class="game-subject anim-shake">🏓</div>
+    <p class="game-tagline">Ball got past!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='paddle', TIME_LIMIT=15, RETURNS_NEEDED=5;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, animRAF=0;
+    const canvas=document.getElementById('pp-canvas'), ctx=canvas.getContext('2d');
+    const W=300, H=320, label=document.getElementById('paddle-label');
+    const PADDLE_W=70, PADDLE_H=12, BALL_R=12;
+    let bx, by, bvx, bvy, paddleX, returns;
+
+    function drawFrame(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#0277BD';ctx.fillRect(0,0,W,H);
+      ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.setLineDash([10,8]);ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();ctx.setLineDash([]);
+      // Net
+      ctx.fillStyle='#fff';ctx.fillRect(W/2-2,H/2-12,4,24);
+      // Opp paddle
+      ctx.fillStyle='#E53935';ctx.beginPath();ctx.roundRect(Math.max(PADDLE_W/2,Math.min(W-PADDLE_W/2,bx))-PADDLE_W/2,14,PADDLE_W,PADDLE_H,5);ctx.fill();
+      ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
+      // Player paddle
+      ctx.fillStyle='#1565C0';ctx.beginPath();ctx.roundRect(paddleX-PADDLE_W/2,H-PADDLE_H-12,PADDLE_W,PADDLE_H,5);ctx.fill();
+      ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
+      // Ball
+      ctx.beginPath();ctx.arc(bx,by,BALL_R,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#ccc';ctx.lineWidth=2;ctx.stroke();
+      bx+=bvx;by+=bvy;
+      if(bx<BALL_R){bx=BALL_R;bvx=Math.abs(bvx);}
+      if(bx>W-BALL_R){bx=W-BALL_R;bvx=-Math.abs(bvx);}
+      if(by<=PADDLE_H+14+BALL_R&&bvy<0){by=PADDLE_H+14+BALL_R;bvy=Math.abs(bvy)+0.2;bvx+=(Math.random()-0.5)*1.5;}
+      if(by>=H-PADDLE_H-12-BALL_R&&bvy>0){
+        if(Math.abs(bx-paddleX)<PADDLE_W/2+BALL_R){
+          by=H-PADDLE_H-12-BALL_R;bvy=-Math.abs(bvy)-0.2;bvx+=(Math.random()-0.5)*2;
+          returns++;label.textContent=returns+' / '+RETURNS_NEEDED+' RETURNS';
+          if(returns>=RETURNS_NEEDED){triggerWin();return;}
+        }
+      }
+      if(by>H+20){triggerLose();return;}
+      if(gameRunning)animRAF=requestAnimationFrame(drawFrame);
+    }
+
+    const gameArea=document.getElementById('game-area');
+    function movePaddle(cX){const rect=gameArea.getBoundingClientRect();paddleX=Math.max(PADDLE_W/2,Math.min(W-PADDLE_W/2,(cX-rect.left)/rect.width*W));}
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning)return;e.preventDefault();movePaddle(e.changedTouches[0].clientX);},{passive:false});
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();movePaddle(e.changedTouches[0].clientX);},{passive:false});
+    gameArea.addEventListener('mousemove',e=>{if(gameRunning)movePaddle(e.clientX);});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(animRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      bx=W/2;by=80;bvx=2+(Math.random()-0.5)*2;bvy=3;paddleX=W/2;returns=0;
+      label.textContent='SWIPE TO RETURN!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);animRAF=requestAnimationFrame(drawFrame);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>UNBOX</title>
+  <meta name="theme-color" content="#D4A574">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #EFEBE9; --color-accent: #8B4513; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(280px,80vw); margin:0 auto; touch-action:none; cursor:crosshair; }
+    #box-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #unbox-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">UNBOX</h1>
+    <div class="game-subject">📦</div>
+    <p class="game-tagline">Swipe the cutter along the tape to open the box</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="box-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Box top face -->
+        <rect x="20" y="20" width="260" height="200" rx="6" fill="#C8A97E" stroke="#000" stroke-width="4"/>
+        <!-- Cardboard texture lines -->
+        <line x1="20" y1="55" x2="280" y2="55" stroke="#B8956A" stroke-width="1"/>
+        <line x1="20" y1="90" x2="280" y2="90" stroke="#B8956A" stroke-width="1"/>
+        <line x1="20" y1="125" x2="280" y2="125" stroke="#B8956A" stroke-width="1"/>
+        <line x1="20" y1="160" x2="280" y2="160" stroke="#B8956A" stroke-width="1"/>
+        <line x1="20" y1="195" x2="280" y2="195" stroke="#B8956A" stroke-width="1"/>
+        <!-- Box bottom border -->
+        <rect x="10" y="200" width="280" height="40" rx="4" fill="#A07850" stroke="#000" stroke-width="3"/>
+        <!-- Center seam line -->
+        <line x1="150" y1="20" x2="150" y2="220" stroke="#8B4513" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/>
+        <!-- Tape strip -->
+        <rect id="tape" x="20" y="100" width="260" height="20" rx="3" fill="#FFE082" stroke="#FFC107" stroke-width="2" opacity="0.9"/>
+        <text x="150" y="115" text-anchor="middle" fill="#8B4513" font-size="9" font-family="monospace" font-weight="bold">FRAGILE</text>
+        <!-- Cut progress (rect clipped from left) -->
+        <rect id="cut-progress" x="20" y="100" width="0" height="20" rx="3" fill="rgba(0,0,0,0.3)"/>
+        <!-- Cut line (drawn) -->
+        <line id="cut-line" x1="20" y1="110" x2="20" y2="110" stroke="#E53935" stroke-width="3" stroke-dasharray="4 2"/>
+        <!-- Cutter tool -->
+        <g id="cutter" transform="translate(10,100)">
+          <rect x="0" y="-8" width="22" height="16" rx="4" fill="#FF6B00" stroke="#000" stroke-width="2"/>
+          <polygon points="22,-4 30,0 22,4" fill="#C0C0C0" stroke="#000" stroke-width="1.5"/>
+        </g>
+        <!-- Content peek (when opened) -->
+        <g id="content-peek" opacity="0">
+          <rect x="40" y="105" width="220" height="10" fill="#E3F2FD" stroke="none"/>
+          <text x="150" y="114" text-anchor="middle" fill="#1565C0" font-size="8" font-family="Inter,sans-serif">📱 inside!</text>
+        </g>
+      </svg>
+    </div>
+    <p id="unbox-label">SWIPE TO CUT THE TAPE!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">📦</div>
+    <p class="game-tagline">Opened!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">📦</div>
+    <p class="game-tagline">Still sealed!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='unbox', TIME_LIMIT=6;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, swiping=false, cutW=0;
+    const gameArea=document.getElementById('game-area'), label=document.getElementById('unbox-label');
+    const cutProgress=document.getElementById('cut-progress'), cutLine=document.getElementById('cut-line');
+    const cutter=document.getElementById('cutter'), contentPeek=document.getElementById('content-peek');
+    const SVG_W=300, TAPE_Y_SVG=110, TAPE_START=20, TAPE_END=280;
+
+    function getSVGPos(clientX, clientY){
+      const rect=gameArea.getBoundingClientRect();
+      return {x:clientX/rect.width*SVG_W, y:clientY/rect.height*280};
+    }
+    function updateCut(svgX){
+      const newW=Math.max(cutW,svgX-TAPE_START);
+      cutW=Math.min(newW,TAPE_END-TAPE_START);
+      cutProgress.setAttribute('width',cutW);
+      cutLine.setAttribute('x2',TAPE_START+cutW);
+      cutter.setAttribute('transform','translate('+(TAPE_START+cutW-10)+',100)');
+      const pct=Math.round(cutW/(TAPE_END-TAPE_START)*100);
+      label.textContent=pct+'% CUT';
+      if(cutW>=(TAPE_END-TAPE_START-5)){
+        contentPeek.setAttribute('opacity','1');
+        triggerWin();
+      }
+    }
+
+    const TAPE_ZONE_Y={min:90,max:130};
+    function isOnTape(svgY){return svgY>=TAPE_ZONE_Y.min&&svgY<=TAPE_ZONE_Y.max;}
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);if(isOnTape(p.y)&&p.x<TAPE_START+cutW+30)swiping=true;},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning||!swiping)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);updateCut(p.x);},{passive:false});
+    gameArea.addEventListener('touchend',()=>{swiping=false;});
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;const p=getSVGPos(e.clientX,e.clientY);swiping=true;});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!swiping)return;const p=getSVGPos(e.clientX,e.clientY);updateCut(p.x);});
+    gameArea.addEventListener('mouseup',()=>{swiping=false;});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),400);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      cutW=0;swiping=false;
+      cutProgress.setAttribute('width',0);
+      cutLine.setAttribute('x2',TAPE_START);
+      cutter.setAttribute('transform','translate(10,100)');
+      contentPeek.setAttribute('opacity',0);
+      label.textContent='SWIPE TO CUT THE TAPE!';
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

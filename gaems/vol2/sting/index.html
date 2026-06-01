@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>STING</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+
+    #game-screen { touch-action: none; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #flower {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5rem;
+      line-height: 1;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #flower-zone {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100px;
+      height: 100px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    #bee {
+      position: absolute;
+      font-size: 3rem;
+      line-height: 1;
+      transition: left 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  top 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    #bee.on-flower {
+      animation: pulse 0.4s ease infinite;
+    }
+
+    #tap-hint {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.1rem;
+      font-weight: 800;
+      background: #000;
+      color: #fff;
+      padding: 0.4rem 1rem;
+      border-radius: 99px;
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.15); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">STING</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🐝</div>
+    <p class="game-tagline">Tap when the bee is over the flower!<br>Win: Pollinated!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="flower">🌸</div>
+      <div id="flower-zone"></div>
+      <div id="bee">🐝</div>
+      <div id="tap-hint">TAP when bee lands! 🐝</div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🌸</div>
+    <p class="game-tagline">Pollinated!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🐝</div>
+    <p class="game-tagline">Missed it!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'sting';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); clearInterval(moveInt); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; clearInterval(moveInt); show('lose'); }
+
+    const bee = document.getElementById('bee');
+    const gameArea = document.getElementById('game-area');
+    let moveInt;
+
+    function getBeeCenter() {
+      const r = bee.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    function getFlowerCenter() {
+      const r = document.getElementById('flower').getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function moveBee() {
+      const area = gameArea.getBoundingClientRect();
+      const pad = 60;
+      const nx = pad + Math.random() * (area.width - pad * 2);
+      const ny = pad + Math.random() * (area.height - pad * 2);
+      bee.style.left = nx + 'px';
+      bee.style.top = ny + 'px';
+    }
+
+    function checkOverlap() {
+      const bc = getBeeCenter();
+      const fc = getFlowerCenter();
+      return Math.hypot(bc.x - fc.x, bc.y - fc.y) < 60;
+    }
+
+    function onTap(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      if (checkOverlap()) {
+        bee.classList.add('on-flower');
+        triggerWin();
+      } else {
+        // flash miss
+        bee.style.filter = 'brightness(2)';
+        setTimeout(() => { bee.style.filter = ''; }, 150);
+      }
+    }
+
+    document.getElementById('game-screen').addEventListener('touchstart', onTap, { passive: false });
+    document.getElementById('game-screen').addEventListener('mousedown', onTap);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      bee.classList.remove('on-flower');
+      bee.style.filter = '';
+
+      // place bee randomly to start
+      const area = gameArea.getBoundingClientRect();
+      bee.style.left = (20 + Math.random() * (area.width - 80)) + 'px';
+      bee.style.top = (20 + Math.random() * (area.height * 0.3)) + 'px';
+
+      clearInterval(moveInt);
+      moveInt = setInterval(() => { if (gameRunning) moveBee(); }, 1200);
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

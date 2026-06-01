@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SWAT</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF3EDB; }
+
+    #game-screen { touch-action: manipulation; overflow: hidden; }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #fly {
+      position: absolute;
+      font-size: 3rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 3;
+      transition: left 0.25s cubic-bezier(0.34,1.56,0.64,1),
+                  top  0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    #fly.swatted {
+      animation: flat-squish 0.35s ease forwards;
+    }
+
+    @keyframes flat-squish {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.5, 0.4); }
+      60%  { transform: scale(0.8, 0.2); opacity: 0.5; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    #splat-burst {
+      position: absolute;
+      font-size: 3rem;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 4;
+      transition: opacity 0.3s;
+    }
+
+    #lives {
+      position: absolute;
+      top: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+    }
+
+    #hint {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.4);
+      white-space: nowrap;
+    }
+
+    #miss-flash {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,0,0,0.18);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 2;
+      transition: opacity 0.15s;
+    }
+
+    #timer-bar-wrap { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: rgba(0,0,0,0.15); }
+    #timer-bar { height: 100%; background: var(--color-accent); }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SWAT</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🪰</div>
+    <p class="game-tagline">Tap the fly! 3 misses and you lose.<br>Win: Got it!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="miss-flash"></div>
+      <div id="fly">🪰</div>
+      <div id="splat-burst">💥</div>
+      <div id="lives">❤️❤️❤️</div>
+      <div id="hint">Tap the fly!</div>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">💥</div>
+    <p class="game-tagline">Got it!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🪰</div>
+    <p class="game-tagline">Too slow!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'swat';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin()  { gameRunning = false; cancelAnimationFrame(timerRAF); clearInterval(moveInt); setTimeout(() => show('win'), 500); }
+    function triggerLose() { gameRunning = false; clearInterval(moveInt); show('lose'); }
+
+    const fly = document.getElementById('fly');
+    const splatBurst = document.getElementById('splat-burst');
+    const livesEl = document.getElementById('lives');
+    const missFlash = document.getElementById('miss-flash');
+    const gameArea = document.getElementById('game-area');
+    let lives = 3;
+    let moveInt;
+    let swatted = false;
+
+    function moveFly() {
+      if (!gameRunning || swatted) return;
+      const area = gameArea.getBoundingClientRect();
+      const pad = 50;
+      fly.style.left = (pad + Math.random() * (area.width - pad * 2 - 48)) + 'px';
+      fly.style.top  = (pad + Math.random() * (area.height * 0.65 - pad)) + 'px';
+    }
+
+    function getFlyCenter() {
+      const r = fly.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function onTap(e) {
+      if (!gameRunning || swatted) return;
+      const pt = e.touches ? e.touches[0] : e;
+      const fc = getFlyCenter();
+      const dist = Math.hypot(pt.clientX - fc.x, pt.clientY - fc.y);
+
+      if (dist < 55) {
+        // HIT
+        swatted = true;
+        clearInterval(moveInt);
+        fly.classList.add('swatted');
+        splatBurst.style.left = (fc.x - window.scrollX - 24) + 'px';
+        splatBurst.style.top  = (fc.y - window.scrollY - 24) + 'px';
+        splatBurst.style.opacity = '1';
+        setTimeout(() => { splatBurst.style.opacity = '0'; }, 500);
+        triggerWin();
+      } else {
+        // MISS
+        lives--;
+        const hearts = ['❤️❤️❤️', '❤️❤️🖤', '❤️🖤🖤', '🖤🖤🖤'];
+        livesEl.textContent = hearts[3 - lives] || '🖤🖤🖤';
+        missFlash.style.opacity = '1';
+        setTimeout(() => { missFlash.style.opacity = '0'; }, 150);
+        if (lives <= 0) {
+          setTimeout(() => triggerLose(), 200);
+        }
+      }
+    }
+
+    document.getElementById('game-screen').addEventListener('touchstart', onTap, { passive: true });
+    document.getElementById('game-screen').addEventListener('mousedown', onTap);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      swatted = false;
+      lives = 3;
+      livesEl.textContent = '❤️❤️❤️';
+      fly.classList.remove('swatted');
+      fly.style.opacity = '1';
+      splatBurst.style.opacity = '0';
+      missFlash.style.opacity = '0';
+
+      // Initial position
+      const area = gameArea.getBoundingClientRect();
+      fly.style.left = (area.width * 0.5 - 24) + 'px';
+      fly.style.top  = (area.height * 0.4) + 'px';
+
+      clearInterval(moveInt);
+      moveInt = setInterval(moveFly, 800);
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

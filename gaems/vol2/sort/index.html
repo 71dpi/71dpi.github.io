@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SORT</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+    #game-screen { background: #00D4FF; touch-action: none; }
+    #sock-display {
+      font-size: 6rem;
+      text-align: center;
+      line-height: 1;
+      user-select: none;
+      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #swipe-arrows {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .arrow-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #000;
+    }
+    .arrow-icon {
+      font-size: 2.5rem;
+    }
+    #score-display {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+    #color-hint {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+    }
+    #sock-color-dot {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 3px solid #000;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .swipe-feedback {
+      position: fixed;
+      top: 50%;
+      font-size: 3rem;
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 100;
+      animation: feedbackPop 0.4s ease forwards;
+    }
+    @keyframes feedbackPop {
+      0% { transform: scale(0.5) translateY(-50%); opacity: 1; }
+      100% { transform: scale(1.5) translateY(-80%); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SORT</h1>
+    <div class="game-subject">🧦</div>
+    <p class="game-tagline">Swipe LEFT for 🔴 red<br>Swipe RIGHT for 🔵 blue<br>Win: sort all 10 socks!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="score-display">0 / 10</p>
+    <div id="sock-display">🧦</div>
+    <p id="color-hint">← RED &nbsp;&nbsp; BLUE →</p>
+    <div id="swipe-arrows">
+      <div class="arrow-label">
+        <span class="arrow-icon">⬅️</span>
+        <span>RED</span>
+      </div>
+      <div class="arrow-label">
+        <span class="arrow-icon">➡️</span>
+        <span>BLUE</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">👏</div>
+    <p class="game-tagline">Sorted!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😵</div>
+    <p class="game-tagline">Mixed up!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'sort';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); setTimeout(()=>show('win'),300); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    // SORT GAME
+    const sockDisplay = document.getElementById('sock-display');
+    const scoreDisplay = document.getElementById('score-display');
+    const gameScreen = document.getElementById('game-screen');
+
+    let sockQueue, currentSock, score, touchStartX, inputLocked;
+
+    // Generate random sequence of 10 socks
+    function generateSocks() {
+      const socks = [];
+      for (let i = 0; i < 10; i++) {
+        socks.push(Math.random() < 0.5 ? 'red' : 'blue');
+      }
+      return socks;
+    }
+
+    function showSock(color) {
+      if (color === 'red') {
+        sockDisplay.textContent = '🔴';
+        sockDisplay.style.filter = 'none';
+      } else {
+        sockDisplay.textContent = '🔵';
+        sockDisplay.style.filter = 'none';
+      }
+    }
+
+    function nextSock() {
+      if (sockQueue.length === 0) { triggerWin(); return; }
+      currentSock = sockQueue.shift();
+      showSock(currentSock);
+      sockDisplay.style.transform = 'scale(1)';
+    }
+
+    function onSwipe(direction) {
+      if (!gameRunning || inputLocked) return;
+      inputLocked = true;
+      const correct = (direction === 'left' && currentSock === 'red') ||
+                      (direction === 'right' && currentSock === 'blue');
+      if (correct) {
+        score++;
+        scoreDisplay.textContent = `${score} / 10`;
+        // fly sock off screen
+        sockDisplay.style.transition = 'transform 0.2s ease, opacity 0.2s';
+        sockDisplay.style.transform = direction === 'left' ? 'translateX(-160px) scale(0.5)' : 'translateX(160px) scale(0.5)';
+        sockDisplay.style.opacity = '0';
+        // feedback
+        const fb = document.createElement('div');
+        fb.className = 'swipe-feedback';
+        fb.textContent = '✅';
+        fb.style.left = direction === 'left' ? '20%' : '70%';
+        document.body.appendChild(fb);
+        setTimeout(() => fb.remove(), 500);
+        setTimeout(() => {
+          sockDisplay.style.transition = '';
+          sockDisplay.style.transform = '';
+          sockDisplay.style.opacity = '';
+          inputLocked = false;
+          nextSock();
+        }, 220);
+      } else {
+        const fb = document.createElement('div');
+        fb.className = 'swipe-feedback';
+        fb.textContent = '❌';
+        fb.style.left = '50%';
+        document.body.appendChild(fb);
+        setTimeout(() => fb.remove(), 500);
+        setTimeout(() => { inputLocked = false; triggerLose(); }, 300);
+      }
+    }
+
+    // Touch handling
+    gameScreen.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    gameScreen.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) {
+        onSwipe(dx < 0 ? 'left' : 'right');
+      }
+    }, { passive: true });
+
+    // Keyboard fallback
+    document.addEventListener('keydown', e => {
+      if (!gameRunning) return;
+      if (e.key === 'ArrowLeft') onSwipe('left');
+      if (e.key === 'ArrowRight') onSwipe('right');
+    });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      score = 0;
+      inputLocked = false;
+      sockQueue = generateSocks();
+      scoreDisplay.textContent = '0 / 10';
+      sockDisplay.style.transform = '';
+      sockDisplay.style.opacity = '';
+      nextSock();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>SQUEEZE</title>
+  <meta name="theme-color" content="#FF3EDB">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF3EDB; --color-accent: #FFF200; }
+    #game-screen { background: #FF3EDB; touch-action: none; }
+
+    #squeeze-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      touch-action: none;
+    }
+
+    #bottle-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #bottle-emoji {
+      font-size: 7rem;
+      line-height: 1;
+      transform: rotate(180deg);
+      display: block;
+      cursor: pointer;
+    }
+
+    #drop-container {
+      position: relative;
+      height: 80px;
+      width: 80px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    #ketchup-drop {
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #FF6666, #CC0000);
+      border: 3px solid #990000;
+      width: 0;
+      height: 0;
+      transition: width 0.05s, height 0.05s;
+      align-self: flex-start;
+    }
+
+    #plate {
+      width: 120px;
+      height: 24px;
+      background: #FFF;
+      border-radius: 50%;
+      border: 3px solid #000;
+      box-shadow: 3px 3px 0 #000;
+    }
+
+    #zone-indicator {
+      position: absolute;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 900;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      border: 3px solid #000;
+      background: rgba(255,255,255,0.9);
+      white-space: nowrap;
+    }
+
+    #hold-hint {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+
+    #sweet-spot-bar {
+      position: relative;
+      width: 200px;
+      height: 24px;
+      background: #eee;
+      border: 3px solid #000;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #sweet-spot-zone {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 54.5%;  /* 30/55 of the bar */
+      right: 0%;
+      background: rgba(0,200,100,0.4);
+    }
+
+    #drop-level-bar {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 0%;
+      background: #CC0000;
+      border-radius: 10px;
+      transition: width 0.05s;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SQUEEZE</h1>
+    <div class="game-subject">🍅</div>
+    <p class="game-tagline">Hold the bottle, release at the right size!<br>Win: Sweet spot drop</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="zone-indicator">Hold &amp; release at the right size!</div>
+    <div id="squeeze-area">
+      <div id="bottle-wrap">
+        <div id="bottle-emoji">🍅</div>
+        <div id="drop-container">
+          <div id="ketchup-drop"></div>
+        </div>
+      </div>
+      <div id="plate"></div>
+      <div id="hold-hint">👇 HOLD THE BOTTLE</div>
+      <div id="sweet-spot-bar">
+        <div id="sweet-spot-zone"></div>
+        <div id="drop-level-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😋</div>
+    <p class="game-tagline">Sauce served!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💦</div>
+    <p class="game-tagline">What a mess!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'squeeze';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 8;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) { checkRelease(); if (gameRunning) triggerLose(); }
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    const dropEl = document.getElementById('ketchup-drop');
+    const levelBar = document.getElementById('drop-level-bar');
+    const zoneDisplay = document.getElementById('zone-indicator');
+    const hintEl = document.getElementById('hold-hint');
+
+    const MIN_RADIUS = 30;
+    const MAX_RADIUS = 55;
+    const MAX_BAR = 70; // radius at which bar is 100%
+    let radius = 0;
+    let holding = false;
+    let growInterval = null;
+    let exploded = false;
+
+    function updateDrop() {
+      const size = radius * 2;
+      dropEl.style.width = size + 'px';
+      dropEl.style.height = size + 'px';
+      const pct = Math.min(100, (radius / MAX_BAR) * 100);
+      levelBar.style.width = pct + '%';
+      if (radius >= MIN_RADIUS && radius < MAX_RADIUS) {
+        zoneDisplay.textContent = '✅ Release now!';
+        zoneDisplay.style.background = 'rgba(0,220,100,0.9)';
+      } else if (radius >= MAX_RADIUS) {
+        zoneDisplay.textContent = '💦 Too much!';
+        zoneDisplay.style.background = 'rgba(255,50,50,0.9)';
+      } else {
+        zoneDisplay.textContent = 'Hold & release at the right size!';
+        zoneDisplay.style.background = 'rgba(255,255,255,0.9)';
+      }
+    }
+
+    function startHold(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      holding = true;
+      hintEl.textContent = '🔴 HOLDING...';
+      clearInterval(growInterval);
+      growInterval = setInterval(() => {
+        if (!holding || !gameRunning) { clearInterval(growInterval); return; }
+        radius += 1.5;
+        updateDrop();
+        if (radius > MAX_RADIUS + 15) {
+          // way too much — auto-lose
+          clearInterval(growInterval);
+          exploded = true;
+          triggerLose();
+        }
+      }, 50);
+    }
+
+    function checkRelease() {
+      if (!gameRunning) return;
+      clearInterval(growInterval);
+      holding = false;
+      if (!exploded) {
+        if (radius >= MIN_RADIUS && radius < MAX_RADIUS) {
+          triggerWin();
+        } else {
+          triggerLose();
+        }
+      }
+    }
+
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.addEventListener('touchstart', startHold, { passive: false });
+    gameScreen.addEventListener('touchend', checkRelease);
+    gameScreen.addEventListener('mousedown', startHold);
+    gameScreen.addEventListener('mouseup', checkRelease);
+
+    function startGame() {
+      clearInterval(growInterval);
+      radius = 0;
+      holding = false;
+      exploded = false;
+      updateDrop();
+      hintEl.textContent = '👇 HOLD THE BOTTLE';
+      zoneDisplay.textContent = 'Hold & release at the right size!';
+      zoneDisplay.style.background = 'rgba(255,255,255,0.9)';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

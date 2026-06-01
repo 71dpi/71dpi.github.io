@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>BURST</title>
+  <meta name="theme-color" content="#0D0D2E">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #0D0D2E; --color-accent: #FFD700; --color-ink: #ffffff; }
+    body { background: var(--color-bg); color: #fff; }
+    .screen { background: var(--color-bg); }
+    .game-title, .game-tagline, .result-label { color: #fff; }
+    .btn { color: #000; }
+    .btn-icon { background: #fff; }
+    #game-area { position:relative; width:min(300px,85vw); height:min(340px,95vw); margin:0 auto; touch-action:none; overflow:hidden; }
+    #burst-canvas { display:block; touch-action:none; cursor:pointer; }
+    #timer-bar-wrap { width:min(300px,85vw); height:14px; background:#333; border:var(--stroke) solid #fff; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #burst-label { font-weight:900; font-size:1.1rem; color:#fff; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">BURST</h1>
+    <div class="game-subject">🎆</div>
+    <p class="game-tagline">Tap the firework at its peak!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <canvas id="burst-canvas" width="300" height="340"></canvas>
+    </div>
+    <p id="burst-label">TAP AT THE PEAK!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🎆</div>
+    <p class="game-tagline">Perfect burst!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TOO LATE!</p>
+    <div class="game-subject anim-shake">💨</div>
+    <p class="game-tagline">Missed the peak!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='burst', TIME_LIMIT=10;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, animRAF=0;
+    const canvas=document.getElementById('burst-canvas'), ctx=canvas.getContext('2d');
+    const W=300, H=340, label=document.getElementById('burst-label');
+    // Firework state
+    let fwX, fwY, fwVY, fwPhase, fwPeak, tapped=false, peakWindow=false;
+    let particles=[], sparkles=[];
+    const COLORS=['#FFD700','#FF6B00','#FF4444','#44FF88','#44AAFF','#FF88FF'];
+
+    function launchFirework(){
+      fwX=80+Math.random()*140; fwY=H; fwVY=-(4+Math.random()*3);
+      fwPeak=60+Math.random()*80; fwPhase='rising'; tapped=false; peakWindow=false;
+      particles=[]; sparkles=[];
+    }
+
+    function explode(){
+      for(let i=0;i<40;i++){
+        const angle=Math.random()*Math.PI*2, speed=1+Math.random()*4;
+        particles.push({x:fwX,y:fwY,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:1,color:COLORS[Math.floor(Math.random()*COLORS.length)]});
+      }
+    }
+
+    function drawFrame(){
+      ctx.fillStyle='rgba(13,13,46,0.4)';
+      ctx.fillRect(0,0,W,H);
+      if(fwPhase==='rising'){
+        fwY+=fwVY;
+        if(fwY<=fwPeak){
+          fwPhase='peak';
+          peakWindow=true;
+          setTimeout(()=>{
+            peakWindow=false;
+            if(!tapped&&gameRunning){fwPhase='falling';}
+          },700);
+        }
+        // Trail
+        ctx.beginPath(); ctx.arc(fwX,fwY,5,0,Math.PI*2);
+        ctx.fillStyle='#FFF176'; ctx.fill();
+        // Trailing sparks
+        for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(fwX+(Math.random()-0.5)*6,fwY+10+i*6,2,0,Math.PI*2);ctx.fillStyle='rgba(255,200,50,0.6)';ctx.fill();}
+      } else if(fwPhase==='peak'){
+        // Pulsing glow
+        const pulse=Math.sin(Date.now()/50)*4;
+        const grad=ctx.createRadialGradient(fwX,fwY,0,fwX,fwY,18+pulse);
+        grad.addColorStop(0,'rgba(255,220,50,0.9)');
+        grad.addColorStop(1,'rgba(255,100,0,0)');
+        ctx.beginPath();ctx.arc(fwX,fwY,18+pulse,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+        ctx.beginPath();ctx.arc(fwX,fwY,6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+        label.textContent='TAP NOW!!';
+      } else if(fwPhase==='falling'){
+        fwY+=3;
+        ctx.beginPath();ctx.arc(fwX,fwY,4,0,Math.PI*2);ctx.fillStyle='rgba(255,150,50,0.5)';ctx.fill();
+        if(fwY>=H){
+          if(!tapped&&gameRunning){fwPhase='done';triggerLose();}
+        }
+      } else if(fwPhase==='exploding'){
+        particles.forEach((p,i)=>{
+          p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.life-=0.022;
+          if(p.life>0){
+            ctx.beginPath();ctx.arc(p.x,p.y,3*p.life,0,Math.PI*2);
+            ctx.fillStyle=p.color;ctx.globalAlpha=p.life;ctx.fill();ctx.globalAlpha=1;
+          }
+        });
+        particles=particles.filter(p=>p.life>0);
+        if(particles.length===0){show('win');return;}
+      }
+      if(gameRunning)animRAF=requestAnimationFrame(drawFrame);
+    }
+
+    function handleTap(){
+      if(!gameRunning)return;
+      if(fwPhase==='peak'&&peakWindow){
+        tapped=true; fwPhase='exploding'; peakWindow=false;
+        explode();
+        cancelAnimationFrame(timerRAF);
+        label.textContent='BURST! 🎆';
+        gameRunning=false;
+        animRAF=requestAnimationFrame(drawFrame);
+      } else if(fwPhase==='rising'||fwPhase==='falling'){
+        // too early or too late
+        label.textContent='NOT YET!';
+      }
+    }
+    canvas.addEventListener('click',handleTap);
+    canvas.addEventListener('touchend',e=>{e.preventDefault();handleTap();},{passive:false});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),800);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      tapped=false;peakWindow=false;
+      ctx.fillStyle='#0D0D2E';ctx.fillRect(0,0,W,H);
+      launchFirework();
+      label.textContent='TAP AT THE PEAK!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);
+      animRAF=requestAnimationFrame(drawFrame);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

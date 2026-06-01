@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>PLUG</title>
+  <meta name="theme-color" content="#00D4FF">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #00D4FF; --color-accent: #FF6B00; }
+
+    #game-screen {
+      touch-action: none;
+      overflow: hidden;
+    }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #phone-wrap {
+      position: absolute;
+      top: 18%;
+      font-size: 5rem;
+      line-height: 1;
+      /* JS will animate left/right */
+      transition: left 0.05s linear;
+    }
+
+    #port-dot {
+      width: 18px;
+      height: 18px;
+      background: #222;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    #cable-area {
+      position: absolute;
+      bottom: 22%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    #cable-base {
+      width: 8px;
+      height: 60px;
+      background: #333;
+      border-radius: 4px;
+    }
+
+    #cable-tip {
+      width: 44px;
+      height: 44px;
+      background: #fff;
+      border: 4px solid #000;
+      border-radius: 50%;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: background 0.2s;
+      position: absolute;
+      bottom: 0;
+    }
+
+    #cable-tip.near { background: #7CFF00; border-color: #000; }
+
+    #cable-tip-wrap {
+      position: absolute;
+      bottom: 22%;
+      left: 50%;
+    }
+
+    #hint-text {
+      position: absolute;
+      bottom: 12%;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #000;
+      text-align: center;
+    }
+
+    #timer-bar-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: rgba(0,0,0,0.15);
+    }
+    #timer-bar {
+      height: 100%;
+      background: var(--color-accent);
+      transition: width 0.05s linear;
+    }
+
+    #connect-flash {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">PLUG</h1>
+    <!-- TO REPLACE: <img src="art/subject.svg"> -->
+    <div class="game-subject">🔌</div>
+    <p class="game-tagline">Drag the cable tip to the phone port!<br>Win: Stay connected for 1 second</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <div id="phone-wrap">
+        📱
+        <div id="port-dot"></div>
+      </div>
+      <div id="cable-tip-wrap">
+        <div id="cable-base"></div>
+        <div id="cable-tip">🔌</div>
+      </div>
+      <div id="connect-flash">⚡</div>
+    </div>
+    <div id="hint-text">Drag the plug ↑</div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Connected!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🔌</div>
+    <p class="game-tagline">Missed!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'plug';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game: document.getElementById('game-screen'),
+      win: document.getElementById('win-screen'),
+      lose: document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 9;
+
+    function runTimer() {
+      const elapsed = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - elapsed / TIME_LIMIT) * 100) + '%';
+      if (elapsed >= TIME_LIMIT) { triggerLose(); return; }
+      if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    // --- GAME STATE ---
+    const phoneWrap = document.getElementById('phone-wrap');
+    const portDot = document.getElementById('port-dot');
+    const cableTipWrap = document.getElementById('cable-tip-wrap');
+    const cableTip = document.getElementById('cable-tip');
+    const connectFlash = document.getElementById('connect-flash');
+
+    let tipX = 0, tipY = 0; // offset from cable tip wrap center
+    let dragging = false;
+    let phoneX = 50; // percent of game area width
+    let phoneDir = 1;
+    let phoneRAF;
+    let connectTime = 0;
+    let lastFrameTime = 0;
+
+    function getPortPos() {
+      const dot = portDot.getBoundingClientRect();
+      return { x: dot.left + dot.width / 2, y: dot.top + dot.height / 2 };
+    }
+
+    function getTipPos() {
+      const tip = cableTip.getBoundingClientRect();
+      return { x: tip.left + tip.width / 2, y: tip.top + tip.height / 2 };
+    }
+
+    function animatePhone(ts) {
+      if (!gameRunning) return;
+      const dt = lastFrameTime ? (ts - lastFrameTime) / 1000 : 0;
+      lastFrameTime = ts;
+      // oscillate phone 20% to 80% of area width
+      phoneX += phoneDir * dt * 22; // 22%/sec
+      if (phoneX > 78) { phoneX = 78; phoneDir = -1; }
+      if (phoneX < 22) { phoneX = 22; phoneDir = 1; }
+
+      const area = document.getElementById('game-area').getBoundingClientRect();
+      phoneWrap.style.left = (area.left + area.width * phoneX / 100 - 40) + 'px';
+      phoneWrap.style.position = 'fixed';
+
+      // check distance
+      const port = getPortPos();
+      const tip = getTipPos();
+      const dist = Math.hypot(port.x - tip.x, port.y - tip.y);
+      const near = dist < 28;
+      cableTip.classList.toggle('near', near);
+
+      if (near) {
+        connectTime += dt;
+        if (connectTime >= 1.0) { flashConnect(); triggerWin(); return; }
+      } else {
+        connectTime = 0;
+      }
+
+      phoneRAF = requestAnimationFrame(animatePhone);
+    }
+
+    function flashConnect() {
+      connectFlash.style.opacity = '1';
+      setTimeout(() => { connectFlash.style.opacity = '0'; }, 400);
+    }
+
+    // Drag the cable tip
+    function onTipStart(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      dragging = true;
+    }
+    function onMove(e) {
+      if (!dragging || !gameRunning) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      cableTip.style.position = 'fixed';
+      cableTip.style.left = (clientX - 22) + 'px';
+      cableTip.style.top = (clientY - 22) + 'px';
+      cableTip.style.bottom = 'auto';
+    }
+    function onEnd() { dragging = false; }
+
+    cableTip.addEventListener('touchstart', onTipStart, { passive: false });
+    cableTip.addEventListener('mousedown', onTipStart);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchend', onEnd);
+    document.addEventListener('mouseup', onEnd);
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      dragging = false;
+      connectTime = 0;
+      lastFrameTime = 0;
+      phoneX = 50;
+      phoneDir = 1;
+      cableTip.classList.remove('near');
+      connectFlash.style.opacity = '0';
+
+      // reset cable tip to center bottom
+      cableTip.style.position = '';
+      cableTip.style.left = '';
+      cableTip.style.top = '';
+      cableTip.style.bottom = '0';
+
+      // position phone wrap
+      const area = document.getElementById('game-area').getBoundingClientRect();
+      phoneWrap.style.position = 'fixed';
+      phoneWrap.style.left = (area.left + area.width * 0.5 - 40) + 'px';
+      phoneWrap.style.top = (area.top + area.height * 0.18) + 'px';
+
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      phoneRAF = requestAnimationFrame(animatePhone);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

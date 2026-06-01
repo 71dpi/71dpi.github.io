@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Bake</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+    #oven-display {
+      font-size: 1rem; font-weight: 900; text-align: center;
+      color: #fff; background: #7a2d00; border-radius: 20px; padding: 10px 24px;
+    }
+    #oven-emoji { font-size: 5rem; }
+    #countdown-display {
+      font-size: 5rem; font-weight: 900; color: #FFF200;
+      text-shadow: 0 3px 0 #7a2d00;
+      font-variant-numeric: tabular-nums;
+      min-width: 80px; text-align: center;
+    }
+    #countdown-display.urgent { animation: pulse-red 0.3s infinite alternate; color: #ff0; }
+    @keyframes pulse-red {
+      from { transform: scale(1);   text-shadow: 0 3px 0 #7a2d00; }
+      to   { transform: scale(1.1); text-shadow: 0 0 20px #ff0;   }
+    }
+    #btn-off {
+      font-size: 2rem; font-weight: 900; padding: 20px 40px;
+      background: #555; color: #999; border: none; border-radius: 20px;
+      cursor: not-allowed; transition: background 0.2s, color 0.2s;
+      touch-action: manipulation;
+    }
+    #btn-off.ready {
+      background: #FFF200; color: #7a2d00; cursor: pointer;
+      box-shadow: 0 6px 0 #b8aa00;
+      animation: btn-pulse 0.2s infinite alternate;
+    }
+    #btn-off.ready:active { transform: translateY(4px); box-shadow: 0 2px 0 #b8aa00; }
+    @keyframes btn-pulse {
+      from { transform: scale(1); }
+      to   { transform: scale(1.05); }
+    }
+    #result-msg { font-size: 1.1rem; font-weight: 900; color: #fff; min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Bake</h1>
+    <div class="game-subject">🫕</div>
+    <p class="game-tagline">Hit OFF exactly when the timer hits 0!<br>Win: ±0.4s of zero</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="oven-emoji">🫕</div>
+    <div id="countdown-display">5</div>
+    <button id="btn-off" disabled>OFF</button>
+    <div id="result-msg"></div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🍕</div>
+    <p class="game-tagline">Perfect!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🔥</div>
+    <p class="game-tagline">Burnt!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'bake';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    let ovenStart, ovenInterval, buttonUsed;
+    const OVEN_DURATION = 5000; // ms
+    const WINDOW = 0.4; // seconds
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearInterval(ovenInterval); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; clearInterval(ovenInterval); show('lose'); }
+
+    function startOven() {
+      ovenStart = Date.now();
+      const cd = document.getElementById('countdown-display');
+      const btn = document.getElementById('btn-off');
+      cd.classList.remove('urgent');
+      cd.textContent = '5';
+
+      ovenInterval = setInterval(() => {
+        if (!gameRunning) { clearInterval(ovenInterval); return; }
+        const elapsed = (Date.now() - ovenStart) / 1000;
+        const remaining = Math.max(0, 5 - elapsed);
+        const display = Math.ceil(remaining);
+        cd.textContent = display;
+
+        if (remaining <= 1.5) cd.classList.add('urgent');
+
+        // Enable button at 4s (1s before zero)
+        if (elapsed >= 4) {
+          btn.disabled = false;
+          btn.classList.add('ready');
+        }
+
+        if (elapsed >= 5 + WINDOW) {
+          clearInterval(ovenInterval);
+          if (!buttonUsed) triggerLose(); // too late
+        }
+      }, 50);
+    }
+
+    const btnOff = document.getElementById('btn-off');
+    function onOff() {
+      if (!gameRunning || buttonUsed) return;
+      const elapsed = (Date.now() - ovenStart) / 1000;
+      buttonUsed = true;
+      btnOff.disabled = true;
+      btnOff.classList.remove('ready');
+      clearInterval(ovenInterval);
+
+      const distFromZero = Math.abs(elapsed - 5);
+      if (distFromZero <= WINDOW) {
+        triggerWin();
+      } else if (elapsed < 5) {
+        document.getElementById('result-msg').textContent = 'Too early!';
+        triggerLose();
+      } else {
+        triggerLose();
+      }
+    }
+    btnOff.addEventListener('click', onOff);
+    btnOff.addEventListener('touchend', (e) => { e.preventDefault(); onOff(); });
+
+    function startGame() {
+      buttonUsed = false;
+      cancelAnimationFrame(timerRAF);
+      clearInterval(ovenInterval);
+      const cd = document.getElementById('countdown-display');
+      cd.classList.remove('urgent');
+      cd.textContent = '5';
+      const btn = document.getElementById('btn-off');
+      btn.disabled = true;
+      btn.classList.remove('ready');
+      document.getElementById('result-msg').textContent = '';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      startOven();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

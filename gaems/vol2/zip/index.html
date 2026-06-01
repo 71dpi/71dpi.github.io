@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>ZIP</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; touch-action: none; }
+
+    #zip-area {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      touch-action: none;
+    }
+
+    #jacket-container {
+      position: relative;
+      width: 200px;
+      height: 300px;
+    }
+
+    #jacket-bg {
+      position: absolute;
+      inset: 0;
+      background: #4A90D9;
+      border: 5px solid #000;
+      border-radius: 20px 20px 10px 10px;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    /* Collar */
+    #jacket-bg::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 60px; height: 30px;
+      background: #6AB0F5;
+      border-radius: 0 0 12px 12px;
+      border: 3px solid #000;
+      border-top: none;
+    }
+
+    #zipper-track {
+      position: absolute;
+      left: 50%;
+      top: 25px;
+      bottom: 15px;
+      width: 8px;
+      background: #888;
+      transform: translateX(-50%);
+      border-radius: 4px;
+    }
+
+    /* Teeth pairs */
+    .tooth-pair {
+      position: absolute;
+      left: -14px;
+      width: 36px;
+      height: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .tooth-pair::before, .tooth-pair::after {
+      content: '';
+      width: 12px;
+      height: 8px;
+      background: #CCC;
+      border-radius: 2px;
+      border: 1px solid #999;
+    }
+    .tooth-pair.closed::before, .tooth-pair.closed::after {
+      background: #555;
+    }
+
+    #zipper-pull {
+      position: absolute;
+      left: 50%;
+      bottom: 15px;
+      width: 24px;
+      height: 24px;
+      background: #FFF200;
+      border: 3px solid #000;
+      border-radius: 4px;
+      transform: translateX(-50%);
+      box-shadow: 2px 2px 0 #000;
+      transition: bottom 0.05s;
+      cursor: grab;
+    }
+
+    #zip-progress-bar {
+      width: 180px;
+      height: 18px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 9px;
+      border: 3px solid #000;
+      overflow: hidden;
+    }
+    #zip-fill {
+      height: 100%;
+      background: #FF6B00;
+      border-radius: 7px;
+      width: 0%;
+      transition: width 0.05s;
+    }
+
+    #swipe-hint {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+      animation: bounce-hint 0.8s ease infinite alternate;
+    }
+    @keyframes bounce-hint {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">ZIP</h1>
+    <div class="game-subject">🧥</div>
+    <p class="game-tagline">Swipe UP to zip the jacket!<br>Win: Full zip-up</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="zip-area">
+      <div id="swipe-hint">⬆️ SWIPE UP FAST!</div>
+      <div id="jacket-container">
+        <div id="jacket-bg"></div>
+        <div id="zipper-track" id="zipper-track"></div>
+        <div id="zipper-pull"></div>
+      </div>
+      <div id="zip-progress-bar"><div id="zip-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Zipped!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🥶</div>
+    <p class="game-tagline">Too cold!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'zip';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 6;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    const pullEl = document.getElementById('zipper-pull');
+    const fillEl = document.getElementById('zip-fill');
+
+    // Jacket container bounds
+    let jacketBottom, jacketTop, trackHeight;
+    let zipProgress = 0; // 0 = all the way down, 1 = fully zipped
+    let swipeStartY = null, swipeStartTime = null;
+    let isDragging = false;
+
+    function getJacketBounds() {
+      const jc = document.getElementById('jacket-container');
+      const rect = jc.getBoundingClientRect();
+      jacketBottom = rect.bottom - 20;
+      jacketTop = rect.top + 25;
+      trackHeight = jacketBottom - jacketTop;
+    }
+
+    function updateZipper() {
+      const pullBottom = jacketBottom - jacketTop - (zipProgress * trackHeight) + 20;
+      pullEl.style.bottom = Math.max(15, Math.min(pullBottom, trackHeight)) + 'px';
+      fillEl.style.width = (zipProgress * 100) + '%';
+    }
+
+    function onTouchStart(e) {
+      if (!gameRunning) return;
+      const pt = e.touches ? e.touches[0] : e;
+      swipeStartY = pt.clientY;
+      swipeStartTime = Date.now();
+      isDragging = true;
+    }
+
+    function onTouchMove(e) {
+      if (!gameRunning || !isDragging) return;
+      e.preventDefault();
+      const pt = e.touches ? e.touches[0] : e;
+      getJacketBounds();
+      const dy = swipeStartY - pt.clientY; // positive = upward
+      const pct = Math.max(0, Math.min(1, dy / trackHeight));
+      if (pct > zipProgress) zipProgress = pct;
+      updateZipper();
+      if (zipProgress >= 1) triggerWin();
+    }
+
+    function onTouchEnd(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      const elapsed = (Date.now() - swipeStartTime) / 1000;
+      const pt = e.changedTouches ? e.changedTouches[0] : e;
+      const dy = swipeStartY - pt.clientY;
+      const speed = dy / elapsed;
+      // Fast swipe up = fast zip
+      if (speed > 200 && dy > 200) {
+        zipProgress = 1;
+        updateZipper();
+        triggerWin();
+      }
+      swipeStartY = null;
+    }
+
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.addEventListener('touchstart', onTouchStart, { passive: false });
+    gameScreen.addEventListener('touchmove', onTouchMove, { passive: false });
+    gameScreen.addEventListener('touchend', onTouchEnd);
+    gameScreen.addEventListener('mousedown', onTouchStart);
+    gameScreen.addEventListener('mousemove', e => { if (isDragging) onTouchMove(e); });
+    gameScreen.addEventListener('mouseup', onTouchEnd);
+
+    function startGame() {
+      zipProgress = 0;
+      isDragging = false;
+      swipeStartY = null;
+      getJacketBounds();
+      updateZipper();
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

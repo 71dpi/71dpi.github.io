@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>AMP</title>
+  <meta name="theme-color" content="#1A1A2E">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #1A1A2E; --color-accent: #FF6B00; --color-ink: #FFFFFF; }
+    body { background: var(--color-bg); color: #fff; }
+    .screen { background: var(--color-bg); }
+    .game-title, .game-tagline, .result-label { color: #fff; }
+    #game-area { position:relative; width:min(320px,88vw); height:min(260px,72vw); margin:0 auto; touch-action:none; }
+    #scene-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(320px,88vw); height:14px; background:#333; border:var(--stroke) solid #fff; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #plug-label { font-weight:900; font-size:1.1rem; color:#fff; letter-spacing:0.05em; }
+    .btn { color:#000; }
+    .btn-icon { background:#fff; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">AMP</h1>
+    <div class="game-subject">🎸</div>
+    <p class="game-tagline">Drag the aux cord into the amp</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="scene-svg" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Amp body -->
+        <rect x="160" y="40" width="140" height="180" rx="10" fill="#2A2A3E" stroke="#888" stroke-width="3"/>
+        <rect x="170" y="55" width="120" height="80" rx="6" fill="#111" stroke="#555" stroke-width="2"/>
+        <!-- speaker cone circles -->
+        <circle cx="230" cy="95" r="35" fill="#222" stroke="#666" stroke-width="2"/>
+        <circle cx="230" cy="95" r="22" fill="#1A1A1A" stroke="#555" stroke-width="1.5"/>
+        <circle cx="230" cy="95" r="10" fill="#333"/>
+        <!-- knobs -->
+        <circle cx="185" cy="160" r="10" fill="#444" stroke="#888" stroke-width="2"/><circle cx="185" cy="157" r="3" fill="#FF6B00"/>
+        <circle cx="215" cy="160" r="10" fill="#444" stroke="#888" stroke-width="2"/><circle cx="218" cy="157" r="3" fill="#FF6B00"/>
+        <circle cx="245" cy="160" r="10" fill="#444" stroke="#888" stroke-width="2"/><circle cx="245" cy="157" r="3" fill="#FF6B00"/>
+        <circle cx="275" cy="160" r="10" fill="#444" stroke="#888" stroke-width="2"/><circle cx="278" cy="157" r="3" fill="#FF6B00"/>
+        <!-- AMP label -->
+        <text x="230" y="205" text-anchor="middle" fill="#FF6B00" font-size="14" font-weight="900" font-family="Inter,sans-serif">AMP</text>
+        <!-- Jack input (target) -->
+        <circle id="jack-socket" cx="230" cy="225" r="14" fill="#111" stroke="#888" stroke-width="3"/>
+        <circle cx="230" cy="225" r="6" fill="#333"/>
+        <text x="230" y="248" text-anchor="middle" fill="#888" font-size="9" font-family="Inter,sans-serif">INPUT</text>
+        <!-- Cable wire (drawn dynamically) -->
+        <path id="cable-wire" d="" stroke="#E53935" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <!-- Cord plug (draggable) -->
+        <circle id="cord-plug" cx="50" cy="200" r="20" fill="#E53935" stroke="#fff" stroke-width="3"/>
+        <rect x="42" y="195" width="5" height="16" rx="2" fill="#fff"/>
+        <rect x="53" y="195" width="5" height="16" rx="2" fill="#fff"/>
+      </svg>
+    </div>
+    <p id="plug-label">PLUG IT IN!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🎸</div>
+    <p class="game-tagline" style="color:#fff">Connected!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🔌</div>
+    <p class="game-tagline" style="color:#fff">No signal!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='amp', TIME_LIMIT=7;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, dragging=false;
+    const gameArea=document.getElementById('game-area'), cordPlug=document.getElementById('cord-plug'), cableWire=document.getElementById('cable-wire');
+    const JACK={cx:230,cy:225}, SNAP_DIST=28;
+    let plugX=50, plugY=200;
+
+    function getSVGPos(clientX, clientY) {
+      const svg=document.getElementById('scene-svg'), rect=gameArea.getBoundingClientRect();
+      const vb=svg.viewBox.baseVal;
+      const sx=vb.width/rect.width, sy=vb.height/rect.height;
+      return {x:(clientX-rect.left)*sx, y:(clientY-rect.top)*sy};
+    }
+    function updatePlug(x,y) {
+      plugX=x; plugY=y;
+      cordPlug.setAttribute('cx',x); cordPlug.setAttribute('cy',y);
+      cableWire.setAttribute('d','M50,200 Q'+((50+x)/2)+','+(y+40)+' '+x+','+y);
+    }
+    function checkSnap() {
+      const dist=Math.hypot(plugX-JACK.cx, plugY-JACK.cy);
+      if (dist<SNAP_DIST) { updatePlug(JACK.cx,JACK.cy); triggerWin(); }
+    }
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);const dx=p.x-plugX,dy=p.y-plugY;if(Math.hypot(dx,dy)<30)dragging=true;},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning||!dragging)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);updatePlug(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchend',e=>{if(dragging){dragging=false;checkSnap();}},{passive:false});
+
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;const p=getSVGPos(e.clientX,e.clientY);const dx=p.x-plugX,dy=p.y-plugY;if(Math.hypot(dx,dy)<30)dragging=true;});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!dragging)return;const p=getSVGPos(e.clientX,e.clientY);updatePlug(p.x,p.y);});
+    gameArea.addEventListener('mouseup',()=>{if(dragging){dragging=false;checkSnap();}});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),400);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      plugX=50;plugY=200;dragging=false;
+      cordPlug.setAttribute('cx',50);cordPlug.setAttribute('cy',200);
+      cableWire.setAttribute('d','M50,200 Q80,240 50,200');
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

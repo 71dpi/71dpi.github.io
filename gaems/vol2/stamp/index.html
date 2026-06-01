@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>STAMP</title>
+  <meta name="theme-color" content="#FF3EDB">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF3EDB; --color-accent: #FF6B00; }
+    #game-screen { background: #FF3EDB; overflow: hidden; }
+    #stamp-stage {
+      position: relative;
+      width: min(360px, 95vw);
+      height: 140px;
+      margin: 0 auto;
+      background: #fff8ee;
+      border: 4px solid #000;
+      border-radius: 8px;
+      box-shadow: 4px 4px 0 #000;
+      overflow: hidden;
+    }
+    #stamp-zone {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 35%; width: 30%;
+      border-left: 4px dashed #FF6B00;
+      border-right: 4px dashed #FF6B00;
+      background: rgba(255,107,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #zone-label {
+      font-size: 0.7rem;
+      font-weight: 900;
+      color: #FF6B00;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+    }
+    #paper {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 120px;
+      height: 100px;
+      background: #fff;
+      border: 3px solid #bbb;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      box-shadow: 2px 2px 0 #bbb;
+    }
+    #stamp-arm {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      pointer-events: none;
+      transition: top 0.1s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #stamp-arm.stamp-down {
+      top: 20px;
+    }
+    #stamp-result {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-size: 2rem;
+      font-weight: 900;
+      color: #FF6B00;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    #stamp-btn {
+      width: 150px;
+      height: 80px;
+      background: #FF6B00;
+      border: 5px solid #000;
+      border-radius: 16px;
+      box-shadow: 5px 5px 0 #000;
+      font-size: 1.75rem;
+      font-weight: 900;
+      font-family: var(--font);
+      color: #fff;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: transform 0.08s, box-shadow 0.08s;
+    }
+    #stamp-btn:active {
+      transform: translate(4px,4px);
+      box-shadow: 1px 1px 0 #000;
+    }
+    #hint-text {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+      animation: pulse 0.8s ease infinite;
+    }
+    #pass-count {
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">STAMP</h1>
+    <div class="game-subject">📋</div>
+    <p class="game-tagline">Tap STAMP when paper is in the orange zone!<br>Win: Approved!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="hint-text">TAP STAMP WHEN PAPER IS IN ZONE!</p>
+    <div id="stamp-stage">
+      <div id="stamp-zone"><span id="zone-label">ZONE</span></div>
+      <div id="paper">📋</div>
+      <div id="stamp-result">✅</div>
+    </div>
+    <p id="pass-count">3 tries left</p>
+    <button id="stamp-btn">STAMP</button>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Approved!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">❌</div>
+    <p class="game-tagline">Missed!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'stamp';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(slideRAF); setTimeout(()=>show('win'),400); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); cancelAnimationFrame(slideRAF); show('lose'); }
+
+    // STAMP GAME
+    const paper = document.getElementById('paper');
+    const stampResult = document.getElementById('stamp-result');
+    const stampBtn = document.getElementById('stamp-btn');
+    const passCount = document.getElementById('pass-count');
+    const stage = document.getElementById('stamp-stage');
+
+    let paperX, paperSpeed, slideRAF, tries;
+    const PAPER_W = 120;
+
+    function getPaperCenter() {
+      return paperX + PAPER_W / 2;
+    }
+
+    function isInZone() {
+      const sw = stage.clientWidth;
+      const zoneLeft = sw * 0.35;
+      const zoneRight = sw * 0.65;
+      const center = getPaperCenter();
+      return center >= zoneLeft && center <= zoneRight;
+    }
+
+    function slidePaper() {
+      paperX += paperSpeed;
+      const sw = stage.clientWidth;
+      if (paperX > sw + 20) {
+        // wrap around
+        paperX = -PAPER_W - 20;
+      } else if (paperX < -PAPER_W - 20) {
+        paperX = sw + 20;
+      }
+      paper.style.left = paperX + 'px';
+      if (gameRunning) slideRAF = requestAnimationFrame(slidePaper);
+    }
+
+    stampBtn.addEventListener('click', () => {
+      if (!gameRunning) return;
+      if (isInZone()) {
+        // Win!
+        stampResult.textContent = '✅';
+        stampResult.style.opacity = '1';
+        stampResult.style.fontSize = '3rem';
+        setTimeout(() => { stampResult.style.opacity = '0'; }, 400);
+        triggerWin();
+      } else {
+        // Miss
+        tries--;
+        passCount.textContent = `${tries} tries left`;
+        stampResult.textContent = '❌';
+        stampResult.style.opacity = '1';
+        setTimeout(() => { stampResult.style.opacity = '0'; }, 400);
+        if (tries <= 0) triggerLose();
+        // Speed up a bit
+        paperSpeed *= (paperSpeed > 0 ? 1.15 : -1.15);
+      }
+    });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      tries = 3;
+      passCount.textContent = '3 tries left';
+      stampResult.style.opacity = '0';
+      paper.style.background = '';
+      paper.innerHTML = '📋';
+      // Random starting direction and speed
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      paperSpeed = dir * (2.0 + Math.random() * 1.5);
+      paperX = Math.random() < 0.5 ? -PAPER_W : stage.clientWidth + 20;
+      slidePaper();
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

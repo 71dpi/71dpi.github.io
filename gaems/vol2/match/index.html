@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>MATCH</title>
+  <meta name="theme-color" content="#FF0062">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF0062; --color-accent: #FFF200; }
+    #game-screen { background: #FF0062; }
+
+    #slot-machine {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    #machine-body {
+      background: #222;
+      border: 5px solid #000;
+      border-radius: 24px;
+      padding: 1.5rem 1rem;
+      box-shadow: 6px 6px 0 #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #reels-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .reel-window {
+      width: 80px;
+      height: 100px;
+      background: #fff;
+      border: 4px solid #000;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .reel-strip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+
+    .reel-symbol {
+      font-size: 2.8rem;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .reel-window.stopped {
+      border-color: #FFF200;
+      box-shadow: 0 0 0 3px #FFF200;
+    }
+
+    .reel-window.bounce-anim {
+      animation: reelBounce 0.3s var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+    }
+
+    @keyframes reelBounce {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    #tap-instruction {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #FFF200;
+      text-shadow: 2px 2px 0 #000;
+      text-align: center;
+    }
+
+    #machine-light {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #f00;
+      border: 3px solid #000;
+      box-shadow: 0 0 8px #f00;
+      animation: blink 0.5s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    #lever {
+      font-size: 3rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">MATCH</h1>
+    <div class="game-subject">🎰</div>
+    <p class="game-tagline">Tap to stop each reel!<br>Win: All 3 match</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="slot-machine">
+      <div id="machine-body">
+        <div id="machine-light"></div>
+        <div id="reels-row">
+          <div class="reel-window" id="reel-0"><div class="reel-strip" id="strip-0"></div></div>
+          <div class="reel-window" id="reel-1"><div class="reel-strip" id="strip-1"></div></div>
+          <div class="reel-window" id="reel-2"><div class="reel-strip" id="strip-2"></div></div>
+        </div>
+        <div id="tap-instruction">TAP TO STOP REEL 1</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">⭐</div>
+    <p class="game-tagline">JACKPOT!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😤</div>
+    <p class="game-tagline">No match!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'match';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    const SYMBOLS = ['🍒','🍋','🍇','🔔','⭐'];
+    const REEL_COUNT = 3;
+    const SYMBOL_H = 100;
+    const instruction = document.getElementById('tap-instruction');
+    const reelMessages = ['TAP TO STOP REEL 1', 'TAP TO STOP REEL 2', 'TAP TO STOP REEL 3', ''];
+
+    let reelOffsets = [0, 0, 0];
+    let reelSpeeds = [180, 220, 160]; // px/s
+    let reelStopped = [false, false, false];
+    let reelValues = [null, null, null];
+    let currentReel = 0;
+    let spinRAF = null;
+    let lastSpinT = null;
+
+    function buildStrip(stripEl, extraSymbols) {
+      stripEl.innerHTML = '';
+      const full = [...SYMBOLS, ...SYMBOLS, ...SYMBOLS, ...SYMBOLS];
+      full.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'reel-symbol';
+        div.textContent = s;
+        stripEl.appendChild(div);
+      });
+    }
+
+    function updateReels(dt) {
+      for (let i = 0; i < REEL_COUNT; i++) {
+        if (reelStopped[i]) continue;
+        reelOffsets[i] += reelSpeeds[i] * dt;
+        const totalH = SYMBOLS.length * SYMBOL_H;
+        reelOffsets[i] %= totalH;
+        const strip = document.getElementById(`strip-${i}`);
+        strip.style.transform = `translateY(-${reelOffsets[i]}px)`;
+      }
+    }
+
+    function spinLoop(ts) {
+      if (!gameRunning) return;
+      if (!lastSpinT) lastSpinT = ts;
+      const dt = (ts - lastSpinT) / 1000;
+      lastSpinT = ts;
+      updateReels(dt);
+      spinRAF = requestAnimationFrame(spinLoop);
+    }
+
+    function stopReel(i) {
+      if (reelStopped[i]) return;
+      reelStopped[i] = true;
+
+      // Snap to nearest symbol
+      const totalH = SYMBOLS.length * SYMBOL_H;
+      const snapped = Math.round(reelOffsets[i] / SYMBOL_H) * SYMBOL_H;
+      reelOffsets[i] = snapped % totalH;
+      const strip = document.getElementById(`strip-${i}`);
+      strip.style.transform = `translateY(-${reelOffsets[i]}px)`;
+
+      // Read the visible symbol (centered in window = 1 symbol height offset from strip top)
+      const symIdx = Math.floor(reelOffsets[i] / SYMBOL_H) % SYMBOLS.length;
+      reelValues[i] = SYMBOLS[symIdx];
+
+      const reelEl = document.getElementById(`reel-${i}`);
+      reelEl.classList.add('stopped');
+      void reelEl.offsetWidth;
+      reelEl.classList.add('bounce-anim');
+      reelEl.addEventListener('animationend', () => reelEl.classList.remove('bounce-anim'), { once: true });
+
+      currentReel++;
+      if (currentReel < REEL_COUNT) {
+        instruction.textContent = reelMessages[currentReel];
+      } else {
+        instruction.textContent = '';
+        // check win
+        const all = reelValues[0] === reelValues[1] && reelValues[1] === reelValues[2];
+        setTimeout(() => {
+          if (all) triggerWin();
+          else triggerLose();
+        }, 500);
+      }
+    }
+
+    function onTap(e) {
+      if (!gameRunning) return;
+      e.preventDefault();
+      if (currentReel < REEL_COUNT && !reelStopped[currentReel]) {
+        stopReel(currentReel);
+      }
+    }
+
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.addEventListener('touchstart', onTap, { passive: false });
+    gameScreen.addEventListener('mousedown', onTap);
+
+    function startGame() {
+      cancelAnimationFrame(spinRAF);
+      reelOffsets = [0, 0, 0];
+      reelStopped = [false, false, false];
+      reelValues = [null, null, null];
+      currentReel = 0;
+      lastSpinT = null;
+      instruction.textContent = reelMessages[0];
+
+      for (let i = 0; i < REEL_COUNT; i++) {
+        buildStrip(document.getElementById(`strip-${i}`));
+        document.getElementById(`reel-${i}`).classList.remove('stopped');
+        // randomize starting offset
+        reelOffsets[i] = Math.floor(Math.random() * SYMBOLS.length) * SYMBOL_H;
+      }
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      spinRAF = requestAnimationFrame(spinLoop);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

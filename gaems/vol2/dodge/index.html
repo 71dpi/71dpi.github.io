@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Dodge</title>
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #000000; --color-accent: #FF0062; }
+    #game-screen { background: #000; overflow: hidden; position: relative; touch-action: none; }
+    #player {
+      position: absolute; width: 24px; height: 24px;
+      background: #fff; border-radius: 50%;
+      box-shadow: 0 0 12px #fff, 0 0 24px rgba(255,255,255,0.5);
+      transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 5;
+    }
+    .laser {
+      position: absolute; height: 4px;
+      background: #FF0062;
+      box-shadow: 0 0 8px #FF0062, 0 0 20px #FF0062;
+      border-radius: 2px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .laser-warn {
+      position: absolute; width: 12px; height: 12px;
+      background: #FF0062; border-radius: 50%;
+      box-shadow: 0 0 10px #FF0062;
+      transform: translateY(-50%);
+      animation: warn-blink 0.2s infinite alternate;
+      z-index: 4;
+    }
+    @keyframes warn-blink {
+      from { opacity: 1; transform: translateY(-50%) scale(1); }
+      to   { opacity: 0.3; transform: translateY(-50%) scale(1.3); }
+    }
+    #lasers-survived {
+      position: absolute; top: 60px; right: 16px;
+      font-size: 1.2rem; font-weight: 900; color: #FF0062;
+      z-index: 10;
+    }
+    #drag-hint {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1rem; font-weight: 900; color: rgba(255,255,255,0.5);
+      pointer-events: none; z-index: 6;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Dodge</h1>
+    <div class="game-subject">🔫</div>
+    <p class="game-tagline">Drag to dodge the laser beams!<br>Win: Survive 8 lasers</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="player"></div>
+    <div id="lasers-survived">0 / 8</div>
+    <div id="drag-hint">DRAG TO MOVE</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">😎</div>
+    <p class="game-tagline">Intact!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">💥</div>
+    <p class="game-tagline">Zapped!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'dodge';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+    let playerX, playerY, lasersDodged, laserQueue;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearAllLasers(); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; clearAllLasers(); show('lose'); }
+
+    function clearAllLasers() {
+      document.querySelectorAll('.laser, .laser-warn').forEach(e => e.remove());
+    }
+
+    function getScreenSize() {
+      const gs = document.getElementById('game-screen');
+      const r = gs.getBoundingClientRect();
+      return { w: r.width, h: r.height };
+    }
+
+    function updatePlayerPos() {
+      const pl = document.getElementById('player');
+      pl.style.left = playerX + 'px';
+      pl.style.top  = playerY + 'px';
+    }
+
+    function fireLaser() {
+      if (!gameRunning) return;
+      const { w, h } = getScreenSize();
+      const fromLeft = Math.random() < 0.5;
+      const laserY = 80 + Math.random() * (h - 160);
+      const LASER_H = 4;
+      const PLAYER_R = 12;
+
+      // Warning indicator
+      const warn = document.createElement('div');
+      warn.className = 'laser-warn';
+      warn.style.top = laserY + 'px';
+      warn.style.left = fromLeft ? '4px' : (w - 16) + 'px';
+      document.getElementById('game-screen').appendChild(warn);
+
+      setTimeout(() => {
+        if (!gameRunning) { warn.remove(); return; }
+        warn.remove();
+
+        // Fire laser
+        const laser = document.createElement('div');
+        laser.className = 'laser';
+        laser.style.top = laserY + 'px';
+        laser.style.width = '0px';
+        laser.style.left = fromLeft ? '0px' : 'auto';
+        laser.style.right = fromLeft ? 'auto' : '0px';
+        document.getElementById('game-screen').appendChild(laser);
+
+        const startTime = Date.now();
+        const duration = 800;
+
+        function animLaser() {
+          if (!gameRunning) { laser.remove(); return; }
+          const progress = Math.min((Date.now() - startTime) / duration, 1);
+          const laserW = w * progress;
+          laser.style.width = laserW + 'px';
+
+          // Collision check
+          const laserLeft  = fromLeft ? 0 : w - laserW;
+          const laserRight = fromLeft ? laserW : w;
+          const laserTop    = laserY - LASER_H * 2;
+          const laserBottom = laserY + LASER_H * 2;
+
+          if (playerX > laserLeft - PLAYER_R && playerX < laserRight + PLAYER_R &&
+              playerY > laserTop            && playerY < laserBottom) {
+            triggerLose();
+            laser.remove();
+            return;
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(animLaser);
+          } else {
+            setTimeout(() => { laser.remove(); }, 200);
+            lasersDodged++;
+            document.getElementById('lasers-survived').textContent = lasersDodged + ' / 8';
+            if (lasersDodged >= 8) { triggerWin(); return; }
+            // Schedule next
+            laserQueue = setTimeout(fireLaser, 300);
+          }
+        }
+        requestAnimationFrame(animLaser);
+      }, 500); // warn duration
+    }
+
+    function onMove(clientX, clientY) {
+      if (!gameRunning) return;
+      const gs = document.getElementById('game-screen');
+      const r = gs.getBoundingClientRect();
+      playerX = Math.max(12, Math.min(r.width - 12, clientX - r.left));
+      playerY = Math.max(50, Math.min(r.height - 12, clientY - r.top));
+      updatePlayerPos();
+      document.getElementById('drag-hint').style.display = 'none';
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', (e) => { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    gs.addEventListener('touchmove',  (e) => { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    gs.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+
+    function startGame() {
+      lasersDodged = 0;
+      cancelAnimationFrame(timerRAF);
+      clearTimeout(laserQueue);
+      clearAllLasers();
+      const { w, h } = getScreenSize();
+      playerX = w / 2; playerY = h / 2;
+      updatePlayerPos();
+      document.getElementById('lasers-survived').textContent = '0 / 8';
+      document.getElementById('drag-hint').style.display = '';
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      laserQueue = setTimeout(fireLaser, 800);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

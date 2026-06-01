@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SHAKE</title>
+  <meta name="theme-color" content="#E8F5E9">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #E8F5E9; --color-accent: #2E7D32; }
+    #game-area { position:relative; width:min(220px,65vw); height:min(320px,90vw); margin:0 auto; touch-action:none; }
+    #shaker-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(220px,65vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #shake-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SHAKE</h1>
+    <div class="game-subject">🍸</div>
+    <p class="game-tagline">Shake your device to mix the martini!<br>On desktop: mash the button!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="shaker-svg" viewBox="0 0 220 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Shaker body -->
+        <path d="M60,60 L50,260 L170,260 L160,60 Z" fill="#9E9E9E" stroke="#000" stroke-width="4"/>
+        <!-- Shaker lid -->
+        <rect x="55" y="35" width="110" height="32" rx="8" fill="#BDBDBD" stroke="#000" stroke-width="3"/>
+        <!-- Shaker cap -->
+        <rect x="70" y="18" width="80" height="22" rx="6" fill="#9E9E9E" stroke="#000" stroke-width="3"/>
+        <!-- Liquid inside (visible through glass) -->
+        <path id="liquid-fill" d="M62,120 L55,260 L165,260 L158,120 Z" fill="#A5D6A7" opacity="0.6"/>
+        <!-- Ice cubes floating -->
+        <rect id="ice-a" x="80" y="140" width="18" height="18" rx="3" fill="rgba(255,255,255,0.7)" stroke="#29B6F6" stroke-width="1.5"/>
+        <rect id="ice-b" x="120" y="155" width="14" height="14" rx="2" fill="rgba(255,255,255,0.7)" stroke="#29B6F6" stroke-width="1.5"/>
+        <rect id="ice-c" x="95" y="180" width="16" height="16" rx="3" fill="rgba(255,255,255,0.7)" stroke="#29B6F6" stroke-width="1.5"/>
+        <!-- Bubbles (appear when shaking) -->
+        <circle id="bub1" cx="90" cy="200" r="0" fill="rgba(255,255,255,0.5)"/>
+        <circle id="bub2" cx="130" cy="170" r="0" fill="rgba(255,255,255,0.5)"/>
+        <circle id="bub3" cx="105" cy="220" r="0" fill="rgba(255,255,255,0.5)"/>
+        <!-- Shine -->
+        <line x1="75" y1="70" x2="75" y2="240" stroke="rgba(255,255,255,0.4)" stroke-width="6" stroke-linecap="round"/>
+        <!-- Progress ring -->
+        <circle id="shake-ring" cx="110" cy="155" r="80" fill="none" stroke="#2E7D32" stroke-width="6" stroke-dasharray="0 503" transform="rotate(-90,110,155)" opacity="0.7"/>
+      </svg>
+    </div>
+    <p id="shake-label">SHAKE IT!</p>
+    <button id="shake-btn" class="btn" style="font-size:1.3rem;padding:0.8rem 2rem;">🤝 SHAKE</button>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🍸</div>
+    <p class="game-tagline">Perfectly mixed!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">🍸</div>
+    <p class="game-tagline">Needs more shaking!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='shake', TIME_LIMIT=8, SHAKES_NEEDED=30;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, shakes=0, lastAcc=null, animRAF=0;
+    const label=document.getElementById('shake-label'), ring=document.getElementById('shake-ring');
+    const CIRC=2*Math.PI*80;
+    const iceA=document.getElementById('ice-a'), iceB=document.getElementById('ice-b'), iceC=document.getElementById('ice-c');
+    const shakeBtn=document.getElementById('shake-btn');
+
+    function addShake(n){
+      shakes=Math.min(SHAKES_NEEDED,shakes+n);
+      const pct=shakes/SHAKES_NEEDED;
+      ring.setAttribute('stroke-dasharray',pct*CIRC+' '+CIRC);
+      label.textContent=Math.round(pct*100)+'% MIXED!';
+      // Animate ice
+      const t=Date.now()/100;
+      iceA.setAttribute('x',80+Math.sin(t)*8);iceA.setAttribute('y',140+Math.cos(t*1.3)*6);
+      iceB.setAttribute('x',120+Math.cos(t*0.9)*7);iceB.setAttribute('y',155+Math.sin(t*1.1)*5);
+      iceC.setAttribute('x',95+Math.sin(t*1.2)*9);iceC.setAttribute('y',180+Math.cos(t)*7);
+      // Bubbles
+      ['bub1','bub2','bub3'].forEach((id,i)=>{
+        const b=document.getElementById(id);
+        b.setAttribute('r',pct*5);
+        b.setAttribute('cy',200-pct*50+Math.sin(t+i)*10);
+      });
+      if(shakes>=SHAKES_NEEDED){triggerWin();}
+    }
+
+    // Device shake via accelerometer
+    let lastShakeTime=0;
+    window.addEventListener('devicemotion',e=>{
+      if(!gameRunning)return;
+      const a=e.accelerationIncludingGravity;
+      if(!a)return;
+      const mag=Math.sqrt((a.x||0)**2+(a.y||0)**2+(a.z||0)**2);
+      if(mag>18&&Date.now()-lastShakeTime>80){lastShakeTime=Date.now();addShake(1);}
+    });
+
+    // Button mashing fallback
+    shakeBtn.addEventListener('click',()=>{if(gameRunning)addShake(3);});
+    shakeBtn.addEventListener('touchstart',e=>{e.preventDefault();if(gameRunning)addShake(3);},{passive:false});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;show('lose');}
+    function startGame(){
+      shakes=0;ring.setAttribute('stroke-dasharray','0 '+CIRC);
+      label.textContent='SHAKE IT!';
+      show('game');gameRunning=true;timerStart=Date.now();timerRAF=requestAnimationFrame(runTimer);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

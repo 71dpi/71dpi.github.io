@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>WIPE</title>
+  <meta name="theme-color" content="#7CFF00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #7CFF00; --color-accent: #FF6B00; }
+    #game-screen { background: #7CFF00; touch-action: none; }
+    #window-wrap {
+      position: relative;
+      width: min(320px, 90vw);
+      height: min(280px, 50vh);
+      margin: 0 auto;
+      border: 5px solid #000;
+      border-radius: 12px;
+      box-shadow: 5px 5px 0 #000;
+      overflow: hidden;
+      background: #b8f5ff;
+    }
+    #window-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      background: linear-gradient(180deg, #87CEEB 0%, #b8f5e0 100%);
+      user-select: none;
+    }
+    #fog-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #progress-wrap {
+      width: 220px;
+      height: 22px;
+      background: #fff;
+      border: 4px solid #000;
+      border-radius: 11px;
+      box-shadow: 3px 3px 0 #000;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    #progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #FF6B00;
+      border-radius: 7px;
+      transition: width 0.1s;
+    }
+    #progress-label {
+      font-size: 0.9rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+    }
+    #wipe-hint {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      color: #000;
+      animation: pulse 1s ease infinite;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">WIPE</h1>
+    <div class="game-subject">🌫️</div>
+    <p class="game-tagline">Rub the foggy window clear!<br>Win: 85% cleared!</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <p id="wipe-hint">RUB THE WINDOW!</p>
+    <div id="window-wrap">
+      <div id="window-view">🌤️</div>
+      <canvas id="fog-canvas"></canvas>
+    </div>
+    <p id="progress-label">Cleared: 0%</p>
+    <div id="progress-wrap"><div id="progress-fill"></div></div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🌤️</div>
+    <p class="game-tagline">Vision clear!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">😶‍🌫️</div>
+    <p class="game-tagline">Still foggy!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'wipe';
+    const screens = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), win: document.getElementById('win-screen'), lose: document.getElementById('lose-screen') };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 12;
+    function runTimer() {
+      const e = (Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width = Math.max(0,(1-e/TIME_LIMIT)*100)+'%';
+      if (e >= TIME_LIMIT) triggerLose(); else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning=false; cancelAnimationFrame(timerRAF); setTimeout(()=>show('win'),400); }
+    function triggerLose() { gameRunning=false; cancelAnimationFrame(timerRAF); show('lose'); }
+
+    // WIPE GAME
+    const canvas = document.getElementById('fog-canvas');
+    const ctx = canvas.getContext('2d');
+    const progressFill = document.getElementById('progress-fill');
+    const progressLabel = document.getElementById('progress-label');
+    const windowWrap = document.getElementById('window-wrap');
+
+    const BRUSH_R = 28;
+    const WIN_PCT = 85;
+    let totalPx, clearedTrackerRAF;
+
+    function setupCanvas() {
+      const rect = windowWrap.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      // Fill with fog
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(180,200,220,0.92)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      totalPx = canvas.width * canvas.height;
+    }
+
+    function wipeAt(px, py) {
+      const rect = canvas.getBoundingClientRect();
+      const x = px - rect.left;
+      const y = py - rect.top;
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x, y, BRUSH_R, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    let checkCount = 0;
+    function checkCleared() {
+      if (!gameRunning) return;
+      checkCount++;
+      if (checkCount % 5 !== 0) return; // sample every 5 calls
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let cleared = 0;
+      // Count pixels where alpha < 30
+      for (let i = 3; i < data.length; i += 4 * 4) { // sample every 4th pixel for speed
+        if (data[i] < 30) cleared++;
+      }
+      // Approximate total samples
+      const totalSamples = Math.floor(totalPx / 4);
+      const pct = Math.min(100, (cleared / totalSamples) * 100);
+      progressFill.style.width = pct + '%';
+      progressLabel.textContent = `Cleared: ${Math.round(pct)}%`;
+      if (pct >= WIN_PCT) triggerWin();
+    }
+
+    canvas.addEventListener('touchmove', e => {
+      if (!gameRunning) return;
+      e.preventDefault();
+      for (const t of e.touches) { wipeAt(t.clientX, t.clientY); }
+      checkCleared();
+    }, { passive: false });
+
+    canvas.addEventListener('touchstart', e => {
+      if (!gameRunning) return;
+      e.preventDefault();
+      for (const t of e.touches) { wipeAt(t.clientX, t.clientY); }
+      checkCleared();
+    }, { passive: false });
+
+    let mouseDown = false;
+    canvas.addEventListener('mousedown', e => { mouseDown = true; wipeAt(e.clientX, e.clientY); });
+    canvas.addEventListener('mousemove', e => { if (mouseDown && gameRunning) { wipeAt(e.clientX, e.clientY); checkCleared(); } });
+    document.addEventListener('mouseup', () => { mouseDown = false; });
+
+    function startGame() {
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      checkCount = 0;
+      progressFill.style.width = '0%';
+      progressLabel.textContent = 'Cleared: 0%';
+      // Use a small delay to let the canvas render in the DOM
+      setTimeout(setupCanvas, 50);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

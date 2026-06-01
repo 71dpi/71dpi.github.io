@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SPRAY</title>
+  <meta name="theme-color" content="#E8F4FD">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #E8F4FD; --color-accent: #1565C0; }
+    #game-area { position:relative; width:min(280px,80vw); height:min(260px,74vw); margin:0 auto; user-select:none; }
+    #hair-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(280px,80vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #spray-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+    #hold-btn { font-size:1.5rem; padding:1rem 2.5rem; background:#E3F2FD; border:var(--stroke) solid #000; border-radius:var(--radius); box-shadow:var(--shadow); cursor:pointer; touch-action:none; }
+    #hold-btn:active { transform:translate(3px,3px); box-shadow:1px 1px 0 #000; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SPRAY</h1>
+    <div class="game-subject">💈</div>
+    <p class="game-tagline">Hold the button until the hair stops moving<br>Win: hold 3 seconds</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="hair-svg" viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Head -->
+        <ellipse cx="140" cy="150" rx="70" ry="85" fill="#FBBF6E" stroke="#000" stroke-width="3"/>
+        <!-- Hair strands that animate -->
+        <line id="h1" x1="100" y1="70" x2="90" y2="40" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <line id="h2" x1="115" y1="65" x2="110" y2="35" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <line id="h3" x1="130" y1="63" x2="130" y2="32" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <line id="h4" x1="145" y1="63" x2="148" y2="32" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <line id="h5" x1="160" y1="65" x2="165" y2="34" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <line id="h6" x1="175" y1="70" x2="183" y2="40" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <line id="h7" x1="188" y1="78" x2="200" y2="50" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <line id="h8" x1="94" y1="80" x2="80" y2="55" stroke="#4A2C12" stroke-width="5" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <circle cx="120" cy="145" r="7" fill="#fff" stroke="#000" stroke-width="2"/><circle cx="122" cy="147" r="3.5" fill="#000"/>
+        <circle cx="160" cy="145" r="7" fill="#fff" stroke="#000" stroke-width="2"/><circle cx="162" cy="147" r="3.5" fill="#000"/>
+        <!-- Smile -->
+        <path d="M118,175 Q140,188 162,175" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Progress arc -->
+        <circle id="hold-ring" cx="140" cy="150" r="90" fill="none" stroke="#1565C0" stroke-width="6" stroke-dasharray="0 566" stroke-dashoffset="0" transform="rotate(-90 140 150)" opacity="0.6"/>
+      </svg>
+    </div>
+    <p id="spray-label">HOLD TO SPRAY!</p>
+    <button id="hold-btn" aria-label="Hold to spray">💨 SPRAY</button>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">💈</div>
+    <p class="game-tagline">Perfect hold!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TIME'S UP!</p>
+    <div class="game-subject anim-shake">💈</div>
+    <p class="game-tagline">Let go too soon!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='spray', TIME_LIMIT=8, HOLD_NEEDED=3.0;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, holding=false, holdStart=0, holdTotal=0, animRAF=0;
+    const holdBtn=document.getElementById('hold-btn'), label=document.getElementById('spray-label'), ring=document.getElementById('hold-ring');
+    const hairs=['h1','h2','h3','h4','h5','h6','h7','h8'].map(id=>document.getElementById(id));
+    const CIRC=2*Math.PI*90;
+    let hairPhase=0, hairAmplitude=12, hairSpeed=2;
+
+    function animHair(ts) {
+      hairPhase+=hairSpeed*(holding?0.3:1)*0.05;
+      hairs.forEach((h,i)=>{
+        const amp=hairAmplitude*(holding?Math.max(0,1-holdTotal/HOLD_NEEDED):1);
+        const wave=Math.sin(hairPhase+i*0.7)*amp;
+        const bx=+h.getAttribute('x2')-wave, by=+h.getAttribute('y2');
+        h.style.transform=`translate(${wave}px,0)`;
+      });
+      if (holding) {
+        holdTotal=Math.min(HOLD_NEEDED,(Date.now()-holdStart)/1000);
+        const pct=holdTotal/HOLD_NEEDED;
+        ring.setAttribute('stroke-dasharray',pct*CIRC+' '+CIRC);
+        label.textContent=Math.round(pct*100)+'% SPRAYED';
+        if (holdTotal>=HOLD_NEEDED) { triggerWin(); return; }
+      }
+      animRAF=requestAnimationFrame(animHair);
+    }
+
+    function startHold() { if(!gameRunning)return; holding=true; holdStart=Date.now()-holdTotal*1000; hairSpeed=0.4; }
+    function endHold()   { holding=false; hairSpeed=2; label.textContent='HOLD TO SPRAY!'; }
+
+    holdBtn.addEventListener('mousedown',startHold);
+    document.addEventListener('mouseup',endHold);
+    holdBtn.addEventListener('touchstart',e=>{e.preventDefault();startHold();},{passive:false});
+    holdBtn.addEventListener('touchend',e=>{e.preventDefault();endHold();},{passive:false});
+
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;holding=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(animRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;holding=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      holdTotal=0;holding=false;hairAmplitude=12;hairSpeed=2;hairPhase=0;
+      ring.setAttribute('stroke-dasharray','0 '+CIRC);
+      label.textContent='HOLD TO SPRAY!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);
+      animRAF=requestAnimationFrame(animHair);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>

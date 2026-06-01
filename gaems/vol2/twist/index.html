@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>TWIST</title>
+  <meta name="theme-color" content="#FF6B00">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF6B00; --color-accent: #FFF200; }
+    #game-screen { background: #FF6B00; touch-action: none; }
+
+    #screw-area {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      flex: 1;
+      width: 100%;
+      touch-action: none;
+    }
+
+    #screw {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: #888;
+      border: 5px solid #333;
+      box-shadow: 4px 4px 0 #000;
+      position: relative;
+      transition: transform 0.05s linear;
+    }
+    #screw::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 10%;
+      width: 80%; height: 14px;
+      background: #555;
+      border-radius: 4px;
+      transform: translateY(-50%);
+    }
+    #screw::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 10%;
+      width: 14px; height: 80%;
+      background: #555;
+      border-radius: 4px;
+      transform: translateX(-50%);
+    }
+
+    #screwdriver {
+      font-size: 5rem;
+      transform: rotate(45deg);
+      filter: drop-shadow(3px 3px 0 #000);
+    }
+
+    #turn-counter {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #000;
+      background: rgba(255,255,255,0.9);
+      padding: 0.5rem 1.5rem;
+      border-radius: 12px;
+      border: 3px solid #000;
+    }
+
+    #progress-wrap {
+      width: 80%;
+      max-width: 280px;
+      height: 20px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 10px;
+      border: 3px solid #000;
+      overflow: hidden;
+    }
+    #progress-fill {
+      height: 100%;
+      background: #FFF200;
+      border-radius: 8px;
+      transition: width 0.1s;
+      width: 0%;
+    }
+
+    #instruction {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">TWIST</h1>
+    <div class="game-subject">🔩</div>
+    <p class="game-tagline">Drag in clockwise circles!<br>Win: 3 full rotations</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="screw-area">
+      <div id="instruction">🔄 ROTATE CLOCKWISE</div>
+      <div id="screw"></div>
+      <div id="screwdriver">🔧</div>
+      <div id="turn-counter">0 / 3 turns</div>
+      <div id="progress-wrap"><div id="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">✅</div>
+    <p class="game-tagline">Secure!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🔩</div>
+    <p class="game-tagline">Still loose!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'twist';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 10;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); setTimeout(() => show('win'), 300); }
+    function triggerLose() { gameRunning = false; show('lose'); }
+
+    const screwEl = document.getElementById('screw');
+    const turnCounter = document.getElementById('turn-counter');
+    const progressFill = document.getElementById('progress-fill');
+
+    let totalDeg = 0;        // cumulative clockwise degrees
+    let screwRotation = 0;   // visual rotation of screw
+    let lastAngle = null;
+    let isTracking = false;
+
+    const TURNS_NEEDED = 3;
+    const DEG_NEEDED = TURNS_NEEDED * 360;
+
+    function getScrewCenter() {
+      const rect = screwEl.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
+
+    function getAngle(cx, cy, px, py) {
+      return Math.atan2(py - cy, px - cx) * 180 / Math.PI;
+    }
+
+    function angleDelta(from, to) {
+      let d = to - from;
+      if (d > 180) d -= 360;
+      if (d < -180) d += 360;
+      return d; // positive = clockwise
+    }
+
+    function onPointerDown(e) {
+      if (!gameRunning) return;
+      const pt = e.touches ? e.touches[0] : e;
+      const { x, y } = getScrewCenter();
+      lastAngle = getAngle(x, y, pt.clientX, pt.clientY);
+      isTracking = true;
+    }
+
+    function onPointerMove(e) {
+      if (!gameRunning || !isTracking) return;
+      e.preventDefault();
+      const pt = e.touches ? e.touches[0] : e;
+      const { x, y } = getScrewCenter();
+      const angle = getAngle(x, y, pt.clientX, pt.clientY);
+      const delta = angleDelta(lastAngle, angle);
+      lastAngle = angle;
+
+      totalDeg += delta;
+      if (totalDeg < 0) totalDeg = 0; // can't go negative
+      screwRotation += delta;
+
+      screwEl.style.transform = `rotate(${screwRotation}deg)`;
+
+      const pct = Math.min(100, (totalDeg / DEG_NEEDED) * 100);
+      progressFill.style.width = pct + '%';
+
+      const turnsComplete = Math.floor(totalDeg / 360);
+      turnCounter.textContent = `${turnsComplete} / ${TURNS_NEEDED} turns`;
+
+      if (totalDeg >= DEG_NEEDED) {
+        turnCounter.textContent = '3/3 DONE!';
+        triggerWin();
+      }
+    }
+
+    function onPointerUp() {
+      isTracking = false;
+      lastAngle = null;
+    }
+
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.addEventListener('touchstart', onPointerDown, { passive: false });
+    gameScreen.addEventListener('touchmove', onPointerMove, { passive: false });
+    gameScreen.addEventListener('touchend', onPointerUp);
+    gameScreen.addEventListener('mousedown', onPointerDown);
+    gameScreen.addEventListener('mousemove', onPointerMove);
+    gameScreen.addEventListener('mouseup', onPointerUp);
+
+    function startGame() {
+      totalDeg = 0;
+      screwRotation = 0;
+      isTracking = false;
+      lastAngle = null;
+      screwEl.style.transform = 'rotate(0deg)';
+      progressFill.style.width = '0%';
+      turnCounter.textContent = '0 / 3 turns';
+
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Chop</title>
+  <meta name="theme-color" content="#FF4500">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #FF4500; --color-accent: #FFF200; }
+    #game-screen { background: #FF4500; overflow: hidden; position: relative; touch-action: none; }
+    #melon {
+      position: absolute;
+      font-size: 5rem;
+      left: -80px;
+      bottom: 10%;
+      animation: none;
+      user-select: none;
+      pointer-events: none;
+    }
+    #melon.flying {
+      animation: fly-melon 1.5s linear forwards;
+    }
+    @keyframes fly-melon {
+      from { left: -80px; bottom: 10%; }
+      to   { left: 110%; bottom: 70%; }
+    }
+    .half {
+      position: absolute;
+      font-size: 3.5rem;
+      pointer-events: none;
+      animation: split 0.7s ease-out forwards;
+    }
+    .half-left  { animation-name: split-left; }
+    .half-right { animation-name: split-right; }
+    @keyframes split-left  {
+      from { transform: translateX(0) rotate(0deg); opacity: 1; }
+      to   { transform: translateX(-80px) rotate(-40deg) translateY(60px); opacity: 0; }
+    }
+    @keyframes split-right {
+      from { transform: translateX(0) rotate(0deg); opacity: 1; }
+      to   { transform: translateX(80px) rotate(40deg) translateY(60px); opacity: 0; }
+    }
+    #swipe-line {
+      position: absolute;
+      pointer-events: none;
+      border: 3px solid #FFF200;
+      border-radius: 2px;
+      transform-origin: left center;
+      display: none;
+      box-shadow: 0 0 8px #FFF200;
+    }
+    #passes-left {
+      position: absolute; top: 60px; right: 16px;
+      font-size: 1.2rem; font-weight: 900; color: #FFF200;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">Chop</h1>
+    <div class="game-subject">🍉</div>
+    <p class="game-tagline">Swipe fast to slice the watermelon!<br>Win: Slice it before it escapes</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="melon">🍉</div>
+    <div id="swipe-line"></div>
+    <div id="passes-left">❤️❤️</div>
+  </div>
+
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WIN!</p>
+    <div class="game-subject anim-bounce">🔪</div>
+    <p class="game-tagline">Sliced!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">LOSE!</p>
+    <div class="game-subject anim-shake">🍉</div>
+    <p class="game-tagline">Missed!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG = 'chop';
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game:  document.getElementById('game-screen'),
+      win:   document.getElementById('win-screen'),
+      lose:  document.getElementById('lose-screen'),
+    };
+    function show(n) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[n].classList.remove('hidden'); }
+
+    let gameRunning = false, timerStart, timerRAF;
+    const TIME_LIMIT = 7;
+    let passes, melonFlying, melonAnimTimeout, sliced;
+    let touchStart = null;
+
+    function runTimer() {
+      const e = (Date.now() - timerStart) / 1000;
+      document.getElementById('timer-bar').style.width = Math.max(0, (1 - e / TIME_LIMIT) * 100) + '%';
+      if (e >= TIME_LIMIT) triggerLose();
+      else if (gameRunning) timerRAF = requestAnimationFrame(runTimer);
+    }
+    function triggerWin() { gameRunning = false; cancelAnimationFrame(timerRAF); clearTimeout(melonAnimTimeout); setTimeout(() => show('win'), 400); }
+    function triggerLose() { gameRunning = false; clearTimeout(melonAnimTimeout); show('lose'); }
+
+    function launchMelon() {
+      if (!gameRunning) return;
+      sliced = false;
+      melonFlying = true;
+      const melon = document.getElementById('melon');
+      melon.style.display = 'block';
+      melon.classList.remove('flying');
+      void melon.offsetWidth;
+      melon.classList.add('flying');
+      melonAnimTimeout = setTimeout(() => {
+        if (!gameRunning || sliced) return;
+        melon.style.display = 'none';
+        melon.classList.remove('flying');
+        melonFlying = false;
+        passes--;
+        updatePasses();
+        if (passes <= 0) triggerLose();
+        else {
+          setTimeout(() => { if (gameRunning) launchMelon(); }, 500);
+        }
+      }, 1500);
+    }
+
+    function updatePasses() {
+      const hearts = ['', '❤️', '❤️❤️'];
+      document.getElementById('passes-left').textContent = passes >= 0 ? (hearts[passes] || '') : '';
+    }
+
+    function getMelonCenter() {
+      const melon = document.getElementById('melon');
+      const r = melon.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function onTouchStart(e) {
+      const t = e.touches ? e.touches[0] : e;
+      touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+    }
+
+    function onTouchEnd(e) {
+      if (!touchStart || !gameRunning || !melonFlying || sliced) return;
+      const t = e.changedTouches ? e.changedTouches[0] : e;
+      const dx = t.clientX - touchStart.x;
+      const dy = t.clientY - touchStart.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dt = Date.now() - touchStart.time;
+      if (dist < 80 || dt > 400) { touchStart = null; return; }
+
+      // Check if swipe crosses melon
+      const mc = getMelonCenter();
+      const sx = touchStart.x, sy = touchStart.y;
+      const ex = t.clientX, ey = t.clientY;
+      // Simple point-to-segment distance
+      const len2 = dx * dx + dy * dy;
+      let t0 = ((mc.x - sx) * dx + (mc.y - sy) * dy) / len2;
+      t0 = Math.max(0, Math.min(1, t0));
+      const nearX = sx + t0 * dx, nearY = sy + t0 * dy;
+      const distToMelon = Math.sqrt((mc.x - nearX) ** 2 + (mc.y - nearY) ** 2);
+
+      if (distToMelon < 55) {
+        sliced = true;
+        melonFlying = false;
+        clearTimeout(melonAnimTimeout);
+        showSlice(mc.x, mc.y);
+        triggerWin();
+      }
+      touchStart = null;
+    }
+
+    function showSlice(cx, cy) {
+      const gs = document.getElementById('game-screen');
+      const gr = gs.getBoundingClientRect();
+      document.getElementById('melon').style.display = 'none';
+      document.getElementById('melon').classList.remove('flying');
+      ['half-left', 'half-right'].forEach(cls => {
+        const h = document.createElement('div');
+        h.className = `half ${cls}`;
+        h.textContent = '🍉';
+        h.style.left = (cx - gr.left - 28) + 'px';
+        h.style.top  = (cy - gr.top  - 28) + 'px';
+        gs.appendChild(h);
+        h.addEventListener('animationend', () => h.remove());
+      });
+    }
+
+    const gs = document.getElementById('game-screen');
+    gs.addEventListener('touchstart', onTouchStart, { passive: true });
+    gs.addEventListener('touchend', onTouchEnd, { passive: true });
+    gs.addEventListener('mousedown', onTouchStart);
+    gs.addEventListener('mouseup', onTouchEnd);
+
+    function startGame() {
+      passes = 2;
+      sliced = false;
+      melonFlying = false;
+      cancelAnimationFrame(timerRAF);
+      clearTimeout(melonAnimTimeout);
+      document.querySelectorAll('.half').forEach(h => h.remove());
+      const melon = document.getElementById('melon');
+      melon.style.display = 'none';
+      melon.classList.remove('flying');
+      updatePasses();
+      show('game');
+      gameRunning = true;
+      timerStart = Date.now();
+      timerRAF = requestAnimationFrame(runTimer);
+      setTimeout(launchMelon, 300);
+    }
+
+    document.getElementById('btn-play').addEventListener('click', startGame);
+    document.getElementById('btn-replay-win').addEventListener('click', startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click', startGame);
+    wireFooter(SLUG);
+    ['win', 'lose'].forEach(s => {
+      document.getElementById(`btn-shuffle-${s}`)?.addEventListener('click', shuffle);
+      document.getElementById(`btn-share-${s}`)?.addEventListener('click', () => shareGame(SLUG));
+    });
+  </script>
+</body>
+</html>

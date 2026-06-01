@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>71dpi Microgames Vol. 2</title>
+  <meta name="description" content="100 microgames. One tap at a time.">
+  <meta name="theme-color" content="#FFF200">
+  <meta property="og:title" content="71dpi Microgames Vol. 2">
+  <meta property="og:description" content="100 microgames. One tap at a time.">
+  <meta property="og:url" content="https://71dpi.github.io/gaems/vol2/">
+  <link rel="canonical" href="https://71dpi.github.io/gaems/vol2/">
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM7X7555');</script>
+  <style>
+    /* Hub overrides — allow normal scrolling on this page */
+    html, body { overflow: auto; height: auto; }
+    body { display: block; background: #FFF200; }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM7X7555"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <div id="header-template" w3-include-html="/components/header.html" role="banner" aria-label="Site header"></div>
+
+  <main id="main">
+    <div class="back"><a href="/gaems/index.html">&#10229; More games</a></div>
+
+    <h1>71dpi Microgames Vol. 2</h1>
+    <p style="text-align:center; font-weight:700; margin-top:-0.5rem; margin-bottom:1rem; font-size:1.1rem;">
+      100 microgames. One tap at a time.
+    </p>
+
+    <button class="btn hub-shuffle" onclick="shuffle()">🔀 Shuffle</button>
+
+    <nav class="hub-grid" aria-label="All 100 microgames" id="game-grid">
+      <!-- populated by JS below -->
+    </nav>
+  </main>
+
+  <div w3-include-html="/components/footer.html" role="contentinfo" aria-label="Site footer"></div>
+
+  <script src="shared.js"></script>
+  <script>
+    // Hash router: #shave → /gaems/vol2/shave/
+    (function() {
+      const hash = location.hash.slice(1).toLowerCase();
+      if (hash && GAMES.includes(hash)) {
+        location.replace(`/gaems/vol2/${hash}/`);
+      }
+    })();
+
+    // Build the game grid
+    const grid = document.getElementById('game-grid');
+
+    // Track which games have been built (update this list as games are added)
+    const BUILT = new Set([
+      // Batch hand-built
+      'shave',
+      // Batch A
+      'plug','sting','catch','sneeze','unroll','dunk','slice','defuse','balance',
+      'zit','thread','stomp','swat','parallel',
+      // Batch B
+      'toast','lick','unlock','pluck','inflate','sort','ref','vacuum','scare',
+      'whack','pour','stamp','wipe','crush',
+      // Batch C
+      'fish','twist','duck','peel','squeeze','match','zip','flip','hammer',
+      'pet','brake','sharpen','mow','blow',
+      // Batch D
+      'shred','aim','scrub','stir','pop','type','fold','knock','clog',
+      'paint','haul','feed','drill','toss',
+      // Batch E
+      'squirt','chop','dial','bake','sweep','tickle','jump','dodge',
+      'saw','crack','iron','stack','lasso','charge',
+      // Batch F
+      'knead','wink','amp','spray','dig','cover','tune','swig','seal',
+      'wrap','burst','melt','unbox','light',
+      // Batch G
+      'clip','paddle','grip','launch','shake','flick','plant','score',
+      'sew','brush','erase','spin','lock','squash','win',
+    ]);
+
+    GAMES.forEach(slug => {
+      const meta = GAME_META[slug];
+      const built = BUILT.has(slug);
+      const a = document.createElement(built ? 'a' : 'div');
+      if (built) a.href = `/gaems/vol2/${slug}/`;
+      a.className = 'hub-cell' + (built ? '' : ' coming-soon');
+      a.setAttribute('aria-label', slug);
+      a.innerHTML = `
+        <span class="cell-emoji">${meta?.emoji ?? '🎮'}</span>
+        <span class="cell-name">${slug.toUpperCase()}</span>
+      `;
+      grid.appendChild(a);
+    });
+
+    // W3 include polyfill (matches site pattern)
+    function includeHTML() {
+      var z, i, elmnt, file, xhttp;
+      z = document.getElementsByTagName("*");
+      for (i = 0; i < z.length; i++) {
+        elmnt = z[i];
+        file = elmnt.getAttribute("w3-include-html");
+        if (file) {
+          xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+              if (this.status == 200) elmnt.innerHTML = this.responseText;
+              if (this.status == 404) elmnt.innerHTML = "Page not found.";
+              elmnt.removeAttribute("w3-include-html");
+              includeHTML();
+            }
+          };
+          xhttp.open("GET", file, true);
+          xhttp.send();
+          return;
+        }
+      }
+    }
+    includeHTML();
+  </script>
+</body>
+</html>

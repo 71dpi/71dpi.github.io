@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SPIN</title>
+  <meta name="theme-color" content="#E8F5E9">
+  <link rel="stylesheet" href="/gaems/vol2/shared.css" />
+  <style>
+    :root { --color-bg: #E8F5E9; --color-accent: #1B5E20; }
+    #game-area { position:relative; width:min(280px,80vw); height:min(280px,80vw); margin:0 auto; touch-action:none; }
+    #spin-svg { width:100%; height:100%; }
+    #timer-bar-wrap { width:min(280px,80vw); height:14px; background:#fff; border:var(--stroke) solid #000; border-radius:99px; overflow:hidden; box-shadow:var(--shadow); }
+    #timer-bar { height:100%; background:var(--color-accent); width:100%; transform-origin:left; }
+    #spin-label { font-weight:900; font-size:1.1rem; letter-spacing:0.05em; }
+  </style>
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1 class="game-title">SPIN</h1>
+    <div class="game-subject">🎡</div>
+    <p class="game-tagline">Swipe in circles to spin the merry-go-round!<br>Win: 3 full spins</p>
+    <button class="btn btn-play" id="btn-play">PLAY</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71" aria-label="Back">71</a>
+      <button class="btn-icon" id="btn-shuffle" aria-label="Shuffle">🔀</button>
+      <button class="btn-icon" id="btn-share" aria-label="Share">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon" aria-label="Ko-fi">☕</a>
+    </footer>
+  </div>
+  <div id="game-screen" class="screen hidden">
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    <div id="game-area">
+      <svg id="spin-svg" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Ground -->
+        <circle cx="140" cy="140" r="130" fill="#C8E6C9" stroke="#000" stroke-width="3"/>
+        <!-- Merry-go-round disk -->
+        <g id="merry">
+          <circle cx="140" cy="140" r="90" fill="#81C784" stroke="#000" stroke-width="3"/>
+          <circle cx="140" cy="140" r="60" fill="#66BB6A" stroke="#000" stroke-width="2"/>
+          <circle cx="140" cy="140" r="30" fill="#43A047" stroke="#000" stroke-width="2"/>
+          <!-- Radial bars -->
+          <line x1="140" y1="50" x2="140" y2="230" stroke="#2E7D32" stroke-width="5"/>
+          <line x1="50" y1="140" x2="230" y2="140" stroke="#2E7D32" stroke-width="5"/>
+          <line x1="76" y1="76" x2="204" y2="204" stroke="#2E7D32" stroke-width="5"/>
+          <line x1="204" y1="76" x2="76" y2="204" stroke="#2E7D32" stroke-width="5"/>
+          <!-- Kids on the ride -->
+          <circle cx="140" cy="58" r="10" fill="#FBBF6E" stroke="#000" stroke-width="2"/>
+          <circle cx="222" cy="140" r="10" fill="#EF9A9A" stroke="#000" stroke-width="2"/>
+          <circle cx="140" cy="222" r="10" fill="#80DEEA" stroke="#000" stroke-width="2"/>
+          <circle cx="58" cy="140" r="10" fill="#CE93D8" stroke="#000" stroke-width="2"/>
+        </g>
+        <!-- Center pole -->
+        <circle cx="140" cy="140" r="12" fill="#5D4037" stroke="#000" stroke-width="3"/>
+        <!-- Spin progress arc -->
+        <circle id="spin-ring" cx="140" cy="140" r="120" fill="none" stroke="#FF6B00" stroke-width="6" stroke-dasharray="0 754" transform="rotate(-90,140,140)" opacity="0.8"/>
+      </svg>
+    </div>
+    <p id="spin-label">SWIPE IN CIRCLES!</p>
+  </div>
+  <div id="win-screen" class="screen hidden">
+    <p class="result-label">WHEEE!</p>
+    <div class="game-subject anim-bounce">🎡</div>
+    <p class="game-tagline">3 full spins!</p>
+    <button class="btn btn-replay" id="btn-replay-win">PLAY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-win">🔀</button>
+      <button class="btn-icon" id="btn-share-win">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <div id="lose-screen" class="screen hidden">
+    <p class="result-label">TOO SLOW!</p>
+    <div class="game-subject anim-shake">🎡</div>
+    <p class="game-tagline">Not enough spin!</p>
+    <button class="btn btn-replay" id="btn-replay-lose">TRY AGAIN</button>
+    <footer class="game-footer">
+      <a href="/gaems/vol2/" class="btn-icon btn-icon-71">71</a>
+      <button class="btn-icon" id="btn-shuffle-lose">🔀</button>
+      <button class="btn-icon" id="btn-share-lose">⤴</button>
+      <a href="https://ko-fi.com/71dpi" target="_blank" rel="noopener" class="btn-icon">☕</a>
+    </footer>
+  </div>
+  <script src="/gaems/vol2/shared.js"></script>
+  <script>
+    const SLUG='spin', TIME_LIMIT=10, SPINS_NEEDED=3;
+    const screens={start:document.getElementById('start-screen'),game:document.getElementById('game-screen'),win:document.getElementById('win-screen'),lose:document.getElementById('lose-screen')};
+    function show(n){Object.values(screens).forEach(s=>s.classList.add('hidden'));screens[n].classList.remove('hidden');}
+    let gameRunning=false, timerStart=0, timerRAF=0, animRAF=0;
+    const gameArea=document.getElementById('game-area'), label=document.getElementById('spin-label');
+    const merry=document.getElementById('merry'), ring=document.getElementById('spin-ring');
+    const SVG_W=280, SVG_H=280, CX=140, CY=140, CIRC=2*Math.PI*120;
+    let angle=0, angularVel=0, totalRotation=0, lastAngle=null, dragging=false;
+
+    function getSVGPos(cX,cY){const rect=gameArea.getBoundingClientRect();return{x:cX/rect.width*SVG_W,y:cY/rect.height*SVG_H};}
+    function getAngle(svgX,svgY){return Math.atan2(svgY-CY,svgX-CX);}
+
+    function startTouch(svgX,svgY){dragging=true;lastAngle=getAngle(svgX,svgY);}
+    function moveTouch(svgX,svgY){
+      if(!dragging||lastAngle===null)return;
+      const a=getAngle(svgX,svgY);
+      let da=a-lastAngle;
+      if(da>Math.PI)da-=Math.PI*2;
+      if(da<-Math.PI)da+=Math.PI*2;
+      angularVel=da;angle+=da;totalRotation+=Math.abs(da);lastAngle=a;
+    }
+    function endTouch(){dragging=false;}
+
+    gameArea.addEventListener('touchstart',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);startTouch(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchmove',e=>{if(!gameRunning)return;e.preventDefault();const p=getSVGPos(e.changedTouches[0].clientX,e.changedTouches[0].clientY);moveTouch(p.x,p.y);},{passive:false});
+    gameArea.addEventListener('touchend',()=>endTouch());
+    gameArea.addEventListener('mousedown',e=>{if(!gameRunning)return;const p=getSVGPos(e.clientX,e.clientY);startTouch(p.x,p.y);});
+    gameArea.addEventListener('mousemove',e=>{if(!gameRunning||!dragging)return;const p=getSVGPos(e.clientX,e.clientY);moveTouch(p.x,p.y);});
+    gameArea.addEventListener('mouseup',()=>endTouch());
+
+    function animLoop(){
+      if(!gameRunning)return;
+      if(!dragging){angularVel*=0.95;}
+      angle+=angularVel*0.3;
+      totalRotation+=Math.abs(angularVel)*0.3;
+      merry.setAttribute('transform','rotate('+((angle*180/Math.PI))+',140,140)');
+      const spins=totalRotation/(Math.PI*2);
+      const pct=Math.min(1,spins/SPINS_NEEDED);
+      ring.setAttribute('stroke-dasharray',pct*CIRC+' '+CIRC);
+      label.textContent=Math.round(pct*100)+'% — '+Math.round(spins*10)/10+' SPINS!';
+      if(spins>=SPINS_NEEDED){triggerWin();return;}
+      animRAF=requestAnimationFrame(animLoop);
+    }
+    function runTimer(){
+      const elapsed=(Date.now()-timerStart)/1000;
+      document.getElementById('timer-bar').style.width=(Math.max(0,1-elapsed/TIME_LIMIT)*100)+'%';
+      if(elapsed>=TIME_LIMIT)triggerLose();else if(gameRunning)timerRAF=requestAnimationFrame(runTimer);
+    }
+    function triggerWin(){gameRunning=false;cancelAnimationFrame(timerRAF);cancelAnimationFrame(animRAF);setTimeout(()=>show('win'),300);}
+    function triggerLose(){gameRunning=false;cancelAnimationFrame(animRAF);show('lose');}
+    function startGame(){
+      angle=0;angularVel=0;totalRotation=0;dragging=false;lastAngle=null;
+      merry.setAttribute('transform','rotate(0,140,140)');
+      ring.setAttribute('stroke-dasharray','0 '+CIRC);
+      label.textContent='SWIPE IN CIRCLES!';
+      show('game');gameRunning=true;timerStart=Date.now();
+      timerRAF=requestAnimationFrame(runTimer);animRAF=requestAnimationFrame(animLoop);
+    }
+    document.getElementById('btn-play').addEventListener('click',startGame);
+    document.getElementById('btn-replay-win').addEventListener('click',startGame);
+    document.getElementById('btn-replay-lose').addEventListener('click',startGame);
+    wireFooter(SLUG);
+    ['win','lose'].forEach(s=>{document.getElementById('btn-shuffle-'+s)?.addEventListener('click',shuffle);document.getElementById('btn-share-'+s)?.addEventListener('click',()=>shareGame(SLUG));});
+  </script>
+</body>
+</html>
