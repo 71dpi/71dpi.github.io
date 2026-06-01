@@ -1,0 +1,4 @@
+# ignore local or generated files
+gaems/vol2/100 microgames.pdf
+gaems/vol2/PROGRESS.md
+.DS_Store
