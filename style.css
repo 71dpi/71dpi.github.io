@@ -39,11 +39,76 @@ nav.inline-links.grid .caption {
   font-weight: 500;
 }
 
+/* Game volumes: 2 columns on desktop, stacked on mobile */
+nav.game-volumes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-left: 15%;
+    margin-right: 15%;
+    justify-items: stretch;
+    align-items: stretch;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+nav.game-volumes a {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+nav.game-volumes a:hover {
+  transform: translateY(-4px);
+}
+
+nav.game-volumes picture,
+nav.game-volumes img {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    display: block;
+    object-fit: cover;
+}
+
+nav.game-volumes .caption {
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+/* Mobile: stack volumes vertically */
+@media (max-width: 768px) {
+  nav.game-volumes {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 0.5rem;
+  }
+
+  nav.game-volumes a {
+        padding: 0.75rem;
+  }
+
+  nav.game-volumes picture,
+  nav.game-volumes img {
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+  }
+
+  nav.game-volumes .caption {
+    font-size: 1rem;
+  }
+}
+
 /* Large tablet: 4 columns */
 @media (max-width: 1400px) {
   nav.inline-links.grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 1.2rem;
+        margin: 0 15%;
+
   }
 
   nav.inline-links.grid picture,
