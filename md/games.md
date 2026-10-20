@@ -1,6 +1,6 @@
 ---
 title: Games | Alex Lockwood
-description: Collections of browser games by Alex Lockwood, built with Claude as exercises in prompt engineering and vibe coding: Shovelware Volume 1 and 100 Microgames Volume 2.
+description: Collections of browser games and toys by Alex Lockwood, built with Claude as exercises in prompt engineering and vibe coding: Shovelware Volume 1, 100 Microgames Volume 2 and Boop·Scape, a pixel-art music maker.
 url: https://71dpi.github.io/gaems/
 author: Alex Lockwood
 ---
@@ -17,7 +17,11 @@ Volume 1 ](https://71dpi.github.io/md/games-vol1.md) [
 
 ![71dpi microgame collection vol. 2 box art](https://71dpi.github.io/gaems/vol2/img/71-vol2.webp)
 
-Volume 2 ](https://71dpi.github.io/md/games-vol2.md)
+Volume 2 ](https://71dpi.github.io/md/games-vol2.md) [
+
+![Boop·Scape, a pixel-art music sequencer with a grid of colorful note characters and an instrument tray](https://71dpi.github.io/gaems/img/boopscape.png)
+
+Boop·Scape ](https://71dpi.github.io/boopscape/)
 
 ---
 HTML version: https://71dpi.github.io/gaems/

@@ -58,6 +58,7 @@ Alex describes himself as an activator for product teams who need guidance: some
 - [Games hub](https://71dpi.github.io/md/games.md): Collections of games made with Claude to explore prompt engineering and vibe coding, as a love letter to 90s shovelware CDs.
 - [Shovelware Volume 1: Slop City, USA](https://71dpi.github.io/md/games-vol1.md): Collection of quick, sloppy browser games.
 - [Microgames Volume 2](https://71dpi.github.io/md/games-vol2.md): 100 tap, swipe, drag and tilt microgames. Each lives at `https://71dpi.github.io/gaems/vol2/<name>/` (for example `/gaems/vol2/pop/`); the full list is linked from the hub page.
+- [Boop·Scape](https://71dpi.github.io/boopscape/): Free pixel-art music maker in the browser. Place note characters on a grid, pick instruments, set the tempo and loop your song. Source: https://github.com/71dpi/boopscape
 
 ## Elsewhere
 

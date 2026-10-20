@@ -79,6 +79,15 @@ nav.game-volumes .caption {
   font-weight: 600;
 }
 
+/* Desktop: three tiles share one row */
+@media (min-width: 769px) {
+  nav.game-volumes:has(> a:nth-child(3)) {
+        grid-template-columns: repeat(3, 1fr);
+        margin-left: 5%;
+        margin-right: 5%;
+  }
+}
+
 /* Mobile: stack volumes vertically */
 @media (max-width: 768px) {
   nav.game-volumes {
