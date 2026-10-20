@@ -1,0 +1,3249 @@
+# Alex Lockwood: full site text
+
+All public pages of https://71dpi.github.io/ as plain markdown, concatenated. Same text as the HTML pages. See https://71dpi.github.io/llms.txt for the index.
+
+
+---
+
+# Alex Lockwood | UX + Creative Direction + Management + Design
+Source: https://71dpi.github.io/
+
+# UX + Creative Direction + MGMT + Design
+
+![Portrait photo of Alex Lockwood](https://71dpi.github.io/img/alexlockwood.jpg)
+
+**ELEVATOR PITCH [ ](https://medium.com/ideas-by-crema/use-this-framework-to-master-the-art-of-the-elevator-pitch-d86c8d1a4537)**
+
+###### For product teams who need guidance and activation, Alex is a UX Architect that grows products and inspires teams. Alex rolls up his sleeves and never stops advocating for his team, their mission, and their customers.
+
+My "[why](https://www.ted.com/talks/simon_sinek_how_great_leaders_inspire_action/up-next?language=en)" is to enable people to do a lot with very little. It's how I grew up. My reality turned it into my purpose. I gather the necessary information and resources, and put it to work. I try, learn quickly, and try again, recognizing patterns and simplifying. I perform and apply research. I make it accessible, approachable, lovable. [Check out my projects](https://71dpi.github.io/md/projects.md) to get a taste.
+
+I'm an activator, bringing people together around an idea. I harness the collective energy and knowledge of working in a group. Diverse experience and points of view keep things fresh. The right people and processes, identified and organized, is how things get done.
+
+![A stylized photo of Alex](https://71dpi.github.io/img/glitch.jpg)
+
+I grew up on the internet. Find me at [@71dpi](http://www.twitter.com/71dpi) across social media. That's one less than screen resolution. Ideas, integrity, clarity, and context is more important than aesthetic. I strive for beauty and delight, but admit that slapping a fresh coat of 4k paint on something never solved a problem.
+
+[
+
+![a tweet by wint (@dril) that reads: im the guy who was not sold on Jack Ass until they made it 3d](https://71dpi.github.io/img/dril-white.jpg)
+
+](https://twitter.com/dril/status/1329111211770662912)
+
+I love that people will always find ways to break your thing or do it better. Where people and tech meet, we find unlimited challenge and learning opportunities. If you want to [get to know me even better](https://71dpi.github.io/md/about.md) aside from just the work stuff, I've written more on [my About page](https://71dpi.github.io/md/about.md).
+
+#### See my work and read case studies:
+
+- [More UX, branding, and graphic design projects are hosted on my Bēhance ](http://www.behance.net/71dpi)
+
+- [See more visual exploration on Dribbble ](http://www.dribbble.com/71dpi)
+
+
+---
+
+# About | Alex Lockwood
+Source: https://71dpi.github.io/about.html
+
+# Good at Business. Family Man. Has Ideas.
+
+## Good Business Boy
+
+I like working on things that help people and make them happy. Sometimes that's a work solution that make's people's jobs easier. Other times it's an attractive logo or t-shirt design. More often it's a Design Thinking exercise, leading teams to solve problems.
+
+You're likely here because you're in the Product, UX, or Design space, or you're looking for help in one of those areas. Check out [my projects](https://71dpi.github.io/md/projects.md), or see my work history using the buttons below, and reach out with any questions.
+
+## Actual Person
+
+Happily married he/him with two lively kids, two even livelier Boston Terriers, and a cat to rule them all. I'm a Christian, but try super hard not to be the judgy kind.
+
+I cook almost every night and love experimenting with flavors from all sorts of cultures. Speaking of cultures, I also brew my own kombucha.
+
+There's usually a podcast or [Spotify playlist](https://open.spotify.com/user/129808580?si=NUYznv5iQPqSngTZGo_QXw) on. I'll listen to just about anything, but typically gravitate toward hyperpop, punk, and rap of the 2010s. If there's a television on, I hope it's showing a cooking show, NFL football, or we're playing Super Smash Bros.
+
+[
+
+![an empathy map, a UX artifact, describing what Alex thinks, feels, sees, hears, and does](https://71dpi.github.io/img/about-alex-empathy.jpg)
+
+An empathy map about me created in Invision Freehand ](https://71dpi.github.io/img/about-alex-empathy.jpg)
+
+## Always Exploring
+
+Work and life keep me plenty busy, but recharging often looks like trying something new and creative. Here are a few things I've messed around with to stay sharp and work through some ideas:
+
+- [Making Video Games](https://71dpi.github.io/md/games.md)
+
+- [Triiiangles](https://triiiangleproject.tumblr.com/)
+
+- Building a Playlist
+
+- [Woodworking and Cinemagraphs](https://www.behance.net/gallery/23416859/Refinishing-Cinemagraphs)
+
+- [Presidential Glitch Art](https://71dpi.tumblr.com/tagged/MissingPOTUS.)
+
+- [Daily UI: Design System](https://dribbble.com/71dpi/projects/856274-Aviation-Design-System-Exploration)
+
+- Album Art: [ ⓵](https://www.behance.net/gallery/6260145/Album-Art-I) [ ⓶](https://www.behance.net/gallery/12240591/Album-Art-II) [ ⓷](https://www.behance.net/gallery/40352505/Album-Art-III)
+
+- [Daily UI: Fun](https://dribbble.com/71dpi/projects/400282-Daily-UI)
+
+- [Building this Website](https://71dpi.github.io/md/index.md)
+
+
+---
+
+# Resumé | Alex Lockwood
+Source: https://71dpi.github.io/resume.html
+
+# Alex Lockwood
+
+###### UX + Creative Direction + MGMT + Design · Cincinnati, Ohio, United States
+
+[About me](https://71dpi.github.io/md/about.md) · [LinkedIn](http://www.linkedin.com/in/alexlockwood) · [Email](https://71dpi.github.io/projects/emailme.html) · [Behance](http://www.behance.net/71dpi) · [Dribbble](http://www.dribbble.com/71dpi) · [Resumé as a PDF](https://71dpi.github.io/Alex%20Lockwood_Resume%2024.pdf)
+
+## Summary
+
+My passion lies in people, and the connections they form with one another and with technology. I've lead projects, managed teams of designers, developers and strategists, and developed new processes for over a decade.
+
+I'm a communicator, visually and vocally. I'm an activator and a leader. I'm highly self-motivated, but thrive in a group. I always seek to find others' passions to develop them and allow better collaboration.
+
+I employ creative direction that pairs strategy and forward-thinking design. My solutions are backed by research and rooted in psychology. Direction and design don't just solve problems, they're the visual cues that lead stories. Every choice made speaks volumes on a subconscious level. Knowing your brand and your audience are clutch to crafting stories in a way people connect with.
+
+My approach and productivity are sculpted from working with small, aggressive agencies. My knowledge and experience in larger organizations allows me to see the whole picture. I've had the pleasure of working with some well known brands including Ford, Kroger, GE, Atari, Target, Yum! Brands, Lincoln, Proctor & Gamble, Fruit of the Loom, Sunny Delight and more.
+
+## Top Skills
+
+- Agentic Design
+
+- Customer Journey Mapping
+
+- Product Design
+
+## Experience
+
+### Kroger Technology & Digital
+
+#### Senior Product Designer
+
+September 2025 - Present
+
+Customer journey architect focused on off-property commerce growth and agentic solutions.
+
+#### Senior Manager of Product Design
+
+March 2025 - October 2025 · Cincinnati, Ohio, United States
+
+Empowering designers to create beautiful, usable, trustworthy, innovative, fresh and profitable e-commerce experiences.
+
+#### Senior Product Designer
+
+February 2024 - April 2025 · Cincinnati, Ohio, United States
+
+Designing products that balance business and UX outcomes, aiming to provide a seamless and delightful customer experience.
+
+### @71dpi
+
+#### UX + Creative Direction + Design Consultant
+
+March 2006 - Present · Cincinnati, Ohio, United States
+
+71dpi.github.io
+
+Creative direction, design, branding, UI/UX for RWD, native apps, print design, illustration, infographics and more.
+
+### Ontada
+
+#### UX Architect
+
+January 2024 - February 2024 · Cincinnati, Ohio, United States
+
+Product design and integrations to improve oncology patient care experiences while improving outcomes and lowering costs for providers.
+
+### GE Aerospace
+
+#### Sr Staff UX Architect
+
+July 2020 - December 2023 · Cincinnati, Ohio
+
+Service design, team leadership, world class CX & UX, research, persona development, UI and prototyping for GE Aerospace
+
+#### Lead Product Designer
+
+July 2016 - July 2020 · Cincinnati, Ohio, United States
+
+Team leadership, user experience design and research, product ownership, design system and prototyping for GE Aviation, GE Aviation Systems, GE Digital, and GE Additive
+
+### Rockfish
+
+#### Senior Design Director
+
+June 2015 - June 2016 · Cincinnati, OH
+
+Creative direction, UI design and planning for mobile, wearables, tablet and responsive executions in the automotive, green energy, and pharmaceutical industries. Clients include Ford, Lincoln, SunRun and Johnson & Johnson.
+
+### POSSIBLE
+
+#### Senior Design Consultant
+
+January 2015 - June 2015 · Cincinnati, OH
+
+Art direction, design and planning for various brands including Momentive, ConAgra, Daisy, Snack Pack, Reddi Wip, and Hebrew National.
+
+### OOHology
+
+#### Managing Director
+
+November 2013 - November 2014 · Cincinnati, OH
+
+Creative direction, client liaison, and management of the design and information architecture teams. Pioneer of the OOHology Cincinnati office located in the heart of OTR.
+
+Management and quality control of projects spanning their full lifecycle from discovery and ideation, through naming, branding, design, UX, SEO, front-end and back-end development, social and marketing. Responsible for the development of teams and processes, as well as scout for, and nurture the creative talent in-house.
+
+Project types included but were not limited to e-commerce, mobile apps, and integrated marketing campaigns. All web related work was created with a strict responsive web design only policy.
+
+Clients ranged from large to small businesses in various verticals including but not limited to automotive, consumer goods, education, engineering, energy, finance, government, jewelry, healthcare, insurance, real estate, retail, software and technology.
+
+### LEAP Digital Agency
+
+#### Senior Designer
+
+June 2011 - November 2013 · Cincinnati, OH
+
+Creative direction, art direction, UX/UI and user-centered design for websites, banners, mobile, apps and more. Managed interns and lead projects. Award winning interactive and print work.
+
+Carnival Cruise Lines, Texas Roadhouse, Kroger, Fruit of the Loom, Vanity Fair, Lily of France, Evenflo
+
+### Pop Design Works
+
+#### Art Director & Graphic Designer
+
+August 2008 - April 2011 · Cincinnati, OH
+
+Creative direction, art direction, branding, print design, front-end design and development for HTML/CSS and Drupal CMS, Flash game development. Conception and implementation of marketing campaigns, contests, social media strategies and more. Integral part in development of workflow processes.
+
+Atari, Yum!, P&G, Sunny D, Cincinnati Homeless Coalition, Beech Acres Parenting Center
+
+### Designed Solutions Group, Inc.
+
+#### Lead Designer
+
+June 2007 - March 2008 · Dayton, OH
+
+Design, HTML/CSS/Flash development for web and interactive games, print production, page layout, site-mapping, animation, illustration and video production.
+
+GE, Meijer, Ann Taylor, P&G
+
+### Dayton Daily News
+
+#### Lead Designer
+
+June 2006 - June 2007 · Dayton, OH
+
+Creative direction for the Online Creative Team. Managed multiple designers. Branded and lead UX/UI design for multiple standalone social networks, forums, blogs and online tools. Also headed market research efforts and created guerrilla marketing plans for said products.
+
+## Education
+
+### The Modern College of Design
+
+Associate's degree, Applied Business in Design · (August 2004 - May 2006)
+
+### Miami Valley Career Technology Center
+
+N/A, Commercial Art · (2002 - 2004)
+
+## Certifications
+
+- What Is Program Management?
+
+- People Success: Employee Assessments
+
+- Change Management: Plan on a Page
+
+- Exam Tips: Microsoft Azure AI Fundamentals (AI-900)
+
+- Figma for UX Design
+
+## Honors & Awards
+
+- 2012 Gold Addy Award
+
+- 2012 Best of Show Award
+
+- 2012 Gold Davey Award
+
+- 2012 Silver Davey Award
+
+- 2012 Silver Davey Award
+
+## Publications
+
+- Engineering Attention
+
+- Logic + Magic
+
+- The eCommerce Issue
+
+## Languages
+
+English
+
+
+---
+
+# Labs | Alex Lockwood
+Source: https://71dpi.github.io/labs.html
+
+# Labs 🧪
+
+A space for the things that nobody seems to want to pay me to do.
+
+## Games
+
+Collections of games I've created using Claude as a series of exercises in learning more about prompt engineering / vibe coding. My goals in doing so were to learn and have fun, while crafting a love letter to the [ 90s shovelware CDs](https://en.wikipedia.org/wiki/Shovelware) of my childhood. Please enjoy.
+
+## Words
+
+A place to express my thoughts and philosophy on design, tech, life and whatever else is on my mind.
+
+## Always Exploring
+
+Work and life keep me plenty busy, but recharging often looks like trying something new and creative. Here are a few things I've messed around with to stay sharp and work through some ideas:
+
+- [Making Video Games](https://71dpi.github.io/md/games.md)
+
+- [Triiiangles](https://triiiangleproject.tumblr.com/)
+
+- Building a Playlist
+
+- [Woodworking and Cinemagraphs](https://www.behance.net/gallery/23416859/Refinishing-Cinemagraphs)
+
+- [Presidential Glitch Art](https://71dpi.tumblr.com/tagged/MissingPOTUS.)
+
+- [Daily UI: Design System](https://dribbble.com/71dpi/projects/856274-Aviation-Design-System-Exploration)
+
+- Album Art: [ ⓵](https://www.behance.net/gallery/6260145/Album-Art-I) [ ⓶](https://www.behance.net/gallery/12240591/Album-Art-II) [ ⓷](https://www.behance.net/gallery/40352505/Album-Art-III)
+
+- [Daily UI: Fun](https://dribbble.com/71dpi/projects/400282-Daily-UI)
+
+- [Building this Website](https://71dpi.github.io/md/index.md)
+
+
+---
+
+# Projects & Case Studies | Alex Lockwood
+Source: https://71dpi.github.io/projects/projects.html
+
+# Team Leadership,Fresh Concepts,Sexy Pixels
+
+###### aka: "Projects"
+
+[
+
+![GE Aerospace New Commercial Customer Experience](https://71dpi.github.io/img/thumbs/thumb-gea-new-customer-experience.jpg)
+
+##### GE Aerospace New Commercial Customer Experience
+
+](https://71dpi.github.io/md/gea-new-customer-experience.md)
+
+[
+
+![GE Aviation Systems CX / UX Lead](https://71dpi.github.io/img/thumbs/thumb-gea-systems-cx.jpg)
+
+##### GE Aviation Systems CX / UX Lead
+
+](https://71dpi.github.io/md/gea-systems-cx.md)
+
+[
+
+![GE Aerospace MRO Network Service Design](https://71dpi.github.io/img/thumbs/thumb-gea-mro.jpg)
+
+##### GE Aerospace MRO Network Service Design
+
+](https://71dpi.github.io/md/gea-mro.md)
+
+[
+
+![Social Media App Product Design & Brand](https://71dpi.github.io/img/thumbs/thumb-social-app-ani.gif)
+
+##### Social Media App Product Design & Brand
+
+](https://71dpi.github.io/md/social-app.md)
+
+[
+
+![GE Aviation Fleet Support](https://71dpi.github.io/img/thumbs/thumb-gea-fleetsupport.jpg)
+
+##### GE Aviation Fleet Support UX Architecture, Design & Management
+
+](https://71dpi.github.io/md/gea-fleetsupport.md)
+
+[
+
+![GE Aviation supply chain service design](https://71dpi.github.io/img/thumbs/thumb-gea-supplychain2.jpg)
+
+##### GE Aviation Supply Chain Service Design Mapping
+
+](https://71dpi.github.io/md/gea-supplychain2.md)
+
+[
+
+![GE Additive](https://71dpi.github.io/img/thumbs/thumb-gea-additive.jpg)
+
+##### GE Additive UX & Product Ownership
+
+](https://71dpi.github.io/md/gea-additive.md)
+
+[
+
+![GE Aviation Supply Chain Product Design UX](https://71dpi.github.io/img/thumbs/thumb-gea-supplychain.jpg)
+
+##### GE Aviation Supply Chain Product Design UX
+
+](https://71dpi.github.io/md/gea-supplychain.md)
+
+[
+
+![FordPass app design](https://71dpi.github.io/img/thumbs/thumb-fordpass.png)
+
+##### FordPass App UX & Art Direction
+
+](https://71dpi.github.io/md/fordpass.md)
+
+[
+
+![Lincoln Way app design](https://71dpi.github.io/img/thumbs/thumb-lincolnway.jpg)
+
+##### Lincoln Way Service Design, UX & Art Direction
+
+](https://71dpi.github.io/md/lincolnway.md)
+
+[
+
+![Fruit of the Loom eCommerce UI/UX](https://71dpi.github.io/img/thumbs/thumb-fotl.jpg)
+
+##### Fruit of the Loom eCommerce UI/UX
+
+](https://71dpi.github.io/md/fotl.md)
+
+[
+
+![SunRun app UX & UI](https://71dpi.github.io/img/thumbs/thumb-sunrun.jpeg)
+
+##### SunRun app UX/UI
+
+](https://71dpi.github.io/md/sunrun.md)
+
+[
+
+![Cafépress UX & UI](https://71dpi.github.io/img/thumbs/thumb-cafepress.jpg)
+
+##### Cafépress UX/UI
+
+](https://71dpi.github.io/md/cafepress.md)
+
+[
+
+![Rivulet UX & Responsive Web Design](https://71dpi.github.io/img/thumbs/thumb-rivulet.jpg)
+
+##### Rivulet UX & Responsive Web Design
+
+](https://71dpi.github.io/md/rivulet.md)
+
+[
+
+![Momentive UI](https://71dpi.github.io/img/thumbs/thumb-momentive.jpeg)
+
+##### Momentive UI
+
+](https://71dpi.github.io/md/momentive.md)
+
+[
+
+![WeThrive! Campaign](https://71dpi.github.io/img/thumbs/thumb-wethrive.jpg)
+
+##### WeThrive! Campaign Direction & Elements
+
+](https://71dpi.github.io/md/wethrive.md)
+
+[
+
+![Servus! brand, naming, logo, collateral & website](https://71dpi.github.io/img/thumbs/thumb-servus.jpg)
+
+##### Servus! Brand & Responsive Web Design
+
+](https://71dpi.github.io/md/servus.md)
+
+#### Even more projects I've worked on:
+
+- [Kroger App Redesign IA & Navigation](https://71dpi.github.io/md/k-refresh-ia.md)
+
+- [Kroger Ease-of-Use Enhancements](https://71dpi.github.io/md/k-ease-of-use-24.md)
+
+- [Kroger Assortment Display Strategy](https://71dpi.github.io/md/k-assortment-display.md)
+
+- [Transforming the Content Authorship Process at Kroger](https://71dpi.github.io/md/k-content-authorship.md)
+
+- [Driving Off-Property Ecommerce Through Design Strategy](https://71dpi.github.io/md/k-off-property-ecommerce.md)
+
+- [Gamification at Kroger](https://71dpi.github.io/md/k-gamification.md)
+
+- [Leading Kroger's Foundational Product Design Team](https://71dpi.github.io/md/k-foundational-design-team-mgmt.md)
+
+- [Enterprise Design System for Data-Intensive Applications](https://71dpi.github.io/md/design-system.md)
+
+- [Carnival Cruise Lines "Grab Your Destiny" Campaign](https://71dpi.github.io/md/carnival.md)
+
+- [Evenflo Website Design](https://71dpi.github.io/md/evenflo.md)
+
+- [Hashtags 101 Infographic](https://71dpi.github.io/md/hashtags101.md)
+
+- [Assorted Logo Designs](https://71dpi.github.io/md/logos.md)
+
+- [Snack Pack Brand Website Design](https://71dpi.github.io/md/snackpack.md)
+
+- [Logic + Magic Magazine Direction](https://71dpi.github.io/md/logicandmagic.md)
+
+#### Some other places my work is featured:
+
+
+---
+
+# Alex Lockwood | Cafepress Case Study
+Source: https://71dpi.github.io/projects/cafepress.html
+
+# Cafépress UX/UI
+
+**TL;DR**
+
+###### Alex produced interactive prototypes to lay the foundations of information architecture and navigation patterns for a major online retailer's mobile strategy.
+
+![mobile device with cafepress app next to steaming coffee mug](https://71dpi.github.io/img/projects/cafepress/cafepress01.jpg)
+
+Moving the Cafépress platform to a mobile friendly solution is no small task. As one of the web's top 500 retailers, it needs to done right the first time. Strong information architecture lays the tracks for complex connections and recommendations. Simple UI means quick, casual browsing and editing. Clever copywriting and easy-to-use social features make users feel like they're part of a small community. Way finding and algorithmic suggestions keep users engaged. All the while the product remains center stage.
+
+![wireframes](https://71dpi.github.io/img/projects/cafepress/cafepress02.jpg)
+
+![Transition from desktop to mobile. Retain the fun and customization. Streamline the UX. Integrate the backend systems seamlessly.](https://71dpi.github.io/img/projects/cafepress/cafepress03.jpg)
+
+![app screens on devices: loading, swipe to delete](https://71dpi.github.io/img/projects/cafepress/cafepress04.jpg)
+
+![app screens on devices: visual product feed, detail screen](https://71dpi.github.io/img/projects/cafepress/cafepress05.jpg)
+
+![app screens on devices: menu, account screen](https://71dpi.github.io/img/projects/cafepress/cafepress06.jpg)
+
+### Project Responsibilities
+
+- Wireframes
+
+- User flows
+
+- Information Architecture
+
+- UI concepts
+
+- Creative Direction
+
+- eCommerce
+
+- Strategy
+
+### Project Team
+
+- Alex Lockwood
+
+- Creative Director, UX Architect
+
+- [Katina Bradbury](http://thatdarnkat.com/)
+
+- Associate Creative Director, Copywriter
+
+
+---
+
+# Alex Lockwood | Carnival Cruise Lines Case Study
+Source: https://71dpi.github.io/projects/carnival.html
+
+# Carnival Cruise Lines
+
+**TL;DR**
+
+###### Alex worked with a small team to design a contest and produce marketing collateral for the world's largest cruise line. Carnival's social accounts saw an average 193% increase in active users during the contest.
+
+The "Grab Your Destiny contest" microsite served as a hub where users could sync their social media accounts and earn points toward big prizes. Liking, sharing, retweeting and more on Facebook and Twitter gave cruise fans additional chances to win free tickets, and even pieces of a retiring ship.
+
+In a short timeframe, I worked with a small team to design the game, create social media content and a post strategy. Dozens of promotional graphics specifically targeted for Facebook, Twitter, Instagram and Pinterest helped spread the word and drive interaction with the brand.
+
+![Splash page with video player](https://71dpi.github.io/img/projects/carnival/carnival01.jpg)
+
+![Contest user interface](https://71dpi.github.io/img/projects/carnival/carnival02.jpg)
+
+![Facebook interaction](https://71dpi.github.io/img/projects/carnival/carnival03.jpg)
+
+![Instagram content](https://71dpi.github.io/img/projects/carnival/carnival04.png)
+
+
+---
+
+# Alex Lockwood's | Enterprise Design System for Data-Intensive Applications Case Study
+Source: https://71dpi.github.io/projects/design-system.html
+
+# Enterprise Design System for Data-Intensive Applications
+
+**TL;DR**
+
+###### For GE Aerospace Services business, Alex led service blueprinting and research to show how billions of dollars in services are forecasted, planned, and actualized across a global network of internal and 3rd party shops. Unlike a shop-centric value stream approach, this enabled stakeholders to identify opportunities to improve data flow and quality across an enterprise rather than just one product.
+
+![design system componentry](https://71dpi.github.io/img/projects/design-system/design-system01.jpg)
+
+## Overview
+
+In my role as a UI/UX Designer at GE Aviation, I led the conceptualization, design, and implementation of a robust enterprise design system tailored for customer-facing applications. This comprehensive design system was meticulously crafted to excel in handling data-dense displays while ensuring seamless responsiveness across various devices, including mobile, large monitors, and laptops. Over time, I stepped back from management of the design system and continued to contribute to it as I continued to used it and lead projects that used its design and web componentry.
+
+![design system in use](https://71dpi.github.io/img/projects/design-system/design-system02.jpg)
+
+## Key Features and Achievements
+
+1. Data-Dense Display Optimization
+
+- \* Challenge: Our enterprise applications dealt with vast amounts of data, requiring a design system that could present complex information intuitively without compromising usability.
+
+- \* Solution: I spearheaded the development of a modular grid system and data visualization components that allowed for efficient organization and presentation of dense data sets. Through iterative user testing and feedback loops, we refined the data presentation to strike the perfect balance between information richness and user comprehension.
+
+1. Cross-Device Responsiveness
+
+- \* Challenge: The diverse range of devices used by our customers necessitated a design system that seamlessly adapted to various screen sizes and resolutions.
+
+- \* Solution: Leveraging responsive design principles, I ensured that the design system was not only adaptable but provided an optimal viewing experience on devices ranging from mobile phones to large displays. Media queries, flexible layouts, and adaptive components were integrated to guarantee a consistent and user-friendly interface across all devices.
+
+1. Mobile-First Approach
+
+- \* Challenge: Recognizing the increasing prevalence of mobile usage among our customers, a mobile-first strategy was imperative.
+
+- \* Solution: I championed a mobile-first design approach, prioritizing the mobile experience in the design process. This involved creating touch-friendly interfaces, optimizing performance for slower network conditions, and implementing progressive enhancement techniques to ensure a seamless transition from mobile to larger screens.
+
+1. Collaboration and Adoption
+
+- \* Achievement: The successful implementation of the design system was not only a testament to its functionality but also its adoption across the organization.
+
+- \* Solution: To foster adoption, I conducted comprehensive training sessions for development teams, providing documentation and resources. Regular feedback loops and continuous improvement cycles were established to refine the design system based on real-world usage and evolving business needs. Continued socialization is managed by a small group of contributors as the system continues to thrive.
+
+## Impact
+
+The enterprise design system significantly improved the efficiency of our development teams, reduced time-to-market for new features, and garnered positive feedback from end-users for its intuitive and consistent interface. The project showcased my ability to bridge the gap between complex technical requirements and user-centric design principles, resulting in a scalable and adaptable design system that continues to evolve with the dynamic needs of our enterprise applications.
+
+![daily UI screens for exploration](https://71dpi.github.io/img/projects/design-system/design-system03.jpg)
+
+## Bonus
+
+One thing I found particularly interesting and useful when reimagining a design system meant for such broad use was to step outside of the business context of the design system and see how the system would apply. For two months I participated in a daily UI challenge, utilizing the design system as my crayon box. The prompts for the challege stretched the design's use cases well beyond what we'd intended, and as a result generated many great conversations and considerations
+
+### Responsibilities
+
+- Strategy
+
+- User Interface Design
+
+- Visual Design
+
+- Accessibility
+
+- Communication and Socialization
+
+### Technologies & Skills
+
+- Sketch
+
+- Invision
+
+- CSS
+
+- Javascript
+
+
+---
+
+# Alex Lockwood | Evenflo Case Study
+Source: https://71dpi.github.io/projects/evenflo.html
+
+# Evenflo eCommerce
+
+**TL;DR**
+
+###### Alex produced wireframes and visual designs optimized for mobile, solving the customer experience pain point of in-store indecision. The site suggests coupons to users with location services enabled, and offers UPC scanning as a means of navigation to product detail pages.
+
+eCommerce website design for desktop, tablet and mobile.
+
+![Evenflo homepage design on tablet](https://71dpi.github.io/img/projects/evenflo/evenflo01.jpg)
+
+![Evenflo homepage design on desktop web browser](https://71dpi.github.io/img/projects/evenflo/evenflo02.jpg)
+
+![Car seat finder tool on mobile devices](https://71dpi.github.io/img/projects/evenflo/evenflo05.jpg)
+
+![Car seat landing page](https://71dpi.github.io/img/projects/evenflo/evenflo03.jpg)
+
+![Car seat detail page](https://71dpi.github.io/img/projects/evenflo/evenflo04.jpg)
+
+
+---
+
+# Alex Lockwood's | FordPass Case Study
+Source: https://71dpi.github.io/projects/fordpass.html
+
+# FordPass App UX & Art Direction
+
+**TL;DR**
+
+###### Alex created UX prototypes, interaction patterns, and visual designs for the first few releases of the FordPass app and platform. More than 1.4 million people have become FordPass users, with Apple saying the FordPass app is "setting the bar for Automotive OEM Apps."
+
+![FordPass in action](https://71dpi.github.io/img/projects/fp/fp-vid.png)
+
+FordPass is an app that brings a full service Ford service center experience and vehicle controls to your mobile device. By the end of my engagement a commercial advertising the app aired during the Super Bowl and thousands of users were onboarded. Over four years later the app sees continuous improvement that garners it a 4.6 star rating average from 180k+ user reviews.
+
+Through service design UX and UI I helped inform the FordPass ecosystem past the screen. From the dealership to ownership FordPass is designed to be a constant companion to your vehicle.
+
+![FordPass app screens](https://71dpi.github.io/img/projects/fp/fp03.png)
+
+I worked as a UX designer and art director to deliver concepts and UI designs. I created UI assets to start and stop vehicles lock and unlock doors and more. With UX partners I designed financing and parking workflows. I created proof of concept prototypes to approach loyalty program partner brands to aid the product owner in pitches.
+
+### Product Responsibilities
+
+- Service Design
+
+- UI Design
+
+- Design System Management
+
+- Accessibility
+
+### Product Technologies & Skills
+
+- Brainstorming
+
+- Mood Boards
+
+- Prototyping
+
+- Pitching
+
+- Sketch
+
+- Invision
+
+### Product Team
+
+- Alex Lockwood
+
+- Product Designer
+
+- [Kara Herbert](https://www.linkedin.com/in/karaherbert)
+
+- UX Lead
+
+- [Andy Crooks](https://www.linkedin.com/in/andrew-crooks-70940079)
+
+- Art Director
+
+- [Jana Roszkowski](https://www.linkedin.com/in/jana-roszkowski-2234391)
+
+- Product Owner
+
+- Team of 6 Business Analyists & UX Contractors
+
+
+---
+
+# Alex Lockwood | Lily of France Case Study
+Source: https://71dpi.github.io/projects/fotl.html
+
+# Fruit of the Loom eCommerce UI/UX
+
+**TL;DR**
+
+###### Alex produced wireframes and visual designs for eCommerce websites in the Fruit of the Loom family of brands. Post-launch, the site saw a 142% increase in visitors and 140% increase in revenue in its first month.
+
+### Lily of France
+
+Creative direction and design for a new, youthful, and confident design for Fruit of the Loom lingerie brand Lily of France.
+
+![Lily of France homepage](https://71dpi.github.io/img/projects/fotl/fotl-lily01.jpg)
+
+### Vanity Fair
+
+UX/UI for parallax scrolling website and online shopping tools for Fruit of the Loom lingerie brand Vanity Fair.
+
+![Lily of France homepage](https://71dpi.github.io/img/projects/fotl/fotl-vf01.jpg)
+
+![Vanity Fair homepage](https://71dpi.github.io/img/projects/fotl/fotl-vf02.jpg)
+
+![Vanity Fair Fit Selector Experience](https://71dpi.github.io/img/projects/fotl/fotl-vf03.gif)
+
+![Vanity Fair Daywear to Sleepwear Experience](https://71dpi.github.io/img/projects/fotl/fotl-vf04.gif)
+
+### Product Technologies & Skills
+
+- Art Direction
+
+- Brainstorming
+
+- User Interface
+
+- Pitching
+
+- Photoshop
+
+
+---
+
+# Alex Lockwood | GE Additive Case Study
+Source: https://71dpi.github.io/projects/gea-additive.html
+
+# GE Additive UX & Product Ownership
+
+**TL;DR**
+
+###### For GE Additive, who manufactures complex and expensive components, Alex Lockwood was the product owner and designer of a tool to estimate project value in a simple way. Unlike complicated spreadsheets, the cloud-based tool made it simple to collaborate and get results fast.
+
+Over 6 months I helped take an ROI calculator for GE Additive from idea to production. The tool evolved from a spreadsheet, to a web app complete with 3D model visualization. My role over this time transitioned as well, from researcher, to designer, to product owner.
+
+![Animated homepage design for evaluation tool web app](https://71dpi.github.io/img/projects/gea-additive/gea-additive01.gif)
+
+## Discovery
+
+Knowing which project to pursue before investing time can reduce waste. Additive manufacturing is equal parts rapid prototyping, and industrialization of complex designs. The long-cycle nature of additive for production parts in aviation requires extra vetting. The creator of an Excel Sheet to calculate material costs became the product owner. Working with two partners in UX, I lead some interviews and participated in others. Stakeholder interviews with GE Additive exposed how engineers solicited and evaluated new ideas. User interviews pointed to where we could iterate on the existing calculator.
+
+![whiteboard workflow sketching](https://71dpi.github.io/img/projects/gea-additive/gea-additive03.jpg)
+
+## Synthesis
+
+Along with a business analyst, we synthesized our findings. The research pointed to many process improvements before and after the calculator's use. For the time being, we focused on four aspects. First, we would democratize the logic in the calculator by bringing it online. Next, we would improve the logic by incorporating new aspects of an additive project. Then we would ensure the tool's accessibility and usability. Finally, we would package results in a way that was easy to understand and exciting for customers.
+
+![paper prototype](https://71dpi.github.io/img/projects/gea-additive/gea-additive05.jpg)
+
+## Design, Test, Iterate
+
+The first design challenge was to ensure users comfortable with Excel would feel at home in the new tool. We translated our sketched user flows into Axure prototypes for testing. A/B testing of two approaches required thorough and unbiased test designs. The tests ran and pointed to clear result that met expectations of users' mental models. A simple form structure that used progressive disclosure replaced an all-powerful spreadsheet. I performed a few different tasks in prototyping and testing. I created one of the two prototypes. I co-designed the tests with a researcher. I then ran half of the tests with end users while observing the rest.
+
+The new tool would incorporate many new aspects and measurements the old tool lacked. Users learned of new functionality through training, coach marks, and tool tips. The UI and inputs had to be intuitive. The tool was for global use, so internationalization design considerations around were included. We accounted for responsive design for any language. We made it easy to receive inputs in various units of measure. Accessibility was a must, given inputs and outputs would be shared externally.
+
+![3d model viewer interface with aircraft model](https://71dpi.github.io/img/projects/gea-additive/gea-additive06.jpg)
+
+The last, and most nuanced design consideration, was showing competence and inspiring confidence. The tool's logic was sound, and the audience was primarily engineers. We found that exposing a distribution of ROI rather than a discrete number resonated. The numbers are what mattered, but confidence in how they were reached sealed deals. Visualizing 3D models in the web tools, immediately connected users to their project. Seeing their thing made it feel real. Tests also found that the quality of the model didn't matter. A rudimentary, low polygon model shown on screen users could rotate was more than enough.
+
+A late pivot to the product saw us focus on an admin section for the app. Admin users needed a way to tweak material costs and formulas without a development team. With a new, smaller set of users identified, we followed a similar pattern as the rest of the app. Interviews, co-design sessions, prototype, and test.
+
+![Estimate curve data visualization based on a monte carlo analysis](https://71dpi.github.io/img/projects/gea-additive/gea-additive02.png)
+
+## Product Management
+
+About half way to our MVP, the scrum master and business analyst left for other opportunities. The UX team also lost a resource, reduced to 2. Shortly thereafter, the product owner recused themselves of their agile duties. Someone had to write user stories and acceptance criteria. Being closest to the users and the business value, I took up the task. I wrote smaller, less technical stories in traditional format, which was new for the team. I ran user stories through an app called Hemingway to reduce the reading level. This increased understanding of the value provided by features and stories. It also and decreased complexity of deliverables and increased the team's velocity. I wrote acceptance criteria in gherkin format while keeping up on prototypes. Our backlog was healthy. My UX counterpart for the remained of the project was able to stay focused on creating a north star vision.
+
+## Delivery
+
+Our final deliverables for the project were threefold. We needed to produce an MVP. We wanted to have a healthy backlog and a way for users to contribute ideas to it. Finally, we would produce a pitch on how the product might expand across a broader process.
+
+Along with user stories, I created UI assets in Sketch and delivered them to engineering via Invision. The handoff from design to development was seamless. The layout, graphic assets, and CSS values were all there for developers to run with. This was the first time Invision was used in software engineering org, but has become standard since.
+
+For each user story for a value added feature, I took a good, better, best approach. "I need" user stories were developed as our MVP. "I want" user stories informed how we might iterate on a feature to provide more value. At the time of delivery of our MVP, I had a backlog of over 20 groomed stories.
+
+![pitch mockup screens](https://71dpi.github.io/img/projects/gea-additive/gea-additive04.jpg)
+
+For our north star pitch, my research partner and I returned to our early synthesis. After performing more stakeholder interviews, we were able to articulate a broader vision. We then produced a deck and video that told our story of how the tool would fit into an iterative additive product ideation lifecycle.
+
+After the successful MVP launch I was asked to focus my efforts on another product. I was able to wrap up with research artifacts, designs, backlog, and processes in place that would support the team for many sprints to come.
+
+### Product Responsibilities
+
+- Product Ownership
+
+- Agile
+
+- User Story Writing & Refinement
+
+- UX Research
+
+- Information Architecture
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- UI Design
+
+### Product Technologies & Skills
+
+- Product Strategy
+
+- Rally
+
+- Interviewing
+
+- Empathy Mapping
+
+- Journey Mapping
+
+- Process Mapping
+
+- Co-design
+
+- Axure
+
+- Sketch
+
+- Invision
+
+### Product Team
+
+- Alex Lockwood
+
+- Product Owner, Product Designer
+
+- [Scott Hisey](https://www.linkedin.com/in/scotthisey)
+
+- UX Research
+
+- [Anya Gerasimchuk](https://www.linkedin.com/in/avgera)
+
+- Interaction Designer
+
+- Cody Austin
+
+- Software Engineering Manager
+
+- 8 person delivery team of front-end, back-end, and QA Engineers
+
+
+---
+
+# Alex Lockwood | GE Aviation Fleet Support Case Study
+Source: https://71dpi.github.io/projects/gea-fleetsupport.html
+
+# GE Aviation Fleet Support UX Architecture, Design & Management
+
+**TL;DR**
+
+###### For GE Aviation Fleet Support, who provides diagnostic services on over 56,000 jet engines, Alex Lockwood led a UX team from discovery through delivery of a mission-critical product suite. Unlike prior products in the space, Alex produced a comprehensive service design vision that led to sustained delivery of products that are responsive, accessible, and delightful for end users.
+
+![Fleet Support app concept](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport01.jpg)
+
+As an Experience Architect, I spent two years designing a product and service ecosystem for GE Aviation Fleet Support. Don't worry, iteration is part of the plan, this isn't a story about chasing waterfalls. The initial ask was to merge a portfolio of over 20 apps by way of a single UI. The apps shared a common mission; keep fleets airworthy and making money. This means diagnostics and monitoring of a global fleet of more than 24,000 planes. As it turns out, there was a lot more to it than a slick new interface.
+
+![Timeseries visualization chart](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport02.jpg)
+
+## Discovery
+
+I introduced myself to Fleet Support as the fourth successor to their ask. Various UX practitioners had started and stopped with the group, so I had a wealth of prior research at hand. My first step was to brush up on existing artifacts and interview notes. This gave me the lay of the land, but would need validation as years had passed. I familiarized myself with applications, auditing their capabilities. Then I engaged with stakeholders to learn their goals and begin validating.
+
+When we started talking personas and value streams, things got much more complicated. All major workflows started and ended with external users. Customers needed the ability to self-manage their data and assets. We needed dashboards to track KPIs for transactional processes. That meant airtight access provisioning and user management. Access, security, compliance, and branding became even more important.
+
+![Research synthesis, hundreds of sticky note insights](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport03.jpg)
+
+## Synthesis
+
+The output of my research would need to lead to a vision for the VP of Product. That meant more than a clear view of the user and the jobs to be done by the services in the tech stack. I dove deep into data sources, and legacy technology. I explored the customer experience by way of contracts and sales. The result was an initial design for a new product offering that would put more power directly in the hands of the customer. Airlines make the decisions for the assets they own, Fleet Support enables them to go faster and work smarter.
+
+I put together a set of personas, and validated old journey maps. More interviews. More ethnographic research.
+
+Dane Petersen, who had worked with Fleet Support in the past, joined the effort as a UX Technologist. With his expertise in development and information architecture our proposal stayed realistic.
+
+![Asset performance management homepage concept](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport04.jpg)
+
+## North Star
+
+What if it just worked? What if airline customers and GE Aviation associates had direct access to actionable data in one spot? I worked with Dane and the product owners of existing apps to create a vision worth striving for. A coded prototype with realistic data allowed stakeholders to dive right in. We took the prototype to users for feedback and buy-in. Associates and customers alike loved it. Finally, we produced a product design vision deck. Packed with user representation direct from research, we knew where to start.
+
+![Chat experience UI](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport05.jpg)
+
+## Build or Buy?
+
+The next step was to form a true product team. Product aligned to the product design vision, and used it to form a true product strategy. We were ready to secure funds, but would we form a team, buy and augment solutions, or something else? GE Digital had a Asset Performance Management application built mostly on requirements from GE Power. One software engineering organization within GE Aviation created many of the legacy products. Yet another software engineering org offered a different skill set and tech stack. UX performed a thorough capability audit of the available options. We evaluated those capabilities against 150 known requirements from our research. We then produced a product roadmap with each solution provider. Our recommendations enabled Fleet Support product owners to align VPs and CIOs to our vision and put a plan in motion.
+
+[
+
+![Auxiliary Design System badge designed by Phil Rinke](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport06.jpg)
+
+AUX badge by Phil Rinke ](https://dribbble.com/shots/9836251-Auxiliary-Design-System-Badge/attachments/1869002?mode=media)
+
+## Design Systems
+
+Another pivotal moment was being faced with competing design systems. We'd chosen to build our own solution. Within the software engineering org, there were 4 different design systems at play. The portfolio wasn't cohesive. The tech stack was dictating which design system would be used.
+
+As product owners solidified resources, UX went to work evaluating the pros and cons of each design system. Our solution was customer facing. It needed to represent the GE Aviation brand, as well as the CFM, Engine Alliance, and Honda Jet joint venture partnerships. It needed to be accessible, not just for the sake of compliance, but for the benefit of our users. It needed to be responsive, which was a new ask for this org.
+
+I proposed we stand on the shoulders of giants, taking the fantastic work of GE Digital's open-source Predix design system. With a few adjustments, we could make the generic GE design system feel very specific to aviation. A team of four formed to build componentry and manage contribution model of internal crowdsourcing. Myself and a few others managed a kanban of production, and implemented a strict accessibility and brand review process.
+
+![Conversation digest UI](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport10.jpg)
+
+## Design, Sprint
+
+At our peak, I was managing a UX team researching initiatives slated for years out, and supporting 5 development pods.
+
+With delivery teams forming, we whipped up a flexible information architecture. Dane and I continued to work seamlessly. While I documented user workflows, Dane smashed through tagging. We met in the middle to keep workflows and navigation from becoming rigid and siloed. We avoided recreating the 20 discrete apps and their functionality under one roof. Instead, we designed a series of services to filter, search, and prompts users to act.
+
+![A journey map](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport07.jpg)
+
+A pair of UX researchers, Anna D'ambrosio and Blake Lane, joined the team. I needed to keep research ahead of our roadmap, I prioritized and helped write research plans. I also continued to participate in research activities and synthesis. Together we met users, untangled 30 years worth of technical diagrams, and more. I helped synthesize findings that took researchers from Cincinnati to Seattle, Paris, and India. into actionable insights.
+
+![Anlytic workflow UI](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport08.jpg)
+
+As development began, our scope grew even bigger. What about the analytics platform behind it all? There were clear benefits to providing a UI for GE data scientists. I would be accountable to the whole thing, so I'd need some help. James Robertson joined the crew, and eventually Mary Rinear. The team was able to deliver a solution that made it simple and safe to build and test analytics without disruption.
+
+![Custom filter UI](https://71dpi.github.io/img/projects/gea-fleetsupport/gea-fleetsupport09.jpg)
+
+The front-end product,"Fleet Monitor X," was on an aggressive timeline. Bryce Woodward and Adam Davis came aboard to help. I found myself working strategically with product owners, and supporting agile teams in the USA and Bangalore, India. I instituted a design collaboration and critique process to keep everything cohesive.
+
+Diversity and flexibility kept the UX team fresh. We gained another designer in India, and front-end developer Justin Egan joined UX as a UX Technologist. We also tried different methods where appropriate. In some instances, we delivered coded prototypes. In others, we delivered UI designs in Sketch. Different designers, different scrum teams, different ways of working. I also had the pleasure of pioneering Google Design Sprints at GE Aviation, facilitating many successful Sprints.
+
+## Pivot
+
+Unfortunately, airline travel declined sharply due to COVID-19 in early 2020. This meant a change in priorities and a slow down in product development for this project. With a flexible architecture, solid foundation, and growing design system, delivery continues. This also meant my role evolved. I continued to manage UX engagement for these products while growing and connecting outward to a larger problem space.
+
+### Product Responsibilities
+
+- UX Research
+
+- Information Architecture
+
+- UI Strategy
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- UI Design
+
+- Design System Adherence & Contribution
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Design Sprints
+
+- Contextual Inquiry
+
+- Interviews
+
+- Card Sorting
+
+- Empathy Mapping
+
+- Journey Mapping
+
+- Process Mapping
+
+- Co-design
+
+- Usability Testing
+
+- Axure
+
+- Sketch
+
+- Invision
+
+### Product Team
+
+- Alex Lockwood
+
+- UX Architect, Pillar Leader
+
+- [Dane Petersen](http://thegreatsunra.com/)
+
+- UX Technologist
+
+- [Justin Egan](https://www.linkedin.com/in/justin-egan-407021b)
+
+- UX Technologist
+
+- [Anna D’Ambrosio](https://www.linkedin.com/in/anna-maria-d%E2%80%99ambrosio-4090981a4)
+
+- UX Research
+
+- [Blake Lane](https://www.jblakelane.com/)
+
+- UX Research
+
+- [Jonathan Marcaly](https://www.linkedin.com/in/jonathanmarcaly2525)
+
+- UX Research
+
+- [Adam Davis](https://www.linkedin.com/in/adam-davis-design)
+
+- Product Designer
+
+- [James Robertson](http://jarodigitaldesigns.com/)
+
+- Product Designer
+
+- [Bryce Woodward](https://www.linkedin.com/in/brycewoodw)
+
+- Interaction Designer
+
+- [Mary Rinear](https://www.linkedin.com/in/maryrinear)
+
+- Interaction Designer
+
+- [Jody Bialowas](https://www.linkedin.com/in/jody-bialowas-206b0613)
+
+- Product Owner
+
+- [Eugene Valdez](https://www.linkedin.com/in/eugene-valdez-b8095ab)
+
+- Product Owner
+
+- [Ron Williams](https://www.linkedin.com/in/ron-williams-12161416)
+
+- Product Owner
+
+- [Fawn McWilson](https://www.linkedin.com/in/fawnmcwilson)
+
+- Product Owner
+
+- [Jonathan Keith](https://www.linkedin.com/in/jonathankeith)
+
+- Product Owner
+
+- [Krishna LP](https://www.linkedin.com/in/krishna-kumar-l-p-108379154)
+
+- Technical Product Manager
+
+- [Saunhita Mijar](https://www.linkedin.com/in/saunhitamijar)
+
+- Technical Product Manager
+
+- [Teresa Pflanz](https://www.linkedin.com/in/tmpflanz)
+
+- Technical Product Manager
+
+- [Mark Hannah](https://www.linkedin.com/in/mark-t-hannah)
+
+- Technical Product Manager
+
+- [Patrick Feldman](https://www.linkedin.com/in/patrick-feldman)
+
+- Development Archtiect
+
+- [Ryan Kaplan](https://www.linkedin.com/in/ryankaplan)
+
+- Software Engineering Manager
+
+- [Jim Schwaller](https://www.linkedin.com/in/jim-schwaller-9231b4/)
+
+- Software Engineering Manager
+
+- [Erin Spinelli](https://www.linkedin.com/in/erinprzeklasa)
+
+- Software Engineering Manager
+
+- [Ravi Shankar](https://www.linkedin.com/in/ravi-shankar-526844114)
+
+- Software Engineering Manager
+
+- And dozens of incredible, dedicated front-end, back-end, and QA software engineers
+
+
+---
+
+# Alex Lockwood's | GE Aerospace MRO Network Service Design Case Study
+Source: https://71dpi.github.io/projects/gea-mro.html
+
+# GE Aerospace MRO Network Service Design
+
+**TL;DR**
+
+###### For GE Aerospace Services business, Alex led service blueprinting and research to show how billions of dollars in services are forecasted, planned, and actualized across a global network of internal and 3rd party shops. Unlike a shop-centric value stream approach, this enabled stakeholders to identify opportunities to improve data flow and quality across an enterprise rather than just one product.
+
+![process visualization displayed as wall art](https://71dpi.github.io/img/projects/gea-mro/gea-mro-blueprint.jpg)
+
+## Problem
+
+When an airplane isn’t flying it isn’t making money. Data quality, completeness and availability are the backbone of an effective and efficient engine repair. That’s how a maintenance provider makes their money. In fact, [GE Aerospace MRO services generated 18.3 billion dollars in revenue in 2022](https://www.investors.com/news/ge-stock-rallies-ahead-of-huge-ge-aerospace-play-whats-in-store-for-investors/). A good maintenance plan and a speedy shop visit is a win for everyone. It’s complicated stuff, and I had the pleasure of helping to visualize and make sense of it all.
+
+So with hundreds of engines needing various levels of support at OEM and licensed partner shops at any given time across the globe, it’s no wonder things get complicated quickly. For the GE Aviation Services business, my job was to visualize that complexity, customer touch points, the actors involved. To find where data is and isn’t flowing. And of course, map any pain points and Lean improvement opportunities along the way.
+
+## Discovery
+
+I partnered with UX Researcher Carl Stevens to assess everything from 30 year forecasts, to 30 day engine overhauls, to the 30 pounds of paperwork that travel with an engine when it is delivered to an MRO facility. We interviewed stakeholders and poured over available VOC to understand variance across 7 shops and 13 products.
+
+My direct contributions to this effort included a research plan, research outcomes and findings decks. The shop and business operations personas and service blueprint I produced are living documentation that is designed to evolve with the people and processes they portray.
+
+![modern poster of visualizing forecasting and planning processes as a solar system](https://71dpi.github.io/img/projects/gea-mro/gea-mro-poster.jpg)
+
+## Outcomes
+
+After two quarters of discovery, Carl and I were able to equip the business with a wealth of insights. In a Lean manufacturing environment, UX design isn’t always the way to directly improve a process. What this initiative did successfully was to serve as a catalyst for change. It gave context to those building solutions, improved decision making capabilities of the business, and provided measurable and structured KPIs for process and data flow improvement efforts. Our work served as pre-work to a Lean Value Stream Mapping initiative and subsequent kaizen events that have improved shop performance, improving turnaround time for customers and shop profitability. Our artifacts have helped designers and developers make smarter bets on the digital products that drive the processes.
+
+### Initiative Responsibilities
+
+- Strategy
+
+- Planning
+
+- UX Research
+
+- Process Visualization
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Product Management
+
+- Lean
+
+- Interviews
+
+- Card Sorting
+
+- Journey Mapping
+
+- Process Mapping
+
+- Miro
+
+
+---
+
+# Alex Lockwood's | GE Aerospace New Customer Experience Case Study
+Source: https://71dpi.github.io/projects/gea-new-customer-experience.html
+
+# GE Aerospace New Commercial Customer Experience
+
+**TL;DR**
+
+###### For GE Aerospace's rapidly growing customer base, Alex Lockwood's CX and UX architecture paved the way for measurably better physical and digital product onboarding experiences.
+
+![Experience planning and architecture process diagram](https://71dpi.github.io/img/projects/gea-new/process.jpg)
+
+## Customer Journey Mapping
+
+In 2023 I worked closely with cross-functional leadership team in a customer journey mapping and customer experience maturity program. We unpacked VOC together, and built a journey map showing customer touch points, pains, and areas of opportunity. As a result, small teams were formed to work the largest areas of opportunity. At this point the global aviation market had started a rapid transformation, seeing an unprecedented number startup airlines buying small fleets of aircraft. Partnering closely with each customer, their engineering and operations teams, and understanding each of their needs in depths poses a massive challenge of scale.
+
+![Vision and roadmap](https://71dpi.github.io/img/projects/gea-new/gea-new-eis.jpg)
+
+## Entry Into Service
+
+The journey from purchase to use of an aircraft engine is no small feat. EIS is a complex process comprised of nearly 200 technical and administrative subtasks. It is time consuming and confusing, even for fully supported customers. The challenge of scale means that this process which traditionally was orchestrated by an on-site customer liaison would benefit the customer and the business from customer self service. The manpower required is unsustainable, and customers don’t want to wait, or share those human resources.
+
+My role in entry into service process improvement as an experience architect was threefold; understand and measure customer expectation, improve the process, enable self service.
+
+Prior process management looked like measuring customer readiness by way of KPIs for key internal steps in the process. Shortening process times should lead to customer success. More materials, training, and tools would make the customer more ready to face the challenges of stable operations. But, how does the customer feel about that? Discovery research and surveys before, during and after the process allow for evaluation of customer satisfaction from an outside-in perspective. Some customers have different goals for a product than the manufacturer of said product. Dissatisfied customers tend to reach out more often with questions and complaints, which equates to higher support cost. They are less likely to purchase more products and services if other options are available. They are also more likely to talk within the industry about any challenges and missteps faced. With a new customer, you only have one chance to make a good first impression. My coaching, research, and listening strategy aimed to put the focus back on customer success.
+
+Once goals are clearly set, process improvement can begin. The ideal future state is to make things so simple and repeatable that customers can complete the process with little or no assistance, with customer support communications becoming more cheerleading and celebration than triage of problems. Through customer insights and working across multiple product lines, I was able to help orchestrate a measurement structure by which to evaluate a reinvented entry into service approach.
+
+Clearer customer benefits, training, and collaboration leads to:
+
+- Customer CSAT ▲
+
+- Case TAT ▼
+
+- Operational Readiness ▲
+
+- AOG Risk ▼
+
+- Support Cost ▼
+
+- Case Volume ▼
+
+- IP spend ▲
+
+![Experience architecture, information architecture, jobs to be done](https://71dpi.github.io/img/projects/gea-new/gea-new-customer-setup.jpg)
+
+## Commercial Engines & Services Customer Setup
+
+One of the biggest barriers to self service in the entry into service, as well as the 30+ years a customer will continue to utilize and service those assets is having the means access their data, purchase materials and services, and get training. Most of the services and tools needed for a customer to get what they need exist and provide a satisfactory experience. Knowing where to go, how to get in, and how to get the most out of these experiences is a major problem. Customers experience long lead times to access, are asked to complete repetitive tasks, and are exposed to a good deal of what’s going on behind the scenes in a way that doesn’t benefit them.
+
+>
+
+![A better customer journey](https://71dpi.github.io/img/projects/gea-new/gea-new-journey.jpg)
+
+### Experience narrative: what does the customer expect?
+
+As a customer, I'm here to find solutions that meet my business goals. I want to engage easily and buy engines with favorable service agreement. I need to buy engines and materials via purchase order or credit. My expectation is to see GEA as a trusted partner. I expect Instant access to digital tools to transact & administer my people, onboarding them in moments. This will enable us to transact seamlessly, and we'll provide additional information as we work together with you.
+
+Longstanding streams of VOC and new discovery allowed me to formulate a series of more specific problem statements, and draft a vision. Let’s pull apart the problems standing in the way of the expected customer experience. Processes to provide customer users access to services they are entitled to is cumbersome, involves many technologies, teams, and handoffs. Data quality and ability for customer to provide ”just right” amount of company and personal information at the right to do their job. Processes lag customer expectations set by other experiences in and outside of industry.
+
+If we work to improve the process, we should see the following when customer users are granted appropriate access to a usable experience on a swift timeline:
+
+- Customer CSAT ▲
+
+- Request TAT ▼
+
+- Associate troubleshooting & modify access case volume ▼
+
+- Case TAT ▼
+
+- Data Quality ▲
+
+To measure success of improvement efforts, I orchestrated a series of surveys and analytics to account for the above spanning 8 transactional experiences, 10 teams, and just shy of 20 systems. I worked with UX research practitioners to hone goals, questions, and verbiage. Then, I garnered cross-functional alignment around a prioritization framework that would use these metrics as inputs to their roadmaps, and processes for reaching out and fostering relationships with dissatisfied users.
+
+The business looks forward to continuous improvement of setup processes that will delight customers, and the ability to measurably account for increases in revenue and decreases in support cost tied directly to customer experience.
+
+### Initiative Responsibilities
+
+- Strategy
+
+- Planning
+
+- UX Research
+
+- Information Architecture
+
+- UI Strategy
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- UI Design
+
+- Design System Adherence & Contribution
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Product Management
+
+- Lean
+
+- Contextual Inquiry
+
+- Interviews
+
+- Card Sorting
+
+- Journey Mapping
+
+- Process Mapping
+
+- Miro
+
+- Sketch
+
+- Invision
+
+
+---
+
+# Alex Lockwood | GE Aviation Supply Chain Product Design Case Study
+Source: https://71dpi.github.io/projects/gea-supplychain.html
+
+# GE Aviation Supply Chain Product Design UX
+
+**TL;DR**
+
+###### For GE Aviation's Supply Chain, who has produced more than 33,000 jet engines, Alex Lockwood designed accessible and data rich UIs that drive action daily. Unlike paper and whiteboards, these UIs are easy to use and display near realtime data.
+
+![part tracker app concept](https://71dpi.github.io/img/projects/gea-supplychain/gea-supplychain01.jpg)
+
+For a year and a half I worked as a product designer for data visualization products in GE Aviation's supply chain. My charge was to design tools that would help operations and improve delivery day over day. I created and executed research plans that spanned from sourcing to delivery. The knowledge gained through interviews, contextual inquiry, and co-design informs operations to date. It also informed creation of a digital product suite that spans all value streams of the chain.
+
+![pacing parts criticality UI](https://71dpi.github.io/img/projects/gea-supplychain/gea-supplychain02.jpg)
+
+## Discovery
+
+The mission was to create experiences that benefit suppliers, employees, and customers alike. The first step was to get to know our users and customers. Working alongside a research partner I planned shop visits and design exercises. Exploratory research drove Lean efforts, the backbone of process improvement at GE Aviation. Supplementary research filled knowledge gaps gemba walks couldn't. Focusing on process first shone a light on variance where one may expect standard work.
+
+![part tracker app concept](https://71dpi.github.io/img/projects/gea-supplychain/gea-supplychain03.jpg)
+
+## Synthesis
+
+Reframing process through human-centered design allowed others to empathize with the people involved. Synthesis and continual validation of research led to many well utilized artifacts. Empathy maps, personas, and journey maps helped keep efforts focused on people. The key metric used throughout the supply chain was "did we have a good day?" Our experiences would point to proof of a good day, ways to make them better, and celebrate them.
+
+Many factors comprise a successful and efficient supply chain. Safety, quality, delivery, and effectiveness were our KPIs. Our shops and customers alike needed better ways to measure and visualize these KPIs. I supported products at the production line, shop, and value stream levels to get and expose this data. Contextual inquiry and card sorts pointed to the right data to gather. Working with IT and developers helped us capture it. In one case we even caught a data quality issue that had persisted for decades. Displaying this data within shops meant creating accessible visualizations for various contexts.
+
+![realtime data visualization UI](https://71dpi.github.io/img/projects/gea-supplychain/gea-supplychain04.jpg)
+
+## Design & Test
+
+Interactive prototypes were created by myself and a partner for our products. Use of Axure RP allowed us to test complex scenarios and observe user behavior to refine designs. Usability tests after implementation informed how we'd iterate and improve. Our solutions would be used on 72" TVs on the shop floor, in offices, and in meeting rooms. Our products would need to be fast, reliable, and accessible in all contexts. They needed to work on touch screens, or with a mouse and keyboard. In the end, they do.
+
+I also oversaw high fidelity UI designs for our products in Sketch. Prototypes in high fidelity allowed us to test font and color choices in context. After early iterations I was able to hand sprint deliverables off. At one point I provided direction for designers sprinting with 4 delivery teams.
+
+![mobile manufacturing and supply chain app concept](https://71dpi.github.io/img/projects/gea-supplychain/gea-supplychain05.jpg)
+
+## Delivery & Retrospective
+
+UX provided quality assurance for MVPs produced in Spotfire. We validated our learnings and data before moving to a more scalable platform. UX partnered with QA to make sure nothing got lost in translation as the final UI came to life. Product adoption peaked after my departure from the space, but its reach is 100% of GE Aviation shops as of 2020. Insights from discovery led to new and more accurate KPIs for the business and its suppliers. These KPIs incorporate and support human behavior rather than dehumanize the process. Making data more accessible and reliable has eliminated waste in many ways. Meetings are more efficient. Pull signals now have less variance and greater accuracy. They also account for availability of people and their skill sets. "Good days" are celebrated in a proud and public way.
+
+UX engagement was sparse before this engagement. Education of how UX research could support the business in tandem with Lean was critical. We formed close and lasting relationships with stakeholders that championed human-centered design. UX became strategic partners in the business's digital transformation. These relationships continue, even as names and faces change.
+
+### Product Responsibilities
+
+- UX Research
+
+- Information Architecture
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- UI Design
+
+### Product Technologies & Skills
+
+- Ethnography
+
+- Contextual Inquiry
+
+- Interviewing
+
+- Card Sorting
+
+- Empathy Mapping
+
+- Journey Mapping
+
+- Process Mapping
+
+- Co-design
+
+- Usability Testing
+
+- Axure
+
+- Sketch
+
+- Invision
+
+### Product Team
+
+- Alex Lockwood
+
+- Product Designer
+
+- [Scott Hisey](https://www.linkedin.com/in/scotthisey)
+
+- UX Research
+
+- [Julie Luebbe](https://www.linkedin.com/in/julianneluebbe)
+
+- UX Research
+
+- [Henri Thevenot](https://www.linkedin.com/in/henri-thevenot-1469154)
+
+- Product Owner
+
+- [Todd Handlin](https://www.linkedin.com/in/todd-handlin-82518a46)
+
+- Product Owner
+
+- [Jim Stout](https://www.linkedin.com/in/jamesmstout)
+
+- Product Owner
+
+
+---
+
+# Alex Lockwood | GE Aviation Supply Chain Service Design Case Study
+Source: https://71dpi.github.io/projects/gea-supplychain2.html
+
+# GE Aviation Supply Chain Service Design Mapping
+
+**TL;DR**
+
+###### For GE Aviation's Supply Chain, who has dozen of plants and suppliers, Alex Lockwood's research produced ecosystem maps that simplify decision making. Unlike reactionary countermeasures, these maps use empathy to inform strategy that impacts real people and processes.
+
+![](https://71dpi.github.io/img/projects/gea-supplychain2/geasc214.jpg)
+
+There was a need within GE Aviation's supply chain to map out business processes to increase on time delivery. The business knew that a service map was the first step in knowing how to apply Lean methodologies and get to know our actors. Along with an interaction designer I engaged in a two month research effort.
+
+![](https://71dpi.github.io/img/projects/gea-supplychain2/geasc208.jpg)
+
+## Systems Thinking
+
+The ask was to map out the entirety of the supply chain from end to end. Stakeholders wanted plot pain points with direct impact on delivery. Additionally, we created empathy maps to capture how people were affected. Comprehensive process maps were created. People and their pains were added alongside process gaps. Databases and transactional systems were included as well.
+
+![](https://71dpi.github.io/img/projects/gea-supplychain2/geasc212.jpg)
+
+## Visualizing the Complex
+
+Interactive versions of the maps were created so people could choose their context. People could choose to look at the supply chain through the lens of an org, a persona, a process, or a technology space. Black belts and Lean experts could focus on the processes. Leadership could focus on the people. Together, they could make plans that improved delivery time without negatively impacting people.
+
+## Okay, now what?
+
+To make the research more actionable, a pain point matrix accompanies the artifact. The matrix plots pain felt against impact to delivery, vetted by stakeholders. It is paired with a set of recommended process improvements and digital solutions. It documents justification and expected outcomes should the recommendations become action items.
+
+![](https://71dpi.github.io/img/projects/gea-supplychain2/geasc207.jpg)
+
+As of drafting this case study, many of these recommendations have come to pass. The strategic research and artifacts produced are iterated upon and revalidated. The partnership between shops, stakeholders, product owners, and UX is stronger than ever.
+
+![](https://71dpi.github.io/img/projects/gea-supplychain2/geasc210.jpg)
+
+![](https://71dpi.github.io/img/projects/gea-supplychain2/geasc213.jpg)
+
+![](https://71dpi.github.io/img/projects/gea-supplychain2/geasc211.jpg)
+
+### Project Responsibilities
+
+- UX Research
+
+- Service Blueprinting
+
+- Value Stream Mapping
+
+- Wireframing
+
+### Project Technologies & Skills
+
+- Ethnography
+
+- Contextual Inquiry
+
+- Interviewing
+
+- Card Sorting
+
+- Empathy Mapping
+
+- Journey Mapping
+
+- Process Mapping
+
+- Usability Testing
+
+- Axure
+
+### Project Team
+
+- Alex Lockwood
+
+- Product Designer
+
+- [Anya Gerasimchuk](https://www.linkedin.com/in/avgera)
+
+- UX Research
+
+- [Jim Stout](https://www.linkedin.com/in/jamesmstout)
+
+- Product Owner
+
+
+---
+
+# Alex Lockwood's | GE Aviation Systems CX Case Study
+Source: https://71dpi.github.io/projects/gea-systems-cx.html
+
+# GE Aviation Systems CX / UX Lead
+
+**TL;DR**
+
+###### For GE Aviation's Systems business, Alex led a multi-business customer experience initiative centered around access and usability of self-service digital tools.
+
+![Experience planning and architecture process diagram](https://71dpi.github.io/img/projects/gea-systems-cx/process-darkmode.jpg)
+
+![Sytems Product Management](https://71dpi.github.io/img/projects/gea-systems-cx/systems-cx-pm2.jpg)
+
+## Customer Journey Mapping
+
+In 2022 I worked closely with cross-functional leadership team in a customer journey mapping and customer experience maturity program. We unpacked VOC together, and built a journey map showing customer touch points, pains, and areas of opportunity. As a result, small teams were formed to work the largest areas of opportunity.
+
+![Super simple journey map and prioritization framework to retain focus](https://71dpi.github.io/img/projects/gea-systems-cx/systems-cx-pm.jpg)
+
+## Program Management & Service Design
+
+I served as the Lead service designer, researcher and UX strategist for 4 P&Ls, including 3 unique brands, in a cross-functional initiative team focused on customer-facing web applications. Alongside other active initiatives, I orchestrated and executed stakeholder and user research, CX workshops, and a prioritization framework for the many problems the team uncovered and wanted to tackle. Key to the sustainment of the initiative was establishing a balanced set of customer success metrics and internal KPIs. To handle change management as people were hired and shifted responsibilities to manage this project in the long term, I maintained a weekly action plan and set team cadences to work within. Some of my tactical deliverables included ecosystem maps, information architecture, UX flows, UI screens, design system components, and an exhaustive set of well defined epics and user stories.
+
+The most impactful aspect of my engagement was bringing stakeholders to the table to see how their customers overlapped. When engaging with a second business within the GE Aerospace portfolio, customers were faced with a similar but different onboarding process. Different systems and people backstage needed information that another part of the business already had. Differences in teams, ERPs, CRMs, and so on led most to ask the customer for their information again, running background checks a second time, and often signing additional contracts. The real problem was that internal complexity was easier to offload to the customer. By the time we untangled and rewrote backstage processes we saw customer wait times reduced by days, volume of troubleshooting cases drop, and an overall reduction in case load for internal admins.
+
+![Flow diagrams showing end user experience, support model, and communications](https://71dpi.github.io/img/projects/gea-systems-cx/systems-cx-flow.jpg)
+
+Discovery work led to prioritization of the technology team’s focus on developing a web portal foundation, processes to onboard and authenticate companies and users, and creation of standard work for a support team, all of which aims to tie together an ecosystem of a dozen applications. One by one, customer-facing experiences are being refreshed with updated flows, brand, and copy that ensure customers get what they need quickly, instill confidence in the system, and utilize shared account management, support, and search services. Future iterations of the portals will be driven by prioritization that considers measurable CSAT and CES metrics, and internal productivity goals to keep the support team from being overburdened.
+
+![Screen mockups of portal landing pages](https://71dpi.github.io/img/projects/gea-systems-cx/systems-cx-onboarding vision.jpg)
+
+After disengaging from direct team rhythms about a year after their inception, I continued to coach team members, and I feel my greatest achievement in this initiative is my advocacy for customer and user experience. I look forward to seeing the team thrive.
+
+### Initiative Responsibilities
+
+- Strategy
+
+- Planning
+
+- UX Research
+
+- Information Architecture
+
+- UI Strategy
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- UI Design
+
+- Design System Adherence & Contribution
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Product Management
+
+- Lean
+
+- Contextual Inquiry
+
+- Interviews
+
+- Card Sorting
+
+- Journey Mapping
+
+- Process Mapping
+
+- Miro
+
+- Sketch
+
+- Invision
+
+
+---
+
+# Alex Lockwood | Hashtags 101 Infographic
+Source: https://71dpi.github.io/projects/hashtags101.html
+
+# Hashtags 101
+
+Educational infographic exploring the history, adoption and practical application of hashtags in social networking.
+
+![hashtags101 infographic](https://71dpi.github.io/img/projects/hashtags101/hashtags101.jpg)
+
+### Team
+
+- Alex Lockwood
+
+- Lead Designer
+
+- Jeremy Purvis
+
+- Designer
+
+- Nathan Engels
+
+- Content
+
+- Hailey Heishman
+
+- Content
+
+
+---
+
+# Alex Lockwood | Kroger Assortment Display Strategy
+Source: https://71dpi.github.io/projects/k-assortment-display.html
+
+# Kroger Assortment Display Strategy
+
+**TL;DR**
+
+###### Alex designed a signal-driven assortment display framework that shows customers only what they can actually buy and receive. Availability is clear across fulfillment methods and locations, so add-to-cart rates and average basket value went up while fallout went down.
+
+## Context
+
+I led design strategy for Kroger's assortment display initiative. The goal was to show the most desirable assortment based on customer signals like fulfillment preference, location, and behavior, so shopping felt more relevant and less frustrating.
+
+## The Challenge
+
+Customers kept running into items that weren't available for the way they chose to get their groceries. That meant abandoned carts and less trust. We needed to make availability clear, stop wasting customers' effort, and help them feel confident in the experience.
+
+## My Approach
+
+I designed a framework that adjusts what's displayed based on signals. Fulfillment preferences tell us if it's delivery, pickup, or shipping. Location and timing mean ZIP code and timeslot availability. Behavior covers past modality choices and browsing patterns. Customers only see what they can realistically buy and receive, so no more disappointment.
+
+## Impact
+
+Prompting customers to pick fulfillment early and filtering out unavailable items simplified the journey and cut abandonment. Clear availability messaging reduced frustration and improved order completion. Being upfront about what's buyable, and how, built trust and loyalty. Add-to-cart rates and average basket value increased.
+
+## My Role
+
+I defined display logic and availability hierarchy across product grids, PDPs, and cart flows. I built a repeatable system for reading customer signals so decisions stay consistent as it grows. Then I documented what we learned and how decisions get made, so handoffs go smoothly.
+
+## Why It Matters
+
+This initiative has no finish line, because customer expectations and operations keep changing. So I built an iterative system and a handoff process that lets future teams keep improving without losing the plot.
+
+### Initiative Responsibilities
+
+- Assortment Strategy & Design
+
+- Signal Modeling & Display Logic
+
+- Cross-Functional Alignment (DX, Ops, Engineering)
+
+- Prototyping & Usability Testing
+
+- Documentation & Handoff
+
+### Product Technologies & Skills
+
+- Design Systems
+
+- Product Strategy
+
+- A/B Testing & Experimentation
+
+- Signal & Data Modeling (basic)
+
+- Prototyping (Figma)
+
+- Usability Testing
+
+- Cross-Functional Stakeholder Management
+
+
+---
+
+# Case Study: Transforming Content Authorship with AMP
+Source: https://71dpi.github.io/projects/k-content-authorship.html
+
+# Transforming the Content Authorship Process at Kroger
+
+**TL;DR**
+
+###### In 2024 Alex mapped Kroger's content authorship flow to make it faster, more accurate, and able to scale. The future-state blueprint standardizes, optimizes, and automates the pipeline from merchandising plan to live content. It cut redundant steps, got cross-functional teams on the same page, and set up automation and better personalization.
+
+## Background
+
+Kroger's digital experience runs on timely, accurate, engaging content for products, categories, and promotions across web and native. The AMP Content Authorship platform is the backbone of that process. Before 2024 the workflow was fragmented and manual, with no single source of truth, and publishing at scale was slow.
+
+## Challenge
+
+The workflow spanned multiple tools and handoffs. That created bottlenecks and plenty of chances for errors. Planning cycles were rigid, so responding to the market was hard. Each banner in the Kroger family of stores publishes its own content, so variants multiplied across banners and modalities. Teams needed fewer redundant steps in asset creation and approval, and better alignment between upstream orchestration and downstream publishing.
+
+## Approach
+
+In 2024 I led an effort to map the value stream of content authorship using Lean methods. Value stream mapping showed the flow from merchandising plan to live display and exposed the waste and bottlenecks. A SIPOC analysis defined suppliers, inputs, processes, outputs, and customers, which cleared up roles and dependencies. Service blueprinting captured front-stage and back-stage activity so we could spot risks and opportunities.
+
+Together they gave us a current-state view and pointed toward a future-state design for a more automated platform.
+
+## Key Actions
+
+We pursued a three-phase roadmap: standardize, optimize, automate. Early opportunities included integrating MX tool APIs for pricing and promotions, building ETL data pipelines for a single source of truth, adding a Digital Asset Management system for creative assets, simplifying Figma-to-JSON workflows to cut handoffs and errors, and adding CMS task integration for automated ticketing and deployment.
+
+We also pushed to move from a push-based content cadence to a pull-based, on-demand one. It responds faster and stays more relevant.
+
+## Results
+
+Fewer redundant steps and manual interventions sped up time to market for content updates. The future-state blueprint informs build vs. buy decisions for automation and orchestration tooling. CX, DX, and Site Production teams now share a roadmap for improving content authorship.
+
+## Impact
+
+The groundwork for automation is in place. Fewer variants make it easier to scale, and better personalization and adaptive UI improve the customer experience.
+
+### Initiative Responsibilities
+
+- Process Design
+
+- Lean Optimization
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Project Planning
+
+- Contextual Inquiry
+
+- Journey Mapping
+
+- Lean
+
+- SIPOC
+
+- Mural
+
+
+---
+
+# Alex Lockwood | Kroger eCommerce Ease-of-Use Enhancements
+Source: https://71dpi.github.io/projects/k-ease-of-use-24.html
+
+# Kroger Ease-of-Use Enhancements
+
+**TL;DR**
+
+###### In 2024 Kroger's Experience Optimization effort set out to make shopping easier. Alex Lockwood led research and prototyping that simplified navigation, improved discoverability, and introduced consistent UI components. Ease-of-use scores and customer satisfaction went up, along with engagement and measured gains in cart adds and conversion on targeted tests.
+
+## Overview
+
+In 2024 Kroger launched a big Experience Optimization effort to raise its ease-of-use benchmark scores and overall customer satisfaction. The focus was findability and usability on the website and app. We grounded the work in design thinking workshops, research, and a lot of testing.
+
+## Goals
+
+Three goals. Improve Kroger's “Easy to Shop” equity ranking and overall digital experience score. Reduce friction in navigation and task completion. Increase engagement, conversion, and revenue through better usability and discoverability.
+
+## Research & Methods
+
+I ran much of the research and prototyping. Design thinking workshops got cross-functional teams aligned and generating ideas. Usability testing and A/B experiments, in UserZoom and live, validated each iteration. Card sorts and tree tests checked the navigation architecture. Surveys and customer panels told us whether navigation was clear and easy to use.
+
+## Key Design Changes
+
+#### Navigation Redesign
+
+I unified main and secondary navigation across web and native. Quick Links handle utility navigation and a Discovery Marquee handles promotional content. People find things faster and spend less time doing it.
+
+#### New Components
+
+A Mission Header template combines the App Bar, Quick Links, and Discovery Marquee so every page starts the same way. Story Blocks add promotional storytelling and inspiration.
+
+#### Content Enhancements
+
+I cleaned up the visual design for clarity and consistency, and added storytelling to drive engagement.
+
+## Impact on Metrics
+
+#### Engagement
+
+Navigation A/B tests showed more clicks and engagement on Quick Links and Media Link treatments without hurting overall conversion.
+
+#### Conversion & Revenue
+
+Story blocks and personalized carousels increased cart adds and produced incremental revenue on targeted tests. Checkout conversion held steady or improved in the experiments.
+
+#### Customer Sentiment
+
+Composite satisfaction scores went up, and ease-of-use was among the strongest drivers of that lift.
+
+## Cross-Functional Collaboration
+
+I partnered with the DX, AMP, Core, and engineering teams. Weekly reviews and governance kept us aligned.
+
+## Results & Learnings
+
+Simple and consistent won. Customers responded well to clearer navigation and personalized content. Next up are adaptive IA, AI-driven personalization, and predictive shopping.
+
+### Initiative Responsibilities
+
+- Strategy
+
+- Planning
+
+- UX Research
+
+- Information Architecture
+
+- UI Strategy
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- UI Design
+
+- Design System Adherence
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Product Management
+
+- Unmoderated Usability Testing
+
+- Card Sorting
+
+- Tree Testing
+
+- Information Architecture
+
+- Mural
+
+- Figma
+
+
+---
+
+# Alex Lockwood | Product Design Management at Kroger
+Source: https://71dpi.github.io/projects/k-foundational-design-team-mgmt.html
+
+# Leading Kroger's Foundational Product Design Team Through Transformation
+
+**TL;DR**
+
+###### Alex managed Kroger's Foundational Design Team through a strategic expansion, from systems architecture to growth-focused point solutions. The hybrid, multidisciplinary team improved personalization, trust, search relevance, and assortment availability while protecting revenue drivers and scaling design delivery.
+
+## Overview
+
+I managed Kroger's Foundational Design Team, a hybrid, multidisciplinary group of design architects, user researchers, UX and product designers, plus remote and contractor contributors. That mix let us build system-level foundations and still deliver point solutions that drove growth.
+
+## Why “Foundational Design”?
+
+The team owned the core domains behind digital commerce: assortment and strategy, trust and privacy, personalization, and search. They're what let Kroger reliably show products and let customers shop across touchpoints.
+
+Assortment and strategy keep the right products and categories available and discoverable. Trust and privacy build confidence in data security and transparency. Personalization tailors experiences to drive engagement and conversion. Search powers discovery and navigation, and it's the front door for a lot of shoppers.
+
+## Team Composition & Hybrid Model
+
+Design architects shaped system frameworks and principles. User researchers drove insights through usability testing and JTBD mapping. UX and product designers turned strategy into experiences that scale. The hybrid model let us tap global talent, move fast remotely, and get together in person for high-impact work.
+
+## Strategic Expansion
+
+We grew from foundational architecture into point solutions that directly influenced product roadmaps and growth metrics. We improved personalization, trust, and availability, and lifted add-to-cart (ATC) and engagement through search and curated pathways.
+
+## Key Initiatives
+
+#### 1. Foundational Change
+
+We reimagined patterns and layouts across Home, Search, and Browse, prototyped conversational AI search, and built lighthouse prototypes that combined trust, personalization, and assortment filtering.
+
+#### 2. Agentic Shopping
+
+I led explorations into agentic commerce, separating conversational AI from embedded agent flows. They enable automated cart-building around dietary and budget constraints, and tie in real-time inventory and loyalty personalization.
+
+#### 3. Full App Redesign
+
+We contributed to Kroger's native app refresh: a food-first experience, simplified navigation, centralized savings and health integrations, and a scalable design system (Citrus/KDS 2.0) for component-based experiences.
+
+## Maintaining Revenue Drivers
+
+While the product evolved, we protected major revenue channels by optimizing search relevance and running personalization experiments that improved ATC and engagement.
+
+## Impact
+
+We delivered measurable CX and engagement improvements, put Kroger early in agentic shopping and omnichannel design, and built a resilient team that can execute at scale and adapt to new technology.
+
+### Initiative Responsibilities
+
+- Team Leadership & Talent Development
+
+- Design Strategy & Systems Architecture
+
+- Research Oversight & JTBD Mapping
+
+- Cross-Functional Governance
+
+- Roadmap Influence & Experimentation
+
+### Product Technologies & Skills
+
+- Conversational AI Prototyping
+
+- Personalization & Experimentation Platforms
+
+- User Research & JTBD
+
+- Prototyping (Figma)
+
+- Stakeholder Management & Governance
+
+
+---
+
+# Alex Lockwood | Gamification at Kroger
+Source: https://71dpi.github.io/projects/k-gamification.html
+
+# Gamification at Kroger
+
+**TL;DR**
+
+###### Alex led gamification and multi-step offer design strategy at Kroger. It boosted short-term engagement, but it didn't match how customers felt about grocery shopping or how the grocery business makes money, so the strategy pivoted.
+
+## Background
+
+Kroger explored gamification to boost engagement and drive incremental revenue through multi-step offers (MSOs). We looked to *Animal Crossing*, *Starbucks Rewards*, and *Fortnite* for inspiration. The idea was to make grocery shopping more interactive and rewarding.
+
+## Challenges Identified
+
+#### Findability and Usability of Multi-Step Offers
+
+Research showed customers struggled to find and understand MSOs. Navigating bonus rewards was complicated and the UI patterns were unclear, which meant low engagement and frustration. Usability tests showed even active rewards were hard to discover, so taking part never felt valuable.
+
+#### No Long-Term Loyalty Strategy
+
+Gamification was exciting in the short term, but it didn't line up with Kroger's bigger loyalty goals. There was no plan to turn gamified experiences into customers who stick around.
+
+## Design and Research
+
+#### Prototyping and Testing
+
+My team prototyped quickly and ran usability studies to improve the MSO interfaces. Engagement and conversion on existing offers went up for a while, which showed better UX could ease some of the friction.
+
+#### Customer Sentiment
+
+Surveys and qualitative feedback surfaced the big insight. Gamification in grocery shopping made customers feel devalued and put off. It came across as gimmicky, which undermines Kroger's promise of simplicity and trust.
+
+## Business Impact
+
+#### Revenue and Spend Behavior
+
+Gamification moved spend earlier or later, but it didn't bring in incremental revenue. Customers were playing the system without growing their basket size or how often they shopped. That didn't match the financial goals, and it made the case for a pivot.
+
+## Strategic Recommendation
+
+As Senior Product Designer, I recommended dropping the roadmap for expanding MSOs through gamification. The focus should shift to loyalty initiatives like membership programs, rewards optimization, and personalized couponing. Those fit what customers expect and how Kroger's business works, and they build real loyalty instead of short engagement spikes.
+
+## Key Takeaways
+
+Gamification was fun to explore, but it doesn't fit Kroger's value proposition. Long-term loyalty strategies beat gamified mechanics in grocery. Trust and perceived value come first, and complicated games wear down both.
+
+### Initiative Responsibilities
+
+- Strategy
+
+- Planning
+
+- UX Research
+
+- Information Architecture
+
+- UI Strategy
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- UI Design
+
+- Design System Adherence
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Product Management
+
+- Unmoderated Usability Testing
+
+- Card Sorting
+
+- Journey Mapping
+
+- Information Architecture
+
+- Mural
+
+- Figma
+
+
+---
+
+# Alex Lockwood | Off-Property Ecommerce Design Strategy
+Source: https://71dpi.github.io/projects/k-off-property-ecommerce.html
+
+# Driving Off-Property Ecommerce Through Design Strategy
+
+**TL;DR**
+
+###### Alex led design strategy for Kroger's off-property ecommerce initiative, creating a scalable playbook and play cards to standardize listings on partners like DoorDash, Instacart, and Uber Eats. Turnaround got shorter, the brand stayed intact, and new partners rolled out quickly. Operational efficiency and engagement went up too.
+
+## Background & Context
+
+Customers were shopping in more places, so Kroger wanted to meet them on retail aggregators like DoorDash, Uber Eats, and Instacart. Off-property processes were fragmented, which meant inconsistent customer experiences and wasted effort. We needed one playbook that could scale execution while protecting brand and commerce quality.
+
+## Mission & Goals
+
+The mission was a complete off-property ecommerce strategy and playbook that delivers consistent, high-quality experiences across third-party models and drives measurable business results. The goals were to expand Kroger's digital footprint, meet customers where they are on aggregators, keep the brand consistent and compliant across partners, speed up workflows with fewer errors, and improve the customer experience through better design and usability.
+
+## Objectives
+
+Build a design framework that scales and adapts across models. Create standard templates and guidelines for listings, imagery, and promotions. Line up design decisions with business and technical needs through cross-functional work. Build KPIs into the playbook to track adoption and performance.
+
+## Role & Contributions
+
+As Senior Product Designer I led design strategy and execution for the playbook. I audited existing off-property experiences to find gaps and inconsistencies. I designed modular, reusable templates that balance brand integrity with partner specs. I ran stakeholder workshops to agree on principles and usability standards, and partnered with product managers and engineers so implementation went smoothly. Then I organized teams to put the playbook to work through model-specific play cards.
+
+## What It Delivered
+
+The playbook gave us consistency, with one visual language across off-property models. Reusable templates and clear workflows cut time to market. The framework is flexible enough for new partnerships and requirements. Clearer, easier-to-use listings increased engagement.
+
+## Key Unlocks
+
+APIs and frictionless checkout point to smoother integration and less friction for customers. AI and connected devices look like the next opportunities for personalization and automation.
+
+## Process Design, Measurement & Staffing
+
+We defined inbound and outbound workflows, set KPIs for adoption, engagement, and operational efficiency, and created staffing models for partner-driven requests and Kroger-led initiatives. That kept us agile at scale.
+
+## Metrics & Outcomes
+
+- Adoption: 100% implementation of the playbook across identified off-property models in the first quarter.
+
+- Operational efficiency: 30% reduction in design and content turnaround time.
+
+- Engagement: 15% increase in click-through rates on off-property listings.
+
+- Stakeholder feedback: positive, with people citing better clarity and easier execution.
+
+## Lessons Learned & What's Next
+
+Bring cross-functional partners in early and alignment comes faster. A scalable design system is a must when you manage this many models. Keep iterating on performance data.
+
+Next: evolve the playbook with AI-driven personalization, connected devices, and whatever partners can do next.
+
+### Initiative Responsibilities
+
+- Playbook & Templates Design
+
+- Off-Property Experience Audits
+
+- Stakeholder Workshops & Alignment
+
+- Implementation Partnership (PM & Engineering)
+
+- Measurement & KPI Framework
+
+- Operational Handoff & Support Models
+
+### Product Technologies & Skills
+
+- Design Systems & Component Libraries
+
+- Listing Templates & Content Modeling
+
+- API Integration Awareness (checkout, inventory)
+
+- Prototyping & Documentation (Figma, design tokens)
+
+- Measurement & Experimentation (A/B testing, analytics)
+
+- Workshop Facilitation & Stakeholder Management
+
+- Process Design & Value Stream Mapping
+
+
+---
+
+# Alex Lockwood | Kroger App Redesign IA
+Source: https://71dpi.github.io/projects/k-refresh-ia.html
+
+# Kroger App Redesign IA & Navigation
+
+Role: Information Architect & Lead Designer • Platforms: iOS & Android • Timeline: 2025 Digital Refresh Initiative
+
+**TL;DR**
+
+###### Alex Lockwood led information architecture and native design for Kroger's 2025 app refresh. Navigation got simpler, savings moved into one place, and the whole thing got a food-first look that works on iOS and Android. Customers found more, used more of their savings, and picked it up fast during rollout.
+
+## Background & Opportunity
+
+Kroger's app had become function-first and fragmented. Competitors were investing in richer, more personal experiences, and customers told us they couldn't find things, savings especially. The refresh was a chance to build one app that made sense for every kind of shopping trip.
+
+## Goals, Mission & Vision
+
+We started with a mission, a vision, and an experience aspiration. The mission was to grow trust by giving customers personalized ways to shop for what they want, when and how they need it, without compromise. The vision was to make every digital interaction personal and essential, guided by preferences and powered by technology. Grocery shopping should feel guided by taste and effortless every visit.
+
+Our principles were simple. Personalized like a trusted shopkeeper. Warm, conversational language that connects and uplifts. Supportive, not just smart.
+
+## Strategic Objectives
+
+Four objectives kept us honest. Simplify navigation for shopping, savings, and health services. Centralize savings so offers are easy to find and act on. Lead with food, with clearer imagery and less clutter. Improve accessibility and performance on iOS and Android.
+
+## Scope & Mandatories
+
+This was a full native redesign on iOS and Android, built on the Citrus Design System. Accessibility, analytics, and testing were mandatory. The work spanned Virtual Assistant, Assortment Display, Rx Mixed Basket, Fresh, Shop, Savings, Health, Meals, and Search.
+
+## Role & Contributions
+
+I defined navigation, content hierarchy, and interaction patterns across the app. I partnered with iOS and Android engineers to build and validate native prototypes, so we tested ideas the way they would actually be built. I applied design system standards so components would be reusable. Then I pointed UI designers, content strategists, analytics, and engineering in the same direction and kept them there.
+
+## Customer Jobs
+
+Design decisions came back to the jobs customers hire Kroger to do. Shop however I want, in store, online, or delivered. Find what fits me best. Make healthy habits easy. Make last-minute meals possible.
+
+## Progress & Outcomes
+
+The refresh shipped in September 2025. The unified experience solved the navigation and savings pain points, improved discovery and savings utilization, and positioned Kroger to regain market share.
+
+## Next Steps
+
+Next up is more personalization and AI-driven features after the MVP, dynamic components for seasonal and contextual moments, and close watch on engagement, repeat rate, and savings utilization.
+
+### Initiative Responsibilities
+
+- Information Architecture & Navigation Design
+
+- Content Strategy & Hierarchy
+
+- Native Interaction Design & Prototyping
+
+- Design System Governance
+
+- Accessibility & Inclusive Design
+
+- Cross-Functional Coordination (Analytics, Eng, Product)
+
+- Experimentation & Measurement Strategy
+
+### Product Technologies & Skills
+
+- Native iOS & Android Design Patterns
+
+- Design Systems
+
+- Information Architecture & Content Modeling
+
+- Prototyping (Figma, native prototyping tools)
+
+- A/B Testing & Experimentation Frameworks
+
+- Accessibility Standards & WCAG
+
+- Stakeholder Management & Roadmap Alignment
+
+
+---
+
+# Alex Lockwood's | Lincoln Way Case Study
+Source: https://71dpi.github.io/projects/lincolnway.html
+
+# Lincoln Way Service Design, UX & Art Direction
+
+**TL;DR**
+
+###### Alex worked with a small team to deliver customer experience strategy, UX design, and art direction for Lincoln's mobility platform. The app boasts a 4+ star rating from over 150k Android and iOS users as of Dec, 2020.
+
+Lincoln Way is The Lincoln Motor Company’s upscale version of the FordPass app and ecosystem. Completely reimagined for an audience that expects excellence and ease, the Lincoln Way needed to be seamless. As of this writing the app holds a solid 4.6 star rating from almost 30k reviews.
+
+Touch points in advertising, in-dealership, and online, would lead users to their mobile devices. The mobile experience would provide Lincoln owners with concierge service via chatbot. the whole thing comes full circle with valet parking, delivery of a loaner when maintenance is needed, and more.
+
+My role on the experience design team was part Service Designer, part Art Director.
+
+I engaged in cultural and trend research to understand expectations of Lincoln owners. I helped develop a few personas to tailor features to the self-sufficient and the tech challenged. I produced multiple concepts for consideration and testing by the brand. I worked alongside business analysts to make sure our more far fetched ideas could be built. Then, I switched hats to work on delivery.
+
+![testing responsive](https://71dpi.github.io/img/projects/lincoln/lincoln01.jpg)
+
+Within a simple and elegant philosophy of creative direction that championed beauty, I got to work on the UI. Myself and fellow art director Andy divvied up what came to total hundreds of UI screens. We developed a pattern library and visual language for the app, with considerations for native iOS and Android development. We worked with a stable of 4 UX designers who kept us honest with low-fi wires. In the end, high fidelity prototypes were needed for brand alignment and for handoff to developers. We managed the design process via kanban, and never missed a deliverable.
+
+The first few releases provided the types of things commonly associated with vehicle apps. Users could start their vehicle, adjust temperature, lock doors, and find parking. Subsequent releases introduced a concierge experience, maintenance scheduling, and brand curated events. From ”how might we” to a high end luxury experience in your pocket, this project was a great mix of tech and style.
+
+### Product Responsibilities
+
+- Service Design
+
+- UI Design
+
+- Design System Management
+
+- Accessibility
+
+### Product Technologies & Skills
+
+- Brainstorming
+
+- Mood Boards
+
+- Prototyping
+
+- Pitching
+
+- Sketch
+
+- Invision
+
+### Product Team
+
+- Alex Lockwood
+
+- Product Designer
+
+- [Kara Herbert](https://www.linkedin.com/in/karaherbert)
+
+- UX Lead
+
+- [Andy Crooks](https://www.linkedin.com/in/andrew-crooks-70940079)
+
+- Art Director
+
+- [Jana Roszkowski](https://www.linkedin.com/in/jana-roszkowski-2234391)
+
+- Product Owner
+
+- Team of 6 Business Analyists & UX Contractors
+
+
+---
+
+# Alex Lockwood | Logic + Magic Magazine Case Study
+Source: https://71dpi.github.io/projects/logicandmagic.html
+
+# Logic + Magic
+
+Art direction, layout, illustration and design for Logic+Magic magazine, a trade publication by LEAP.
+
+## THE ECOMMERCE ISSUE
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-01.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-02.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-03.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-04.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-05.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-06.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-07.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-08.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-09.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-10.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-11.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-12.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-13.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-14.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-15.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-16.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-17.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-18.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-01-20.jpg)
+
+## ENGINEERING ATTENTION
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-01.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-02.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-03.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-04.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-05.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-06.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-07.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-08.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-09.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-10.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-11.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-12.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-13.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-14.jpg)
+
+![testing responsive](https://71dpi.github.io/img/projects/logicmagic/logicmagic-02-15.jpg)
+
+
+---
+
+# Alex Lockwood | Logo Design Gallery
+Source: https://71dpi.github.io/projects/logos.html
+
+# Branding & Logos
+
+Logos for various clients across various industries.
+
+![logo for The Kleingers Group, architects](https://71dpi.github.io/img/projects/logo/kleingers-logo.png)
+
+![logo for Hello Flight, flight tracking website](https://71dpi.github.io/img/projects/logo/helloflight-logo.png)
+
+![logo for Servus, HR company](https://71dpi.github.io/img/projects/logo/servus-logo.png)
+
+![logo for Donnie Maserati, rapper](https://71dpi.github.io/img/projects/logo/donniemaserati-logo.png)
+
+![logo for Kyndle, Kentucky public service non-profit organization](https://71dpi.github.io/img/projects/logo/kyndle-logo.png)
+
+![logo for The Cliff Divers, entreprenuers group](https://71dpi.github.io/img/projects/logo/cliffdivers-logo.png)
+
+![50th anniversary celebration logo for Servus, formerly BR Associates](https://71dpi.github.io/img/projects/logo/servus50-logo.png)
+
+![logo for Celestial Gifts, small business](https://71dpi.github.io/img/projects/logo/celestialgifts-logo.png)
+
+![logo for Highland Glass, glass artisans](https://71dpi.github.io/img/projects/logo/highland-logo.png)
+
+![Publisher 's mark for CR Publishing](https://71dpi.github.io/img/projects/logo/cr-logo.png)
+
+![logo for Mueller, environmental engineers](https://71dpi.github.io/img/projects/logo/mueller-logo.png)
+
+![logo for Firekid, musician](https://71dpi.github.io/img/projects/logo/firekid-logo.png)
+
+![logo for The Club Girls, VIP online community](https://71dpi.github.io/img/projects/logo/theclubgirls-logo.png)
+
+![personal logo of Alex Lockwood](https://71dpi.github.io/img/projects/logo/alexlockwood-logo.png)
+
+![logo for Mechanical & electrical engineering firm](https://71dpi.github.io/img/projects/logo/mee-logo.png)
+
+![logo for sorghum partners, agriculture advocates](https://71dpi.github.io/img/projects/logo/sorghum-logo.png)
+
+![logo for Jesus Andres, photographer](https://71dpi.github.io/img/projects/logo/jesusandres-logo.png)
+
+![logo for Jameeda Rucker, Public Relations](https://71dpi.github.io/img/projects/logo/jrpr-logo.png)
+
+![logo for 83bar, venture capitalist firm](https://71dpi.github.io/img/projects/logo/83bar-logo.png)
+
+
+---
+
+# Alex Lockwood | momentive Case Study
+Source: https://71dpi.github.io/projects/momentive.html
+
+# Momentive UI
+
+![Person browsing Momentive website on iPad](https://71dpi.github.io/img/projects/momentive/m03.png)
+
+A fully responsive marketing, cataloging and ordering solution for the world's second largest producer of industrial silicones. In a massive effort to streamline business to business connections, Momentive's rebranding was the perfect moment to go from old-school catalogues and a desktop-only website to a feature-rich online experience, along with a revamped visual identity, refined copywriting, and an overhaul to all printed and trade show materials.
+
+![Image of hot air balloons with text that reads 'product-focused design that inspires innovation.'](https://71dpi.github.io/img/projects/momentive/m06.png)
+
+![dozens of mobile devices showing various sections of the site](https://71dpi.github.io/img/projects/momentive/m07.png)
+
+![New brand rolled out in digital and print. Hundreds of product types, sorted adn served. Over 50 locations represented. Industry news. Frequent trade shows plotted and catalogued.](https://71dpi.github.io/img/projects/momentive/m08.png)
+
+### Product Technologies & Skills
+
+- Art Direction
+
+- User Interface
+
+- Prototyping
+
+- Photoshop
+
+- Design System Management
+
+
+---
+
+# Alex Lockwood | Rivulet Case Study
+Source: https://71dpi.github.io/projects/rivulet.html
+
+# Rivulet UI/UX
+
+![Rivulet elevator pitch](https://71dpi.github.io/img/projects/rivulet/rivulet01.jpg)
+
+Creative direction, branding, UX and design for a premium liqueur's luxury brand. Following through on the positioning of the liqueur as a luxury good meant an emphasis on beauty, and even a bit of excess, with a sharp, clean design with parallax scrolling functionality.
+
+![Rivulet naming and brand](https://71dpi.github.io/img/projects/rivulet/rivulet02.jpg)
+
+Primarily sold in overseas markets, steeping the brand in American history was important to its appeal. Turning to the South for inspiration, Thomas Jefferson’s Monticello estate, and the small rivers on premises, provided the perfect name, and draws a strong visual likeness to the cross-section of a pecan.
+
+![Rivulet homepage](https://71dpi.github.io/img/projects/rivulet/rivulet03.jpg)
+
+Rivulet is a globally distributed distilled pecan spirit. The website was primarily designed for distributors, and needed to be easy to find information.
+
+![Rivulet wireframes and user flow](https://71dpi.github.io/img/projects/rivulet/rivulet04.jpg)
+
+![Rivulet website on mobile device](https://71dpi.github.io/img/projects/rivulet/rivulet05.jpg)
+
+![Video showing parallax experience on Rivulet homepage](https://71dpi.github.io/img/projects/rivulet/rivulet06.mp4)
+
+![Rivulet mockup showing content marketing strategy](https://71dpi.github.io/img/projects/rivulet/rivulet07.jpg)
+
+### Project Responsibilities
+
+- Creative Direction
+
+- Naming
+
+- Branding
+
+- Information Architecture
+
+- Wireframes
+
+- UI Design
+
+- Animation
+
+- Content Marketing Strategy
+
+### Project Team
+
+- Alex Lockwood
+
+- Creative Director, UX Architect
+
+- [Brad Luttrell](https://www.linkedin.com/in/bradluttrell)
+
+- Associate Creative Director, Copywriter
+
+- [Mark Palmer](https://www.linkedin.com/in/markandrewpalmer)
+
+- Chief Creative Officer
+
+
+---
+
+# Alex Lockwood | Servus! Case Study
+Source: https://71dpi.github.io/projects/servus.html
+
+# Servus! Branding & Digital
+
+Naming, branding, identity, collateral and responsive website design with parallax effects for the largest franchisee of Long John Silver's restaurants. The focus for their brand and assets is to give back to their employees through recognition, events and encouragement.
+
+![Servus! business cards](https://71dpi.github.io/img/projects/servus/servus01.jpg)
+
+![Naming and branding](https://71dpi.github.io/img/projects/servus/servus02.jpg)
+
+![a unique web experience built to celebrate present and future team members](https://71dpi.github.io/img/projects/servus/servus03.jpg)
+
+![Food and fun](https://71dpi.github.io/img/projects/servus/servus04.jpg)
+
+![animation showing website parallax functionality](https://71dpi.github.io/img/projects/servus/servus05.mp4)
+
+![Careers and locations](https://71dpi.github.io/img/projects/servus/servus06.jpg)
+
+![website on laptop and mobile device](https://71dpi.github.io/img/projects/servus/servus07.jpg)
+
+![franchises and benefits](https://71dpi.github.io/img/projects/servus/servus08.jpg)
+
+![more detail pages shown on laptop and two mobile devices](https://71dpi.github.io/img/projects/servus/servus09.jpg)
+
+### Project Responsibilities
+
+- Creative Direction
+
+- Naming
+
+- Branding
+
+- Information Architecture
+
+- Wireframes
+
+- UI Design
+
+- Animation
+
+### Project Team
+
+- Alex Lockwood
+
+- Creative Director, UX Architect
+
+- [Brad Luttrell](https://www.linkedin.com/in/bradluttrell)
+
+- Associate Creative Director, Copywriter
+
+- [Mark Palmer](https://www.linkedin.com/in/markandrewpalmer)
+
+- Chief Creative Officer
+
+
+---
+
+# Alex Lockwood | Snack Pack Case Study
+Source: https://71dpi.github.io/projects/snackpack.html
+
+# Snack Pack UI & Content
+
+![Pudding kid from Billy Madison](https://71dpi.github.io/img/projects/snackpack/snackpack01.gif)
+
+Responsive web UX/UI for the brown bag lunch classic, Snack Pack. Key considerations for the site were brand presence, easy access to products and nutrition facts, and content strategy to boost SEO and drive traffic, while making things easy to share on social media.
+
+![Snack Pack homepage design](https://71dpi.github.io/img/projects/snackpack/snackpack02.jpg)
+
+![Video showing Snack Pack site experience](https://71dpi.github.io/img/projects/snackpack/snackpack03.mp4)
+
+![Snack Pack site content](https://71dpi.github.io/img/projects/snackpack/snackpack04.jpg)
+
+
+---
+
+# Alex Lockwood's | Social Media App Product Design & Brand Case Study
+Source: https://71dpi.github.io/projects/social-app.html
+
+# Social Media App Product Design & Brand
+
+**TL;DR**
+
+###### Alex created a brand presence, full mobile application UX flow, UI designs, and functional prototype to test and market a new social media concept and patent a unique interaction design pattern.
+
+![Freehand boards showing app flow complexity](https://71dpi.github.io/img/projects/social-app/social-app-flow.jpg)
+
+## Unique emoji-based 😜 posts & search 👀
+
+Concept design for creation, delivery, and discovery of video, image and text content. Branding, brand and UX research, user flow, product and interaction design.
+
+## 🤔 Opportunity
+
+Create a unique content delivery system expanding on existing communication methods. Emoji take on a meaning of their own, contextual to the sender, the viewer, and the tone and timing of the conversation. What if an emoji acted as a container for deeper content?
+
+The feed appears as a stream of emoji only from your connections for a quick vibe check. Not looking to engage in certain mood or topic? Keep scrolling. See something curious? Tap to see more.
+
+Explore the world on a map UI with clusters of posts. Pop in to see commonly used emoji, and engage or bounce. Or, flip the script and type a string of emoji. See where that string is showing up worldwide and see public posts, discovering the deeper meaning ascribed by various cultures and groups.
+
+Similar to Live Photos, active emoji are activated by a simple action. Interaction design needs to be accessible and feel natural. By working with available characters, active emoji are easy to understand and fun to expand on. Most frequent users of social media and collaborative communication apps develop emoji shorthand naturally. Active emoji take this phenomenon to the next level.
+
+## 🏋️‍♀️ Results
+
+95% of potential users surveyed across 3 personas expressed a high level of interest and excitement, while a small contingent did admittedly view the idea as “🌽 corny.” I disengaged with the team handing off comprehensive UX flows, a brand kit, and basic design system for marketing and development, all informed by user prototype testing.
+
+### Initiative Responsibilities
+
+- Interaction Design
+
+- Information Architecture
+
+- UX Research
+
+- Wireframing
+
+- Usability Testing
+
+- Accessibility
+
+- Visual Design
+
+- Branding
+
+### Product Technologies & Skills
+
+- Design Thinking
+
+- Product Management
+
+- User Flows
+
+- Freehand
+
+- Invision Studio
+
+
+---
+
+# Alex Lockwood | SunRun Case Study
+Source: https://71dpi.github.io/projects/sunrun.html
+
+# SunRun app UX/UI
+
+My Sunrun PhoneGap app and site experience for solar energy customers. My Sunrun provides solar customers a way to track their energy production levels, refer others, and share their energy production and consumption statistics via social media. UI elements, iconography and photo selections also made their way back into the company's marketing site and materials.
+
+![phone gap app](https://71dpi.github.io/img/projects/sunrun/sr03.png)
+
+![animated interactions within app experience](https://71dpi.github.io/img/projects/sunrun/sr08.webm)
+
+![app experience on mobile device near swimming pool](https://71dpi.github.io/img/projects/sunrun/sr09.png)
+
+### Product Technologies & Skills
+
+- Art Direction
+
+- User Interface
+
+- Iconography
+
+- Prototyping
+
+- Pitching
+
+- Photoshop
+
+- Keynote
+
+
+---
+
+# Alex Lockwood | WeThrive! Campaign Case Study
+Source: https://71dpi.github.io/projects/wethrive.html
+
+# WeThrive! Campaign Case Study
+
+**TL;DR**
+
+###### Alex art directed and designed various forms of media for an initiative promoting healthier foods in schools, community gardens and safe parks for children to play in Hamilton County, Ohio. The work garnered 63 million outdoor impressions, 2.7 million display impressions, 140% increase in Facebook fans over 6 months, 129% increase in Twitter followers over 6 months, and won multiple awards.
+
+![Video showing setup and use of WeThrive Kinect installation](https://71dpi.github.io/img/projects/wethrive/wethrive01.mp4)
+
+Marketing campaign for the Hamilton County Public Health board and part of Michelle Obama's "Let's Move!" childhood wellness initiative. Deliverables included an award-winning Digital Out-of-Home experience using Microsoft Kinect technology, a website, billboards, flyers, award-winning poster series, and more.
+
+![Increased physical activity digital composition](https://71dpi.github.io/img/projects/wethrive/wethrive02.jpg)
+
+![Safe places to play digital composition](https://71dpi.github.io/img/projects/wethrive/wethrive03.jpg)
+
+![Community gardens digital composition](https://71dpi.github.io/img/projects/wethrive/wethrive04.jpg)
+
+![Healthy food choices digital composition](https://71dpi.github.io/img/projects/wethrive/wethrive05.jpg)
+
+![No Smoking, Young Lungs at Play billboard](https://71dpi.github.io/img/projects/wethrive/wethrive11.jpg)
+
+![WeThrive! website design in browser](https://71dpi.github.io/img/projects/wethrive/wethrive06.jpg)
+
+### Product Responsibilities
+
+- Art Direction
+
+- UI Design
+
+- Asset Creation
+
+- Print Design & Oversight
+
+### Project Team
+
+- Alex Lockwood
+
+- Lead Designer
+
+- [Nathan Dye](https://www.linkedin.com/in/nathan-dye-16559b7)
+
+- Copywriter
+
+- [Brandon Faris](https://brandonfaris.com/)
+
+- Director, Video Creative
+
+
+---
+
+# Games | Alex Lockwood
+Source: https://71dpi.github.io/gaems/
+
+# Games
+
+Collections of games I've created using Claude as a series of exercises in learning more about prompt engineering / vibe coding. My goals in doing so were to learn and have fun, while crafting a love letter to the [ 90s shovelware CDs](https://en.wikipedia.org/wiki/Shovelware) of my childhood. Please enjoy.
+
+[
+
+![71dpi shovelware collection vol. 1 box art](https://71dpi.github.io/gaems/vol1/img/71-vol1.webp)
+
+Volume 1 ](https://71dpi.github.io/md/games-vol1.md) [
+
+![71dpi microgame collection vol. 2 box art](https://71dpi.github.io/gaems/vol2/img/71-vol2.webp)
+
+Volume 2 ](https://71dpi.github.io/md/games-vol2.md)
+
+
+---
+
+# 71dpi Shovelware Volume 1: Slop City, USA
+Source: https://71dpi.github.io/gaems/vol1/
+
+# 71dpi Shovelware Volume 1: Slop City, USA
+
+[
+
+![bigfoot box art](https://71dpi.github.io/gaems/vol1/img/bigfoot.png)
+
+Bigfoot ](https://71dpi.github.io/bigfoot) [
+
+![cat-and-mouse box art](https://71dpi.github.io/gaems/vol1/img/cat-and-mouse.png)
+
+Cat and Mouse ](https://71dpi.github.io/cat-and-mouse) [
+
+![cheer box art](https://71dpi.github.io/gaems/vol1/img/cheer.png)
+
+Cheer ](https://71dpi.github.io/cheer) [
+
+![chop box art](https://71dpi.github.io/gaems/vol1/img/chop.png)
+
+Chop ](https://71dpi.github.io/chop) [
+
+![cycle box art](https://71dpi.github.io/gaems/vol1/img/cycle.png)
+
+Cycle ](https://71dpi.github.io/cycle) [
+
+![guard box art](https://71dpi.github.io/gaems/vol1/img/guard.png)
+
+Guard ](https://71dpi.github.io/guard) [
+
+![infinity box art](https://71dpi.github.io/gaems/vol1/img/infinity.png)
+
+Infinity ](https://71dpi.github.io/infinity) [
+
+![masterpiece box art](https://71dpi.github.io/gaems/vol1/img/masterpiece.png)
+
+Masterpiece ](https://71dpi.github.io/masterpiece) [
+
+![mukbang box art](https://71dpi.github.io/gaems/vol1/img/mukbang.png)
+
+Mukbang ](https://71dpi.github.io/mukbang) [
+
+![passphrase box art](https://71dpi.github.io/gaems/vol1/img/passphrase.png)
+
+Passphrase ](https://71dpi.github.io/passphrase) [
+
+![pop box art](https://71dpi.github.io/gaems/vol1/img/pop.png)
+
+Pop ](https://71dpi.github.io/pop) [
+
+![scratch box art](https://71dpi.github.io/gaems/vol1/img/scratch.png)
+
+Scratch ](https://71dpi.github.io/scratch) [
+
+![shine box art](https://71dpi.github.io/gaems/vol1/img/shine.png)
+
+Shine ](https://71dpi.github.io/shine) [
+
+![super bro maker box art](https://71dpi.github.io/gaems/vol1/img/super-bro-maker.png)
+
+Super Bro Maker ](https://71dpi.github.io/super-bro-maker) [
+
+![surveillance box art](https://71dpi.github.io/gaems/vol1/img/surveillance.png)
+
+Surveillance ](https://71dpi.github.io/surveillance) [
+
+![swoll box art](https://71dpi.github.io/gaems/vol1/img/swoll.png)
+
+Swoll ](https://71dpi.github.io/swoll) [
+
+![thumb-war box art](https://71dpi.github.io/gaems/vol1/img/thumb-war.png)
+
+Thumb War ](https://71dpi.github.io/thumb-war) [
+
+![wolf box art](https://71dpi.github.io/gaems/vol1/img/wolf.png)
+
+Wolf ](https://71dpi.github.io/wolf) [
+
+![adddd box art](https://71dpi.github.io/gaems/vol1/img/adddd.png)
+
+Adddd ](https://71dpi.github.io/adddd) [
+
+![weirdle box art](https://71dpi.github.io/gaems/vol1/img/weirdle.png)
+
+Weirdle ](https://71dpi.github.io/weirdle) [
+
+![smite box art](https://71dpi.github.io/gaems/vol1/img/smite.png)
+
+Smite ](https://71dpi.github.io/smite) [
+
+![sear box art](https://71dpi.github.io/gaems/vol1/img/sear.png)
+
+Sear ](https://71dpi.github.io/sear) [
+
+![hurdle box art](https://71dpi.github.io/gaems/vol1/img/hurdle.png)
+
+Hurdle ](https://71dpi.github.io/hurdle) [
+
+![faceoff box art](https://71dpi.github.io/gaems/vol1/img/faceoff.png)
+
+Faceoff ](https://71dpi.github.io/faceoff) [
+
+![encounter box art](https://71dpi.github.io/gaems/vol1/img/encounter.png)
+
+Encounter ](https://71dpi.github.io/encounter) [
+
+![kickjump box art](https://71dpi.github.io/gaems/vol1/img/kickjump.png)
+
+Kickjump ](https://71dpi.github.io/kickjump) [
+
+![kickjump-2 box art](https://71dpi.github.io/gaems/vol1/img/kickjump-2.png)
+
+Kickjump 2 ](https://71dpi.github.io/kickjump-2)
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+![under construction, new game coming whenever](https://71dpi.github.io/gaems/vol1/img/under-construction.png)
+
+Coming Soon
+
+
+---
+
+# 71dpi Microgames Vol. 2
+Source: https://71dpi.github.io/gaems/vol2/
+
+# 71dpi Microgames Vol. 2
+
+100 microgames. One tap at a time.
+
+- [SHAVE](https://71dpi.github.io/gaems/vol2/shave/)
+
+- [PLUG](https://71dpi.github.io/gaems/vol2/plug/)
+
+- [STING](https://71dpi.github.io/gaems/vol2/sting/)
+
+- [CATCH](https://71dpi.github.io/gaems/vol2/catch/)
+
+- [SNEEZE](https://71dpi.github.io/gaems/vol2/sneeze/)
+
+- [UNROLL](https://71dpi.github.io/gaems/vol2/unroll/)
+
+- [DUNK](https://71dpi.github.io/gaems/vol2/dunk/)
+
+- [SLICE](https://71dpi.github.io/gaems/vol2/slice/)
+
+- [DEFUSE](https://71dpi.github.io/gaems/vol2/defuse/)
+
+- [BALANCE](https://71dpi.github.io/gaems/vol2/balance/)
+
+- [ZIT](https://71dpi.github.io/gaems/vol2/zit/)
+
+- [THREAD](https://71dpi.github.io/gaems/vol2/thread/)
+
+- [STOMP](https://71dpi.github.io/gaems/vol2/stomp/)
+
+- [SWAT](https://71dpi.github.io/gaems/vol2/swat/)
+
+- [PARALLEL](https://71dpi.github.io/gaems/vol2/parallel/)
+
+- [TOAST](https://71dpi.github.io/gaems/vol2/toast/)
+
+- [LICK](https://71dpi.github.io/gaems/vol2/lick/)
+
+- [UNLOCK](https://71dpi.github.io/gaems/vol2/unlock/)
+
+- [PLUCK](https://71dpi.github.io/gaems/vol2/pluck/)
+
+- [INFLATE](https://71dpi.github.io/gaems/vol2/inflate/)
+
+- [SORT](https://71dpi.github.io/gaems/vol2/sort/)
+
+- [REF](https://71dpi.github.io/gaems/vol2/ref/)
+
+- [VACUUM](https://71dpi.github.io/gaems/vol2/vacuum/)
+
+- [SCARE](https://71dpi.github.io/gaems/vol2/scare/)
+
+- [WHACK](https://71dpi.github.io/gaems/vol2/whack/)
+
+- [POUR](https://71dpi.github.io/gaems/vol2/pour/)
+
+- [STAMP](https://71dpi.github.io/gaems/vol2/stamp/)
+
+- [WIPE](https://71dpi.github.io/gaems/vol2/wipe/)
+
+- [CRUSH](https://71dpi.github.io/gaems/vol2/crush/)
+
+- [FISH](https://71dpi.github.io/gaems/vol2/fish/)
+
+- [TWIST](https://71dpi.github.io/gaems/vol2/twist/)
+
+- [DUCK](https://71dpi.github.io/gaems/vol2/duck/)
+
+- [PEEL](https://71dpi.github.io/gaems/vol2/peel/)
+
+- [SQUEEZE](https://71dpi.github.io/gaems/vol2/squeeze/)
+
+- [MATCH](https://71dpi.github.io/gaems/vol2/match/)
+
+- [ZIP](https://71dpi.github.io/gaems/vol2/zip/)
+
+- [FLIP](https://71dpi.github.io/gaems/vol2/flip/)
+
+- [HAMMER](https://71dpi.github.io/gaems/vol2/hammer/)
+
+- [PET](https://71dpi.github.io/gaems/vol2/pet/)
+
+- [BRAKE](https://71dpi.github.io/gaems/vol2/brake/)
+
+- [SHARPEN](https://71dpi.github.io/gaems/vol2/sharpen/)
+
+- [MOW](https://71dpi.github.io/gaems/vol2/mow/)
+
+- [BLOW](https://71dpi.github.io/gaems/vol2/blow/)
+
+- [SHRED](https://71dpi.github.io/gaems/vol2/shred/)
+
+- [AIM](https://71dpi.github.io/gaems/vol2/aim/)
+
+- [SCRUB](https://71dpi.github.io/gaems/vol2/scrub/)
+
+- [STIR](https://71dpi.github.io/gaems/vol2/stir/)
+
+- [POP](https://71dpi.github.io/gaems/vol2/pop/)
+
+- [TYPE](https://71dpi.github.io/gaems/vol2/type/)
+
+- [FOLD](https://71dpi.github.io/gaems/vol2/fold/)
+
+- [KNOCK](https://71dpi.github.io/gaems/vol2/knock/)
+
+- [CLOG](https://71dpi.github.io/gaems/vol2/clog/)
+
+- [PAINT](https://71dpi.github.io/gaems/vol2/paint/)
+
+- [HAUL](https://71dpi.github.io/gaems/vol2/haul/)
+
+- [FEED](https://71dpi.github.io/gaems/vol2/feed/)
+
+- [DRILL](https://71dpi.github.io/gaems/vol2/drill/)
+
+- [TOSS](https://71dpi.github.io/gaems/vol2/toss/)
+
+- [SQUIRT](https://71dpi.github.io/gaems/vol2/squirt/)
+
+- [CHOP](https://71dpi.github.io/gaems/vol2/chop/)
+
+- [DIAL](https://71dpi.github.io/gaems/vol2/dial/)
+
+- [BAKE](https://71dpi.github.io/gaems/vol2/bake/)
+
+- [SWEEP](https://71dpi.github.io/gaems/vol2/sweep/)
+
+- [TICKLE](https://71dpi.github.io/gaems/vol2/tickle/)
+
+- [JUMP](https://71dpi.github.io/gaems/vol2/jump/)
+
+- [DODGE](https://71dpi.github.io/gaems/vol2/dodge/)
+
+- [SAW](https://71dpi.github.io/gaems/vol2/saw/)
+
+- [CRACK](https://71dpi.github.io/gaems/vol2/crack/)
+
+- [IRON](https://71dpi.github.io/gaems/vol2/iron/)
+
+- [STACK](https://71dpi.github.io/gaems/vol2/stack/)
+
+- [LASSO](https://71dpi.github.io/gaems/vol2/lasso/)
+
+- [CHARGE](https://71dpi.github.io/gaems/vol2/charge/)
+
+- [KNEAD](https://71dpi.github.io/gaems/vol2/knead/)
+
+- [WINK](https://71dpi.github.io/gaems/vol2/wink/)
+
+- [AMP](https://71dpi.github.io/gaems/vol2/amp/)
+
+- [SPRAY](https://71dpi.github.io/gaems/vol2/spray/)
+
+- [DIG](https://71dpi.github.io/gaems/vol2/dig/)
+
+- [COVER](https://71dpi.github.io/gaems/vol2/cover/)
+
+- [TUNE](https://71dpi.github.io/gaems/vol2/tune/)
+
+- [SWIG](https://71dpi.github.io/gaems/vol2/swig/)
+
+- [SEAL](https://71dpi.github.io/gaems/vol2/seal/)
+
+- [WRAP](https://71dpi.github.io/gaems/vol2/wrap/)
+
+- [BURST](https://71dpi.github.io/gaems/vol2/burst/)
+
+- [MELT](https://71dpi.github.io/gaems/vol2/melt/)
+
+- [UNBOX](https://71dpi.github.io/gaems/vol2/unbox/)
+
+- [LIGHT](https://71dpi.github.io/gaems/vol2/light/)
+
+- [CLIP](https://71dpi.github.io/gaems/vol2/clip/)
+
+- [PADDLE](https://71dpi.github.io/gaems/vol2/paddle/)
+
+- [GRIP](https://71dpi.github.io/gaems/vol2/grip/)
+
+- [LAUNCH](https://71dpi.github.io/gaems/vol2/launch/)
+
+- [SHAKE](https://71dpi.github.io/gaems/vol2/shake/)
+
+- [FLICK](https://71dpi.github.io/gaems/vol2/flick/)
+
+- [PLANT](https://71dpi.github.io/gaems/vol2/plant/)
+
+- [SCORE](https://71dpi.github.io/gaems/vol2/score/)
+
+- [SEW](https://71dpi.github.io/gaems/vol2/sew/)
+
+- [BRUSH](https://71dpi.github.io/gaems/vol2/brush/)
+
+- [ERASE](https://71dpi.github.io/gaems/vol2/erase/)
+
+- [SPIN](https://71dpi.github.io/gaems/vol2/spin/)
+
+- [LOCK](https://71dpi.github.io/gaems/vol2/lock/)
+
+- [SQUASH](https://71dpi.github.io/gaems/vol2/squash/)
+
+- [WIN](https://71dpi.github.io/gaems/vol2/win/)

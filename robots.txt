@@ -6,9 +6,6 @@ Allow: /
 Disallow: /components/
 # (emailme, project-template, design and the placeholder case studies are
 # marked noindex in their own <meta>, so they stay crawlable for that tag to be seen.)
-# Superseded resume PDFs (current: "Alex Lockwood_Resume 24.pdf")
-Disallow: /lockwood_resume_20.pdf
-Disallow: /lockwood_resume_21.pdf
 
 # AI / LLM crawlers, explicitly welcome
 User-agent: GPTBot
@@ -33,5 +30,8 @@ User-agent: Applebot-Extended
 Allow: /
 User-agent: CCBot
 Allow: /
+
+# LLM-friendly index of the site (also see /llms-full.txt)
+# https://71dpi.github.io/llms.txt
 
 Sitemap: https://71dpi.github.io/sitemap.xml
