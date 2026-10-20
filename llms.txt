@@ -1,0 +1,70 @@
+# Alex Lockwood
+
+> Portfolio of Alex Lockwood (he/him), a UX architect, product designer, creative director and design manager. Case studies cover GE Aerospace / GE Aviation, Kroger, FordPass, Lincoln Way, Fruit of the Loom and more, spanning CX and service design, enterprise design systems, information architecture, ecommerce, branding and design team leadership. The site also hosts "Labs": free browser games built with Claude as vibe-coding experiments.
+
+Alex describes himself as an activator for product teams who need guidance: someone who rolls up his sleeves, advocates for his team and their customers, and "enables people to do a lot with very little." He goes by @71dpi online. Case studies are written in first person and open with a TL;DR. To contact him, use LinkedIn; the on-site email page deliberately requires JavaScript to limit spam.
+
+## Core pages
+
+- [Home](https://71dpi.github.io/): Elevator pitch, philosophy and entry point to the work.
+- [Projects & Case Studies](https://71dpi.github.io/projects/projects.html): Index of all portfolio case studies.
+- [About](https://71dpi.github.io/about.html): Background, working style, personal side and side projects. Links to the current resume PDF.
+- [Labs](https://71dpi.github.io/labs.html): Side experiments, games and writing.
+- [Resume (PDF)](https://71dpi.github.io/Alex%20Lockwood_Resume%2024.pdf): Current resume.
+
+## Case studies: Kroger (retail / ecommerce, 2024-2025)
+
+- [Kroger App Redesign IA & Navigation](https://71dpi.github.io/projects/k-refresh-ia.html): Information architecture and native iOS/Android design for the 2025 app refresh; simpler navigation, centralized savings, food-first experience.
+- [Kroger Ease-of-Use Enhancements](https://71dpi.github.io/projects/k-ease-of-use-24.html): 2024 Experience Optimization work on navigation, discoverability and consistent UI components, with measured gains in cart adds and conversion.
+- [Kroger Assortment Display Strategy](https://71dpi.github.io/projects/k-assortment-display.html): Signal-driven framework that shows customers only items they can actually buy and receive.
+- [Transforming the Content Authorship Process at Kroger](https://71dpi.github.io/projects/k-content-authorship.html): Mapping and streamlining the pipeline from merchandising plans to live content.
+- [Driving Off-Property Ecommerce Through Design Strategy](https://71dpi.github.io/projects/k-off-property-ecommerce.html): Playbook and play cards for partner listings on DoorDash, Instacart and Uber Eats.
+- [Gamification at Kroger](https://71dpi.github.io/projects/k-gamification.html): Gamification and multi-step offer strategy, including the lessons behind a strategic pivot.
+- [Leading Kroger's Foundational Product Design Team](https://71dpi.github.io/projects/k-foundational-design-team-mgmt.html): Design management through a shift from systems architecture to growth-focused point solutions.
+
+## Case studies: GE Aerospace / GE Aviation (enterprise, B2B, aviation)
+
+- [GE Aerospace New Commercial Customer Experience](https://71dpi.github.io/projects/gea-new-customer-experience.html): Customer journey mapping and CX/UX architecture for product onboarding.
+- [GE Aviation Systems CX / UX Lead](https://71dpi.github.io/projects/gea-systems-cx.html): Multi-business customer experience initiative around self-service digital tools.
+- [GE Aerospace MRO Network Service Design](https://71dpi.github.io/projects/gea-mro.html): Service blueprinting of how billions in services are forecasted, planned and actualized across a global shop network.
+- [Enterprise Design System for Data-Intensive Applications](https://71dpi.github.io/projects/design-system.html): Design system work for data-heavy enterprise products.
+- [GE Aviation Fleet Support](https://71dpi.github.io/projects/gea-fleetsupport.html): UX team leadership and service design vision for diagnostics across 56,000+ jet engines.
+- [GE Aviation Supply Chain Product Design](https://71dpi.github.io/projects/gea-supplychain.html): Accessible, data-rich UIs for a supply chain that produced 33,000+ jet engines.
+- [GE Aviation Supply Chain Service Design Mapping](https://71dpi.github.io/projects/gea-supplychain2.html): Ecosystem maps that simplify supply chain decision making.
+- [GE Additive UX & Product Ownership](https://71dpi.github.io/projects/gea-additive.html): Product owner and designer taking an ROI calculator from idea to production in six months.
+
+## Case studies: consumer apps, ecommerce, brand and creative
+
+- [FordPass App UX & Art Direction](https://71dpi.github.io/projects/fordpass.html): UX prototypes, interaction patterns and visual design for early FordPass releases (1.4M+ users).
+- [Lincoln Way](https://71dpi.github.io/projects/lincolnway.html): Service design, UX and art direction for Lincoln's mobility app (4+ stars from 150k+ ratings).
+- [Fruit of the Loom / Lily of France / Vanity Fair ecommerce](https://71dpi.github.io/projects/fotl.html): Wireframes and visual design; 142% visitor and 140% revenue increase in the first month after launch.
+- [Social Media App Product Design & Brand](https://71dpi.github.io/projects/social-app.html): Brand, mobile UX flow, prototype and a patentable emoji-based interaction pattern.
+- [Cafépress](https://71dpi.github.io/projects/cafepress.html): Information architecture and prototypes for a mobile strategy.
+- [Evenflo ecommerce](https://71dpi.github.io/projects/evenflo.html): Mobile-first ecommerce with location-based coupons and UPC scanning.
+- [Carnival Cruise Lines "Grab Your Destiny"](https://71dpi.github.io/projects/carnival.html): Social contest microsite and collateral; 193% average increase in active social users.
+- [WeThrive!](https://71dpi.github.io/projects/wethrive.html): Art direction for a public health campaign in Hamilton County, Ohio (63M outdoor impressions).
+- [SunRun](https://71dpi.github.io/projects/sunrun.html): "My Sunrun" solar customer app and site UX/UI.
+- [Momentive](https://71dpi.github.io/projects/momentive.html): Responsive marketing, catalog and ordering site for an industrial silicones producer.
+- [Rivulet](https://71dpi.github.io/projects/rivulet.html): Creative direction, branding and parallax site for a luxury liqueur.
+- [Servus!](https://71dpi.github.io/projects/servus.html): Naming, branding and responsive site for a Long John Silver's franchisee.
+- [Snack Pack](https://71dpi.github.io/projects/snackpack.html): Responsive site UX/UI with an SEO-minded content strategy.
+- [Logic + Magic Magazine](https://71dpi.github.io/projects/logicandmagic.html): Art direction and layout for a LEAP trade publication.
+- [Hashtags 101](https://71dpi.github.io/projects/hashtags101.html): Educational infographic on the history and use of hashtags.
+- [Branding & Logos](https://71dpi.github.io/projects/logos.html): Logo work for assorted clients.
+
+## Labs: games (free, playable in the browser)
+
+- [Games hub](https://71dpi.github.io/gaems/): Collections of games made with Claude to explore prompt engineering and vibe coding, as a love letter to 90s shovelware CDs.
+- [Shovelware Volume 1: Slop City, USA](https://71dpi.github.io/gaems/vol1/): Collection of quick, sloppy browser games.
+- [Microgames Volume 2](https://71dpi.github.io/gaems/vol2/): 100 tap, swipe, drag and tilt microgames. Each lives at `https://71dpi.github.io/gaems/vol2/<name>/` (for example `/gaems/vol2/pop/`); the full list is linked from the hub page.
+
+## Elsewhere
+
+- [LinkedIn](https://www.linkedin.com/in/alexlockwood)
+- [Behance](https://www.behance.net/71dpi): More UX, branding and graphic design.
+- [Dribbble](https://dribbble.com/71dpi): Visual explorations and works in progress.
+- [GitHub](https://github.com/71dpi/): Source for this site (MIT licensed code; site content © Alex Lockwood).
+
+## Optional
+
+- [Sitemap](https://71dpi.github.io/sitemap.xml)
