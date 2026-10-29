@@ -1,3 +1,10 @@
+@font-face {
+  font-family: '71Hand';
+  src: url('/fonts/71Hand-Bold.woff2') format('woff2');
+  font-weight: 600 700;
+  font-display: swap;
+}
+
 /* Grid layout for game navigation */
 nav.inline-links.grid {
   display: grid;
@@ -332,33 +339,38 @@ nav.game-volumes .caption {
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-family: '71Hand', 'Inter', Arial, sans-serif;
+            font-size: 5rem;
             font-weight: 700;
             color: rgba(0, 0, 0, 0.85);
-            letter-spacing: -0.1rem;
-            line-height: 2.5rem;
+            letter-spacing: 0;
+            line-height: 4rem;
             margin: 3rem 10%;
         }
 
+        /* h2 is the TL;DR / summary paragraph */
         h2 {
-            font-size: 1.75rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4d25e0;
+            letter-spacing: 0;
+            line-height: 1.2rem;
+            margin: 2rem 10%;
+            padding: 0 1.1rem;
+        }
+
+        /* h3 is the section heading */
+        h3 {
+            font-family: '71Hand', 'Inter', Arial, sans-serif;
+            font-variant-caps: all-small-caps;
+            font-size: 2rem;
             font-weight: 600;
             color: rgba(0, 0, 0, 0.85);
-            letter-spacing: -0.05rem;
+            letter-spacing: 0.04rem;
             line-height: 2rem;
             margin: 1rem 10%;
             background-color: #fff200;
             clear: both;
-        }
-
-        h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: rgba(0, 0, 0, 0.85);
-            letter-spacing: -0.05rem;
-            line-height: 1.5rem;
-            margin: 1rem 10%;
-            background-color: #fff200;
         }
 
         h4 {
@@ -864,8 +876,8 @@ nav.game-volumes .caption {
             }
 
             h1 {
-                font-size: 5rem;
-                line-height: 5rem;
+                font-size: 7rem;
+                line-height: 6rem;
                 margin-top: 5rem;
                 margin-bottom: 5rem;
             }
@@ -1053,7 +1065,6 @@ nav.game-volumes .caption {
             line-height: 1.6;
         }
 
-        h1,
         h2,
         h3,
         h4,
@@ -1062,7 +1073,7 @@ nav.game-volumes .caption {
             line-height: 1.3;
         }
 
-        /* ---- Resume page (scoped to .resume, nothing else is affected) ---- */
+        /* ---- Resume page ---- */
         .resume .resume-links {
             font-family: 'Inter', Arial, sans-serif;
             font-size: .85rem;
@@ -1070,7 +1081,7 @@ nav.game-volumes .caption {
             padding-bottom: 1rem;
         }
 
-        .resume h2 {
+        .resume > h3 {
             margin-top: 3rem;
         }
 
