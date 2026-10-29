@@ -370,6 +370,8 @@ nav.game-volumes .caption {
             line-height: 2rem;
             margin: 1rem 10%;
             background-color: #fff200;
+            /* yellow bleeds left; type stays flush with <p> */
+            box-shadow: -1rem 0 0 #fff200;
             clear: both;
         }
 
@@ -1095,6 +1097,7 @@ nav.game-volumes .caption {
             margin: 0 0 1rem -1rem;
             display: inline-block;
             padding: 0 .5rem;
+            box-shadow: none;
         }
 
         .resume .resume-role {
@@ -1137,6 +1140,7 @@ nav.game-volumes .caption {
             display: inline-block;
             padding: 0 .5rem;
             margin-bottom: .5rem;
+            box-shadow: none;
         }
 
         .resume .resume-edu p {
