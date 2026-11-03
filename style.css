@@ -340,7 +340,9 @@ nav.game-volumes .caption {
 
         h1 {
             font-family: '71Hand', 'Inter', Arial, sans-serif;
-            font-size: 5rem;
+            font-size: clamp(2rem, 6vw, 3.5rem); 
+            overflow-wrap: break-word;
+            hyphens: auto;
             font-weight: 700;
             color: rgba(0, 0, 0, 0.85);
             letter-spacing: 0;
@@ -878,7 +880,6 @@ nav.game-volumes .caption {
             }
 
             h1 {
-                font-size: 7rem;
                 line-height: 6rem;
                 margin-top: 5rem;
                 margin-bottom: 5rem;
