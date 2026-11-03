@@ -86,7 +86,6 @@ nav.game-volumes .caption {
   font-weight: 600;
 }
 
-/* Desktop: three tiles share one row */
 @media (min-width: 769px) {
   nav.game-volumes:has(> a:nth-child(3)) {
         grid-template-columns: repeat(3, 1fr);
@@ -95,7 +94,6 @@ nav.game-volumes .caption {
   }
 }
 
-/* Mobile: stack volumes vertically */
 @media (max-width: 768px) {
   nav.game-volumes {
         grid-template-columns: 1fr;
@@ -210,6 +208,12 @@ nav.game-volumes .caption {
             padding: 0;
         }
 
+        img,
+        picture,
+        video {
+            max-width: 100%;
+        }
+
         header {
             display: inline-block;
             width: 100%;
@@ -224,16 +228,58 @@ nav.game-volumes .caption {
             min-height: 5.2rem;
         }
 
-        /* reserve space for included header to eliminate layout shift during async load */
         #header-template {
             min-height: 13rem;
             background-color: #fff200;
-            /* match header background while loading */
         }
 
         @media screen and (min-width: 768px) {
             #header-template {
                 min-height: 6rem;
+            }
+        }
+
+        /* mobile header: small logo and menu picker share one row */
+        @media screen and (max-width: 767px) {
+            #header-template {
+                min-height: 5.8rem;
+            }
+
+            header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.5rem;
+                box-sizing: border-box;
+                min-height: 0;
+                padding: 1.25rem 10%;
+            }
+
+            header > a {
+                flex: 0 1 12.5rem;
+                min-width: 0;
+                line-height: 0;
+            }
+
+            header picture {
+                display: block;
+            }
+
+            /* the logo file has ~4% transparent padding on its left edge; pull it flush with the text */
+            header .site-logo {
+                display: block;
+                width: 100%;
+                margin: 0 0 0 -4.2%;
+            }
+
+            header nav.hamburger-menu {
+                float: none;
+                margin: 0;
+            }
+
+            header nav.hamburger-menu select#nav-menu {
+                position: static;
+                margin: 0;
             }
         }
 
@@ -340,13 +386,14 @@ nav.game-volumes .caption {
 
         h1 {
             font-family: '71Hand', 'Inter', Arial, sans-serif;
-            font-size: clamp(2rem, 6vw, 3.5rem); 
+            font-size: clamp(2.5rem, 12vw, 7rem);
+            text-wrap: balance;
             overflow-wrap: break-word;
             hyphens: auto;
             font-weight: 700;
             color: rgba(0, 0, 0, 0.85);
             letter-spacing: 0;
-            line-height: 4rem;
+            line-height: 1.05;
             margin: 3rem 10%;
         }
 
@@ -378,6 +425,7 @@ nav.game-volumes .caption {
         }
 
         h4 {
+            overflow-wrap: anywhere;
             font-size: 1rem;
             font-weight: 600;
             color: rgba(0, 0, 0, 0.85);
@@ -529,13 +577,14 @@ nav.game-volumes .caption {
         .tile-emoji {
             color: rgba(0, 0, 0, 1);
             font-weight: 600;
-            font-size: 3rem;
+            font-size: clamp(1.5rem, 7vw, 3rem);
             letter-spacing: .2rem;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 6rem;
             text-align: center;
+            overflow-wrap: anywhere;
         }
 
         .pic-tile {
@@ -647,7 +696,7 @@ nav.game-volumes .caption {
         }
 
         .center {
-            width: 100%;
+            width: auto;
             text-align: center;
             display: block;
         }
@@ -880,7 +929,8 @@ nav.game-volumes .caption {
             }
 
             h1 {
-                line-height: 6rem;
+                /* column shrinks to 70% on desktop */
+                font-size: clamp(3rem, 10vw, 7rem);
                 margin-top: 5rem;
                 margin-bottom: 5rem;
             }
