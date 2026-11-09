@@ -20,8 +20,21 @@
 
   const canvas = document.createElement('canvas');
   canvas.setAttribute('aria-hidden', 'true');
-  canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;' +
-    'cursor:default;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;';
+  // The canvas only draws. It ignores pointers so touches fall through to the page (scrolling) unless they land in the grab zone below.
+  canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;';
+
+  // The grab zone is the only thing that takes pointer input. On touch screens it is inset from the picture's edges,
+  // so a thumb scrolling the page past the face lands in the padding ring and scrolls instead of snagging.
+  // touch-action:none applies only inside the zone (that is what lets the drag pull without the page scrolling).
+  const grabber = document.createElement('div');
+  grabber.setAttribute('aria-hidden', 'true');
+  grabber.style.cssText = 'position:absolute;touch-action:none;cursor:default;user-select:none;-webkit-user-select:none;' +
+    '-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;';
+  const coarse = matchMedia('(pointer: coarse)');
+  const TOUCH_PAD = '20%';   // padding ring on each side on touch screens: the grab zone is the middle 60%
+  const sizeGrabber = () => { grabber.style.inset = coarse.matches ? TOUCH_PAD : '0'; };
+  sizeGrabber();
+  if (coarse.addEventListener) coarse.addEventListener('change', sizeGrabber);
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
   if (!gl) return;   // the <img> stays
 
@@ -263,26 +276,26 @@ void main(){
   }
   const inside = p => p.u >= 0 && p.u <= 1 && p.v >= 0 && p.v <= 1;
 
-  canvas.addEventListener('pointerdown', e => {
+  grabber.addEventListener('pointerdown', e => {
     if (drag) return;
     const p = toImg(e.clientX, e.clientY);
     if (!inside(p)) return;
-    canvas.setPointerCapture(e.pointerId);
+    grabber.setPointerCapture(e.pointerId);
     const still = Math.hypot(dx, dy) > 0.01 && Math.hypot(p.u - (grab.u + dx), p.v - (grab.v + dy)) < 0.3;
     if (!still) { grab.u = p.u; grab.v = p.v; dx = dy = vx = vy = 0; }
     tgt.x = p.u - grab.u; tgt.y = p.v - grab.v;
     drag = true; pid = e.pointerId;
     burst = Math.max(burst, 1.0);
-    canvas.style.cursor = 'grabbing';
+    grabber.style.cursor = 'grabbing';
     e.preventDefault();
   });
-  canvas.addEventListener('pointermove', e => {
+  grabber.addEventListener('pointermove', e => {
     const p = toImg(e.clientX, e.clientY);
     cur.sx = p.sx; cur.sy = p.sy;
     if (!drag) {
       const now = inside(p);
       hovering = now;
-      canvas.style.cursor = now ? 'grab' : 'default';
+      grabber.style.cursor = now ? 'grab' : 'default';
     }
     if (drag && e.pointerId === pid) {
       const rx = p.u - grab.u, ry = p.v - grab.v;
@@ -292,20 +305,20 @@ void main(){
     }
     lastPos = [e.clientX, e.clientY];
   });
-  canvas.addEventListener('pointerleave', () => { if (!drag) { hovering = false; canvas.style.cursor = 'default'; } });
+  grabber.addEventListener('pointerleave', () => { if (!drag) { hovering = false; grabber.style.cursor = 'default'; } });
   function release(e) {
     if (!drag || e.pointerId !== pid) return;
     drag = false; pid = -1; burst = Math.max(burst, 0.5);
-    canvas.style.cursor = 'grab';
+    grabber.style.cursor = 'grab';
     if (e.pointerType !== 'mouse') hovering = false;
   }
-  canvas.addEventListener('pointerup', release);
-  canvas.addEventListener('pointercancel', release);
-  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  grabber.addEventListener('pointerup', release);
+  grabber.addEventListener('pointercancel', release);
+  grabber.addEventListener('contextmenu', e => e.preventDefault());
 
   // if the GPU drops the context, pull the canvas and let the <img> fallback show again
   let dead = false;
-  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); dead = true; canvas.remove(); });
+  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); dead = true; canvas.remove(); grabber.remove(); });
 
   let faceHi = null, faceLo = null;
   let last = performance.now();
@@ -439,6 +452,7 @@ void main(){
     last = performance.now();
     frame(last);
     stage.appendChild(canvas);
+    stage.appendChild(grabber);
   };
   // on error nothing happens: the <img> fallback is already on screen
   img.src = base.getAttribute('src');
