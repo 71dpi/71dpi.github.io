@@ -1,0 +1,65 @@
+/*
+ * Design tokens: semantic only, no ramps, trying to keep this simple since it's just for me.
+ * Each color is light-dark(<light>, <dark>), so dark mode lives next to its light value.
+ * Follows the OS by default; force one with <html data-theme="light"> or "dark".
+ * Needs light-dark(): Chrome 123+, Safari 17.5+, Firefox 120+.
+ * Media queries can't read variables, so the one breakpoint stays literal: 768px.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Color: surfaces */
+  --color-bg:        light-dark(#ffffff, #0e0e10);
+  --color-surface:   light-dark(#eeeeee, #1c1c21);   /* tiles, sliders, chips */
+  --color-border:    light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .14));
+
+  /* Color: text */
+  --color-text:       light-dark(rgb(0 0 0 / .85), rgb(255 255 255 / .88));
+  --color-text-muted: light-dark(rgb(0 0 0 / .65), rgb(255 255 255 / .62));
+
+  /* Color: brand + accent swap roles in dark mode.
+     Light: yellow is the brand fill (header, highlights), purple is the accent (links, buttons, focus).
+     Dark:  purple is the brand fill, yellow is the accent. */
+  --color-brand:    light-dark(#fff200, #4F2683);
+  --color-on-brand: light-dark(#000000, #ffffff);
+
+  --color-accent:        light-dark(#4F2683, #fff200);
+  --color-accent-hover:  light-dark(#4d25e0, #fff77a);   /* hover/active lighten on dark, darken on light */
+  --color-accent-active: light-dark(#3617a8, #fffbb8);
+  --color-on-accent:     light-dark(#ffffff, #000000);
+  --color-focus-ring:    color-mix(in srgb, var(--color-accent) 30%, transparent);
+
+  /* Type */
+  --font-display: '71Hand', 'Inter', Arial, sans-serif;
+  --font-ui:      system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-body:    'charter', 'Georgia', 'Cambria', 'Times New Roman', Times, serif;
+
+  --text-sm:      .85rem;
+  --text-md:      1rem;
+  --text-lg:      1.2rem;
+  --text-display: clamp(2.5rem, 12vw, 7rem);
+
+  --leading-body:    1.6;
+  --leading-heading: 1.3;
+
+  /* Space */
+  --space-1: .5rem;
+  --space-2: 1rem;
+  --space-3: 2rem;
+  --space-4: 3rem;
+  --gutter:  10%;     /* the side margin the page's text column uses */
+
+  /* Shape + depth + motion */
+  --radius-sm: .25rem;
+  --radius-md: .5rem;
+  --shadow-raised: 0 6px 18px light-dark(rgb(0 0 0 / .12), rgb(0 0 0 / .5));
+  --motion: .2s ease-in-out;
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+/* Printing is always light, whatever the screen theme */
+@media print {
+  :root, :root[data-theme] { color-scheme: light; }
+}

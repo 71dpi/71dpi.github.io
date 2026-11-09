@@ -101,12 +101,13 @@
   <main id="main" role="main">
 
 <h1><abbr title="User Experience">UX</abbr> + Creative Direction + <abbr title="Management">MGMT</abbr> + Design</h1>
-<picture>
-    <!-- <source media="(min-width: 768px)" srcset="/img/alexlockwood.webp" type="image/webp">
-    <source media="(max-width: 768px)" srcset="/img/alexlockwood.webp" type="image/webp"> -->
-    <source srcset="/img/alexlockwood.webp" type="image/webp">
-    <img src="/img/alexlockwood.jpg" alt="Portrait photo of Alex Lockwood" class="big-picture my-dumb-face">
-</picture>
+<div class="face-stage my-dumb-face" data-pull-face>
+    <!-- The img is the fallback. /js/pull-my-face.js lays an interactive WebGL canvas over it once ready. -->
+    <picture>
+        <source srcset="/img/alexlockwood.webp" type="image/webp">
+        <img src="/img/alexlockwood.jpg" alt="Portrait photo of Alex Lockwood" class="big-picture">
+    </picture>
+</div>
 
 <div class="tldr-label">
     ELEVATOR PITCH
@@ -182,3 +183,4 @@
   <script>
     includeHTML();
 </script>
+  <script src="/js/pull-my-face.js" defer></script>

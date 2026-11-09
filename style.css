@@ -1,3 +1,5 @@
+@import url('/tokens.css');
+
 @font-face {
   font-family: '71Hand';
   src: url('/fonts/71Hand-Bold.woff2') format('woff2');
@@ -9,11 +11,11 @@
 nav.inline-links.grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1rem;
+  gap: var(--space-2);
   justify-items: center;
   align-items: center;
   width: 100%;
-  padding: 0 1rem;
+  padding: 0 var(--space-2);
   box-sizing: border-box;
 }
 
@@ -22,7 +24,7 @@ nav.inline-links.grid a {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1rem;
+  padding: var(--space-2);
   text-decoration: none;
   transition: transform 0.2s ease;
 }
@@ -36,12 +38,12 @@ nav.inline-links.grid img {
   width: 100%;
   max-width: 180px;
   height: auto;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-1);
   display: block;
 }
 
 nav.inline-links.grid .caption {
-  font-size: 1rem;
+  font-size: var(--text-md);
   margin-top: 0.25rem;
   font-weight: 500;
 }
@@ -50,7 +52,7 @@ nav.inline-links.grid .caption {
 nav.game-volumes {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: var(--space-2);
     margin-left: 15%;
     margin-right: 15%;
     justify-items: stretch;
@@ -82,7 +84,7 @@ nav.game-volumes img {
 
 nav.game-volumes .caption {
   font-size: 1.1rem;
-  margin-top: 0.5rem;
+  margin-top: var(--space-1);
   font-weight: 600;
 }
 
@@ -98,7 +100,7 @@ nav.game-volumes .caption {
   nav.game-volumes {
         grid-template-columns: 1fr;
         gap: 1.5rem;
-        padding: 0 0.5rem;
+        padding: 0 var(--space-1);
   }
 
   nav.game-volumes a {
@@ -108,11 +110,11 @@ nav.game-volumes .caption {
   nav.game-volumes picture,
   nav.game-volumes img {
         max-width: 100%;
-        margin-bottom: 0.5rem;
+        margin-bottom: var(--space-1);
   }
 
   nav.game-volumes .caption {
-    font-size: 1rem;
+    font-size: var(--text-md);
   }
 }
 
@@ -135,7 +137,7 @@ nav.game-volumes .caption {
 @media (max-width: 1024px) {
   nav.inline-links.grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    gap: var(--space-2);
   }
 
   nav.inline-links.grid picture,
@@ -149,7 +151,7 @@ nav.game-volumes .caption {
   nav.inline-links.grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
-    padding: 0 0.5rem;
+    padding: 0 var(--space-1);
   }
 
   nav.inline-links.grid a {
@@ -169,7 +171,7 @@ nav.game-volumes .caption {
         button,
         select {
             font-size: 16px;
-            font-family: 'Inter', Arial, sans-serif;
+            font-family: var(--font-ui);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
@@ -181,14 +183,14 @@ nav.game-volumes .caption {
             text-transform: uppercase;
             letter-spacing: 0.25rem;
             font-weight: 600;
-            color: rgba (0 0 0 0.8);
+            color: var(--color-text);
             transition: all .2s ease-in-out;
         }
 
         select#nav-menu:hover {
             transform: scale(1.02);
             cursor: pointer;
-            border-color: rgba(0, 0, 0, 0.3);
+            border-color: color-mix(in srgb, var(--color-on-brand) 35%, transparent);
         }
 
         .desktop-menu {
@@ -206,6 +208,8 @@ nav.game-volumes .caption {
         body {
             margin: 0;
             padding: 0;
+            background: var(--color-bg);
+            color: var(--color-text);
         }
 
         img,
@@ -221,16 +225,16 @@ nav.game-volumes .caption {
             top: 0;
             left: 0;
             right: 0;
-            padding: 4rem 0px 3rem;
+            padding: 4rem 0px var(--space-4);
             margin: 0;
             border-bottom: 1px solid rgba(0, 0, 0, 0);
-            background-color: #fff200;
+            background-color: var(--color-brand);
             min-height: 5.2rem;
         }
 
         #header-template {
             min-height: 13rem;
-            background-color: #fff200;
+            background-color: var(--color-brand);
         }
 
         @media screen and (min-width: 768px) {
@@ -239,7 +243,6 @@ nav.game-volumes .caption {
             }
         }
 
-        /* mobile header: small logo and menu picker share one row */
         @media screen and (max-width: 767px) {
             #header-template {
                 min-height: 5.8rem;
@@ -249,10 +252,10 @@ nav.game-volumes .caption {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                gap: 0.5rem;
+                gap: var(--space-1);
                 box-sizing: border-box;
                 min-height: 0;
-                padding: 1.25rem 10%;
+                padding: 1.25rem var(--gutter);
             }
 
             header > a {
@@ -265,7 +268,6 @@ nav.game-volumes .caption {
                 display: block;
             }
 
-            /* the logo file has ~4% transparent padding on its left edge; pull it flush with the text */
             header .site-logo {
                 display: block;
                 width: 100%;
@@ -303,18 +305,18 @@ nav.game-volumes .caption {
 
         #logo {
             display: inline-block;
-            margin-left: 10%;
+            margin-left: var(--gutter);
         }
 
         .site-logo {
             width: 80%;
-            margin: 0 10%;
+            margin: 0 var(--gutter);
         }
 
         a.logo-link,
         a.logo-link:visited,
         a.logo-link:hover {
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--color-on-brand);
             text-decoration: none;
         }
 
@@ -329,11 +331,11 @@ nav.game-volumes .caption {
         nav {
             display: block;
             float: right;
-            margin-right: 10%;
+            margin-right: var(--gutter);
         }
 
         a.logo-typography:hover {
-            text-decoration: solid wavy 1px #6236ff;
+            text-decoration: solid wavy 1px var(--color-accent);
         }
 
         select#nav-menu {
@@ -352,12 +354,12 @@ nav.game-volumes .caption {
             -webkit-rtl-ordering: logical;
             background-color: rgba(0, 0, 0, 0);
             cursor: default;
-            margin: 0 10% 0 0;
+            margin: 0 var(--gutter) 0 0;
             padding: 0.45rem 0.2rem 0.4rem 0.75rem;
-            border-radius: .5rem;
+            border-radius: var(--radius-md);
             border-width: 1px;
             border-style: solid;
-            border-color: rgba(0, 0, 0, 0.1);
+            border-color: color-mix(in srgb, var(--color-on-brand) 15%, transparent);
             border-image: initial;
             -moz-appearance: none;
             -webkit-appearance: none;
@@ -369,138 +371,138 @@ nav.game-volumes .caption {
         }
 
         p {
-            font-family: 'charter', 'Georgia', 'Cambria', 'Times New Roman', Times, serif;
-            font-size: 1.2rem;
+            font-family: var(--font-body);
+            font-size: var(--text-lg);
             font-style: normal;
             font-weight: 400;
             initial-letter: 0rem;
             overflow-wrap: break-word;
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--color-text);
             letter-spacing: 0;
             line-height: 2rem;
-            margin: 0 10%;
-            padding-bottom: 2rem;
+            margin: 0 var(--gutter);
+            padding-bottom: var(--space-3);
         }
 
         h1 {
-            font-family: '71Hand', 'Inter', Arial, sans-serif;
-            font-size: clamp(2.5rem, 12vw, 7rem);
+            font-family: var(--font-display);
+            font-size: var(--text-display);
             text-wrap: balance;
             overflow-wrap: break-word;
             hyphens: auto;
             font-weight: 700;
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--color-text);
             letter-spacing: 0;
             line-height: 1.05;
-            margin: 3rem 10%;
+            margin: var(--space-4) var(--gutter);
         }
 
         /* h2 is the TL;DR / summary paragraph */
         h2 {
-            font-size: 0.85rem;
+            font-size: var(--text-sm);
             font-weight: 500;
-            color: #4d25e0;
+            color: var(--color-accent);
             letter-spacing: 0;
             line-height: 1.2rem;
-            margin: 2rem 10%;
+            margin: var(--space-3) var(--gutter);
             padding: 0 1.1rem;
         }
 
         /* h3 is the section heading */
         h3 {
-            font-family: '71Hand', 'Inter', Arial, sans-serif;
+            font-family: var(--font-display);
             font-variant-caps: all-small-caps;
             font-size: 2rem;
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--color-on-brand);
             letter-spacing: 0.04rem;
             line-height: 2rem;
-            margin: 1rem 10%;
-            background-color: #fff200;
+            margin: var(--space-2) var(--gutter);
+            background-color: var(--color-brand);
             /* yellow bleeds left; type stays flush with <p> */
-            box-shadow: -1rem 0 0 #fff200;
+            box-shadow: -1rem 0 0 var(--color-brand);
             clear: both;
         }
 
         h4 {
             overflow-wrap: anywhere;
-            font-size: 1rem;
+            font-size: var(--text-md);
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--color-text);
             letter-spacing: 0;
             line-height: 1rem;
-            margin: 2rem 10% 1.5rem;
+            margin: var(--space-3) var(--gutter) 1.5rem;
             display: inline-block;
         }
 
         h5 {
-            font-size: 1rem;
+            font-size: var(--text-md);
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--color-text);
             letter-spacing: 0;
             line-height: 1rem;
-            margin: 1rem 10% 3rem;
+            margin: var(--space-2) var(--gutter) var(--space-4);
         }
 
         h6 {
-            font-size: 0.85rem;
+            font-size: var(--text-sm);
             font-weight: 500;
-            color: #4d25e0;
+            color: var(--color-accent);
             letter-spacing: 0;
             line-height: 1.2rem;
-            margin: 2rem 10%;
+            margin: var(--space-3) var(--gutter);
             padding: 0 1.1rem;
         }
 
         .back {
-            margin: 1rem 10% -2rem;
+            margin: var(--space-2) var(--gutter) -2rem;
         }
 
         .tldr-label {
             font-size: 0.75rem;
             font-weight: 300;
-            color: rgba(0, 0, 0, 0.65);
+            color: var(--color-text-muted);
             letter-spacing: 0.1rem;
             line-height: 1rem;
-            margin: 2rem 10% 0;
+            margin: var(--space-3) var(--gutter) 0;
         }
 
         .projects-label {
             font-size: 0.75rem;
             font-weight: 300;
-            color: rgba(0, 0, 0, 0.65);
+            color: var(--color-text-muted);
             letter-spacing: 0.1rem;
             line-height: 1rem;
-            margin: 2rem 10% 0;
+            margin: var(--space-3) var(--gutter) 0;
             text-transform: uppercase;
             text-align: center;
         }
 
         ul {
-            padding: 0 0 0 2rem;
-            margin: 1rem 10% 2rem;
+            padding: 0 0 0 var(--space-3);
+            margin: var(--space-2) var(--gutter) var(--space-3);
         }
 
         li {
-            font-size: 1.2rem;
-            color: rgba(0, 0, 0, 0.85);
+            font-size: var(--text-lg);
+            color: var(--color-text);
             letter-spacing: 0;
             line-height: 1.5rem;
-            font-family: 'charter', 'Georgia', 'Cambria', 'Times New Roman', Times, serif;
+            font-family: var(--font-body);
             font-style: normal;
             font-weight: 400;
             initial-letter: 0rem;
             overflow-wrap: break-word;
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
-            margin: 0 10% 0 -0.5rem;
-            padding-bottom: 1rem;
+            margin: 0 var(--gutter) 0 -0.5rem;
+            padding-bottom: var(--space-2);
         }
 
         li::marker {
-            color: #666;
+            color: var(--color-text-muted);
         }
 
         li.team-member {
@@ -513,31 +515,31 @@ nav.game-volumes .caption {
 
         li.skill,
         li.responsibility {
-            padding-bottom: .5rem;
+            padding-bottom: var(--space-1);
         }
 
         li.team-role {
-            color: rgba(0, 0, 0, .65);
+            color: var(--color-text-muted);
             list-style: none;
             margin-top: -1rem;
             font-size: .75rem;
-            font-family: 'Inter', Arial, sans-serif;
+            font-family: var(--font-ui);
         }
 
         abbr {
-            text-decoration-color: #fff200;
+            text-decoration-color: var(--color-brand);
         }
 
         a,
         a:visited {
-            text-decoration: underline #fff200;
+            text-decoration: underline var(--color-brand);
             position: relative;
-            color: #6236ff;
+            color: var(--color-accent);
         }
 
         a:hover {
-            color: #4d25e0;
-            text-decoration: underline #4d25e0;
+            color: var(--color-accent-hover);
+            text-decoration: underline var(--color-accent-hover);
         }
 
         #clear-header {
@@ -546,24 +548,33 @@ nav.game-volumes .caption {
 
         .twitter-tweet-rendered {
             width: 80% !important;
-            margin: 0 10% 2rem !important;
+            margin: 0 var(--gutter) var(--space-3) !important;
         }
 
         .tile {
             width: 50%;
-            background: #fff200;
+            background: var(--color-brand);
             float: left;
-            margin: 1rem 0;
-            font-size: 1rem;
+            margin: var(--space-2) 0;
+            font-size: var(--text-md);
             text-transform: uppercase;
         }
 
         .tile2 {
-            background: #eee;
+            background: var(--color-surface);
         }
 
+        .tile2 .tile-text {
+            color: var(--color-text);
+        }
+
+        /* Decorative tile tints: the light values are the original inline backgrounds, each with a dark-mode pair */
+        .tint-ice    { background: light-dark(aliceblue, #1d2733); }
+        .tint-grey   { background: light-dark(#cccccc, #2c2c33); }
+        .tint-violet { background: light-dark(blueviolet, #3d2266); }
+
         .tile-text {
-            color: rgba(0, 0, 0, 0.75);
+            color: var(--color-on-brand);
             font-weight: 600;
             font-size: .8rem;
             letter-spacing: .2rem;
@@ -575,7 +586,7 @@ nav.game-volumes .caption {
         }
 
         .tile-emoji {
-            color: rgba(0, 0, 0, 1);
+            color: var(--color-text);
             font-weight: 600;
             font-size: clamp(1.5rem, 7vw, 3rem);
             letter-spacing: .2rem;
@@ -592,16 +603,16 @@ nav.game-volumes .caption {
         }
 
         .pic-clear {
-            padding-top: 2rem;
+            padding-top: var(--space-3);
         }
 
         .big-picture-inline {
-            margin: 0 0 2rem;
+            margin: 0 0 var(--space-3);
         }
 
         .pic-inline {
             width: 80%;
-            margin: 0 10%;
+            margin: 0 var(--gutter);
         }
 
         .linkout-icon {
@@ -619,12 +630,12 @@ nav.game-volumes .caption {
 
         a.button.big-button,
         button.big-button {
-            color: #fff;
-            background-color: #6236ff;
-            padding: 1rem 3rem;
-            margin: 1rem 10%;
+            color: var(--color-on-accent);
+            background-color: var(--color-accent);
+            padding: var(--space-2) var(--space-4);
+            margin: var(--space-2) var(--gutter);
             border: none;
-            border-radius: .25rem;
+            border-radius: var(--radius-sm);
             border-width: 1px;
         }
 
@@ -632,13 +643,13 @@ nav.game-volumes .caption {
               nav.inline-links {
             display: block;
             float: left;
-            margin-left: 10%;
+            margin-left: var(--gutter);
         }
         .inline-links.grid {
             max-width: fit-content;
             display: grid;
             grid-template-columns: repeat(auto-fit, 8rem);
-            gap: 1rem;
+            gap: var(--space-2);
             justify-content: center;
             justify-items: center;
             padding: 0 0;
@@ -661,14 +672,14 @@ nav.game-volumes .caption {
         .inline-links.grid a:hover img,
         .inline-links.grid a:focus img {
             transform: scale(1.06);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+            box-shadow: var(--shadow-raised);
         }
 
         .inline-links.grid .caption {
             display: block;
             font-size: 0.8rem;
             margin-top: 0.4rem;
-            color: #333;
+            color: var(--color-text-muted);
         }
 
         .inline-links.grid a {
@@ -688,11 +699,11 @@ nav.game-volumes .caption {
         }
 
         button.big-button:hover {
-            background-color: #4d25e0;
+            background-color: var(--color-accent-hover);
         }
 
         button.big-button:active {
-            background-color: #3617a8;
+            background-color: var(--color-accent-active);
         }
 
         .center {
@@ -707,25 +718,38 @@ nav.game-volumes .caption {
             padding: 0;
         }
 
+        /* Wrapper for the pull-my-face canvas, which is laid over the img inside it */
+        .face-stage {
+            position: relative;
+        }
+
+        .face-stage picture,
+        .face-stage img {
+            display: block;
+            width: 100%;
+            margin: 0;
+        }
+
         hr {
             margin: 4rem 20%;
             border-width: thin;
             border-bottom: none;
+            border-color: var(--color-border);
         }
 
         .footer-center {
             display: block;
             text-align: center;
-            margin: 3rem 0;
+            margin: var(--space-4) 0;
             font-size: .75rem;
-            color: #555;
+            color: var(--color-text-muted);
             clear: both;
         }
 
         .footer-social {
             width: 2rem;
             padding: 0 .25rem;
-            margin: 2rem 0 0;
+            margin: var(--space-3) 0 0;
         }
 
         .footer-social {
@@ -741,15 +765,15 @@ nav.game-volumes .caption {
         }
 
         button.scroll-to-top {
-            color: #3617a8;
+            color: var(--color-accent-active);
             background-color: transparent;
-            padding: 1rem 3rem;
-            margin: 0 10% 1rem;
+            padding: var(--space-2) var(--space-4);
+            margin: 0 var(--gutter) var(--space-2);
             font-weight: 600;
-            border-radius: .25rem;
+            border-radius: var(--radius-sm);
             border-width: 1px;
             border-style: solid;
-            border-color: rgba(0, 0, 0, .1);
+            border-color: var(--color-border);
             width: -webkit-fill-available;
             cursor: pointer;
         }
@@ -774,12 +798,12 @@ nav.game-volumes .caption {
             position: relative;
             left: 4.5rem;
             font-size: 16px;
-            font-family: 'Inter', Arial, sans-serif;
-            font-size: 1rem;
+            font-family: var(--font-ui);
+            font-size: var(--text-md);
             text-transform: uppercase;
             letter-spacing: 0.25rem;
             font-weight: 600;
-            color: rgba (0 0 0 0.8);
+            color: var(--color-text);
         }
 
         /* Hide default HTML checkbox */
@@ -799,7 +823,7 @@ nav.game-volumes .caption {
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: color-mix(in srgb, var(--color-text) 20%, var(--color-bg));
             -webkit-transition: .4s;
             transition: .4s;
         }
@@ -823,7 +847,7 @@ nav.game-volumes .caption {
         }
 
         input:focus+.slider {
-            box-shadow: 0 0 1px #3617a8;
+            box-shadow: 0 0 1px var(--color-accent-active);
         }
 
         input:checked+.slider:before {
@@ -831,8 +855,6 @@ nav.game-volumes .caption {
             -ms-transform: translateX(26px);
             transform: translateX(26px);
         }
-
-        /* Rounded sliders */
 
         .slider.round {
             border-radius: 34px;
@@ -867,7 +889,7 @@ nav.game-volumes .caption {
 
         @media screen and (min-width:768px) {
             html {
-                font-size: 1rem;
+                font-size: var(--text-md);
             }
 
             header {
@@ -893,8 +915,8 @@ nav.game-volumes .caption {
             a.desktop-menu-item {
                 position: relative;
                 text-decoration: none;
-                color: rgba(0, 0, 0, 0.85);
-                font-size: 1.2rem;
+                color: var(--color-on-brand);
+                font-size: var(--text-lg);
                 font-weight: 700;
                 margin: 0 0 0 1.5rem;
                 top: 1.45rem;
@@ -915,13 +937,13 @@ nav.game-volumes .caption {
 
             a.desktop-menu-item:hover::before {
                 visibility: visible;
-                background-color: #6236ff;
+                background-color: var(--color-accent);
                 transform: scaleX(1);
             }
 
             .img-tile-mosaic {
                 width: 80%;
-                margin: 0 10%;
+                margin: 0 var(--gutter);
             }
 
             .little-tile {
@@ -937,7 +959,7 @@ nav.game-volumes .caption {
 
             .logo-link {
                 font-size: 3rem;
-                color: rgba(0, 0, 0, 0.85);
+                color: var(--color-on-brand);
                 letter-spacing: -0.1rem;
                 line-height: 4rem;
             }
@@ -953,17 +975,17 @@ nav.game-volumes .caption {
             .big-picture,
             .big-picture-inline {
                 width: 80%;
-                margin: 1rem 10% 3rem;
+                margin: var(--space-2) var(--gutter) var(--space-4);
             }
 
             .big-picture-hd {
                 width: 100%;
-                margin: 1rem 0 3rem;
+                margin: var(--space-2) 0 var(--space-4);
             }
 
             .little-picture-inline {
                 width: 40%;
-                margin: 0 30% 2rem;
+                margin: 0 30% var(--space-3);
             }
 
             button.scroll-to-top,
@@ -972,7 +994,7 @@ nav.game-volumes .caption {
             }
 
             button.big-button {
-                font-size: 1rem;
+                font-size: var(--text-md);
             }
 
             h1,
@@ -998,13 +1020,13 @@ nav.game-volumes .caption {
             }
 
             .tile {
-                margin: 3rem 0;
+                margin: var(--space-4) 0;
             }
 
             .my-dumb-face {
                 width: 20%;
                 float: left;
-                margin: 0 2rem 0 13%;
+                margin: 0 var(--space-3) 0 13%;
             }
 
             .aka {
@@ -1052,7 +1074,7 @@ nav.game-volumes .caption {
             }
 
             h5 {
-                margin: 1rem 0 3rem;
+                margin: var(--space-2) 0 var(--space-4);
             }
         }
 
@@ -1065,7 +1087,7 @@ nav.game-volumes .caption {
             left: 0;
             background: #000;
             color: #fff;
-            padding: 0.5rem 1rem;
+            padding: var(--space-1) var(--space-2);
             z-index: 100;
             text-decoration: none;
         }
@@ -1082,9 +1104,9 @@ nav.game-volumes .caption {
         input:focus-visible,
         select:focus-visible,
         textarea:focus-visible {
-            outline: 2px solid #6236ff;
+            outline: 2px solid var(--color-accent);
             outline-offset: 2px;
-            box-shadow: 0 0 0 3px rgba(98, 54, 255, 0.3);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
         }
 
         /* Respect prefers-reduced-motion */
@@ -1115,7 +1137,7 @@ nav.game-volumes .caption {
 
         /* Text readability */
         p {
-            line-height: 1.6;
+            line-height: var(--leading-body);
         }
 
         h2,
@@ -1123,31 +1145,31 @@ nav.game-volumes .caption {
         h4,
         h5,
         h6 {
-            line-height: 1.3;
+            line-height: var(--leading-heading);
         }
 
         /* ---- Resume page ---- */
         .resume .resume-links {
-            font-family: 'Inter', Arial, sans-serif;
-            font-size: .85rem;
+            font-family: var(--font-ui);
+            font-size: var(--text-sm);
             line-height: 1.5rem;
-            padding-bottom: 1rem;
+            padding-bottom: var(--space-2);
         }
 
         .resume > h3 {
-            margin-top: 3rem;
+            margin-top: var(--space-4);
         }
 
         .resume .resume-job {
-            margin: 0 10% 2.5rem;
-            padding-left: 1rem;
-            border-left: 3px solid #fff200;
+            margin: 0 var(--gutter) 2.5rem;
+            padding-left: var(--space-2);
+            border-left: 3px solid var(--color-brand);
         }
 
         .resume .resume-job h3 {
-            margin: 0 0 1rem -1rem;
+            margin: 0 0 var(--space-2) -1rem;
             display: inline-block;
-            padding: 0 .5rem;
+            padding: 0 var(--space-1);
             box-shadow: none;
         }
 
@@ -1162,19 +1184,19 @@ nav.game-volumes .caption {
         }
 
         .resume .resume-meta {
-            font-family: 'Inter', Arial, sans-serif;
+            font-family: var(--font-ui);
             font-size: .75rem;
             line-height: 1.2rem;
-            color: rgba(0, 0, 0, .65);
+            color: var(--color-text-muted);
             letter-spacing: .02rem;
-            margin: 0 0 .5rem;
+            margin: 0 0 var(--space-1);
             padding: 0;
         }
 
         .resume .resume-job p,
         .resume .resume-edu p {
             margin: 0;
-            padding-bottom: 1rem;
+            padding-bottom: var(--space-2);
             font-size: 1.1rem;
             line-height: 1.8rem;
         }
@@ -1184,18 +1206,18 @@ nav.game-volumes .caption {
             font-size: .75rem;
             line-height: 1.2rem;
             padding-bottom: 0;
-            margin-bottom: .5rem;
+            margin-bottom: var(--space-1);
         }
 
         .resume .resume-edu h3 {
             display: inline-block;
-            padding: 0 .5rem;
-            margin-bottom: .5rem;
+            padding: 0 var(--space-1);
+            margin-bottom: var(--space-1);
             box-shadow: none;
         }
 
         .resume .resume-edu p {
-            margin: 0 10%;
+            margin: 0 var(--gutter);
         }
 
         .resume ul.resume-list li {
@@ -1207,18 +1229,18 @@ nav.game-volumes .caption {
         .resume ul.resume-chips {
             display: flex;
             flex-wrap: wrap;
-            gap: .5rem;
+            gap: var(--space-1);
             padding: 0;
             list-style: none;
-            margin: 1rem 10% 2rem;
+            margin: var(--space-2) var(--gutter) var(--space-3);
         }
 
         .resume ul.resume-chips li {
             margin: 0;
             padding: .25rem .9rem;
-            border: 2px solid #fff200;
+            border: 2px solid var(--color-brand);
             border-radius: 2rem;
-            font-family: 'Inter', Arial, sans-serif;
+            font-family: var(--font-ui);
             font-size: .9rem;
             font-weight: 500;
         }
@@ -1239,4 +1261,18 @@ nav.game-volumes .caption {
             body {
                 font-size: 11pt;
             }
+        }
+
+
+        /* ---- Dark mode extras (colors themselves live in tokens.css) ---- */
+        /* The logo is dark gray on transparent; on the dark-mode header it turns white.
+           light-dark() only handles colors, so filters need explicit selectors for OS + manual theme. */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) header .site-logo {
+                filter: brightness(0) invert(1);
+            }
+        }
+
+        :root[data-theme="dark"] header .site-logo {
+            filter: brightness(0) invert(1);
         }
