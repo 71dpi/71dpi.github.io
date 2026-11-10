@@ -4,3 +4,7 @@ gaems/vol2/PROGRESS.md
 .DS_Store
 # private planning notes, never publish
 PROJECT-DAMOCLES.md
+
+# build output and image cache (tools/build-site.py)
+_site/
+.cache/

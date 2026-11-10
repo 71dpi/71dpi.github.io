@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="CafePress Case Study: Alex Lockwood's UX and design for the merchandise platform. Visual design and user experience for print-on-demand e-commerce.">
-    <meta name="keywords" content="UX design, e-commerce, merchandise platform, visual design, case study">
     <meta name="author" content="Alex Lockwood">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://71dpi.github.io/projects/cafepress.html">
@@ -30,7 +29,9 @@
       "inLanguage": "en"
     }
     </script>
-    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="preload" href="/fonts/71Hand-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/tokens.css">
+    <link rel="stylesheet" href="/style.css">
     <title>Alex Lockwood | Cafepress Case Study</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
@@ -67,17 +68,28 @@
             }
         }
     </script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <!-- Google Analytics: gtag.js loads on first interaction, or 5s after load, so it stays off the critical path.
+         Hits queued in dataLayer (incl. the page_view) are sent as soon as it arrives. -->
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-1J92RYBWB4');
+        (function () {
+            var loaded = false;
+            function load() {
+                if (loaded) return;
+                loaded = true;
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4';
+                document.head.appendChild(s);
+            }
+            ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+                addEventListener(e, load, { once: true, passive: true });
+            });
+            addEventListener('load', function () { setTimeout(load, 5000); });
+        })();
     </script>
 </head>
 
@@ -156,7 +168,7 @@
 -->
 <hr>
 <div class="projects-label">Would you like to see more?</div>
-<span class="center"><button class="big-button" type="button" onclick="window.location.href='projects.html'" title="CX, UX, UI, Creative Direction and more"> View Projects</button></span>
+<span class="center"><a class="big-button" href="projects.html" title="CX, UX, UI, Creative Direction and more">View Projects</a></span>
 <div w3-include-html="/components/footer.html"></div>
 <script>
     includeHTML();

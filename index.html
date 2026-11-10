@@ -5,10 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Discover Alex Lockwood's portfolio of UX design, product strategy, and creative direction work. Specializing in complex digital experiences, design systems, and user-centered innovation.">
-    <meta name="keywords" content="UX design, product design, creative direction, user experience, design systems, digital product, portfolio">
     <meta name="author" content="Alex Lockwood">
     <meta name="robots" content="index, follow">
-    <meta name="rating" content="general">
     <link rel="canonical" href="https://71dpi.github.io/">
     <link rel="alternate" type="text/markdown" href="/md/index.md" title="Markdown version of this page">
     <meta property="og:locale" content="en_US">
@@ -76,42 +74,54 @@
             }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="preload" href="/fonts/71Hand-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/tokens.css">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preload" as="image" href="/img/alexlockwood.webp" type="image/webp" fetchpriority="high">
     <title>Alex Lockwood | UX + Creative Direction + Management + Design</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <!-- Google Analytics: gtag.js loads on first interaction, or 5s after load, so it stays off the critical path.
+         Hits queued in dataLayer (incl. the page_view) are sent as soon as it arrives. -->
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-1J92RYBWB4');
+        (function () {
+            var loaded = false;
+            function load() {
+                if (loaded) return;
+                loaded = true;
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4';
+                document.head.appendChild(s);
+            }
+            ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+                addEventListener(e, load, { once: true, passive: true });
+            });
+            addEventListener('load', function () { setTimeout(load, 5000); });
+        })();
     </script>
 </head>
 
 <body>
   <a href="#main" class="skip-link">Skip to main content</a>
   <div id="header-template" w3-include-html="/components/header.html" role="banner" aria-label="Site header"></div>
-  <main id="main" role="main">
+  <main id="main">
 
 <h1><abbr title="User Experience">UX</abbr> + Creative Direction + <abbr title="Management">MGMT</abbr> + Design</h1>
 <div class="face-stage my-dumb-face" data-pull-face>
     <!-- The img is the fallback. /js/pull-my-face.js lays an interactive WebGL canvas over it once ready. -->
     <picture>
         <source srcset="/img/alexlockwood.webp" type="image/webp">
-        <img src="/img/alexlockwood.jpg" alt="Portrait photo of Alex Lockwood" class="big-picture">
+        <img src="/img/alexlockwood.jpg" alt="Portrait photo of Alex Lockwood" class="big-picture" width="800" height="800" fetchpriority="high" decoding="async" data-sizes="(min-width: 768px) 20vw, 100vw">
     </picture>
 </div>
 
 <div class="tldr-label">
     ELEVATOR PITCH
-    <a href="https://medium.com/ideas-by-crema/use-this-framework-to-master-the-art-of-the-elevator-pitch-d86c8d1a4537" title="Use This Framework to Master the Art of the Elevator Pitch by Eric Hurst" rel="external, Medium.com"> <span class="linkout-icon">&#8689; </a></span>
+    <a href="https://medium.com/ideas-by-crema/use-this-framework-to-master-the-art-of-the-elevator-pitch-d86c8d1a4537" title="Use This Framework to Master the Art of the Elevator Pitch by Eric Hurst" rel="external noopener"> <span class="linkout-icon">&#8689;</span></a>
 </div>
 
 <h2>For product teams who need guidance and activation, Alex is a UX Architect that grows products and inspires teams. Alex rolls up his sleeves and never stops advocating for his team, their mission, and their customers.</h2>
@@ -128,9 +138,9 @@
     <img srcset="/img/glitch.jpg" sizes="(min-width: 768px)" src="/img/glitch.jpg" alt="A stylized photo of Alex" class="big-picture-inline big-picture big-picture-hd">
 </picture>
 
-<p class="pic-clear">I grew up on the internet. Find me at <a href="http://www.twitter.com/71dpi" title="Alex on Twitter" rel="external, twitter.com">@71dpi</a> across social media. That's one less than screen resolution. Ideas, integrity, clarity, and context is more important
+<p class="pic-clear">I grew up on the internet. Find me at <a href="http://www.twitter.com/71dpi" title="Alex on Twitter" rel="external noopener">@71dpi</a> across social media. That's one less than screen resolution. Ideas, integrity, clarity, and context is more important
     than aesthetic. I strive for beauty and delight, but admit that slapping a fresh coat of 4k paint on something never solved a problem.</p>
-<a href="https://twitter.com/dril/status/1329111211770662912" rel="External, Twitter.com" target="_blank">
+<a href="https://twitter.com/dril/status/1329111211770662912" rel="external noopener" target="_blank">
     <picture>
         <source media="(min-width: 1440px)" srcset="/img/dril-white.webp" type="image/webp">
         <source media="(min-width: 768px)" srcset="/img/dril-white.webp" type="image/webp">
@@ -141,17 +151,16 @@
 <p>I love that people will always find ways to break your thing or do it better. Where people and tech meet, we find unlimited challenge and learning opportunities. If you want to <a href="/about.html" title="more about Alex Lockwood">get to know me even better</a>    aside from just the work stuff, I've written more on <a href="/about.html" title="more about Alex Lockwood">my About page</a>.</p>
 <div class="tile"><span class="tile-text">People</span></div>
 <div class="tile tile2"><span class="tile-text">Principles</span></div>
-<h4>See my work and read case studies:</h4>
-<span class="center"><button class="big-button" type="button" onclick="window.location.href='projects/projects.html'" title="CX, UX, UI, Creative Direction and more" >View Projects</button></span>
+<p class="subhead">See my work and read case studies:</p>
+<span class="center"><a class="big-button" href="projects/projects.html" title="CX, UX, UI, Creative Direction and more">View Projects</a></span>
 <ul>
     <!--
       <li><a href="/projects/project-template.html" title="what am I telling screen readers?">Text goes here</a></li>
       -->
-    <li><a href="http://www.behance.net/71dpi" title="Alex 's Behance portfolio" rel="external, Behance.net">More UX, branding, and graphic design projects are hosted on my Bēhance <span class="linkout-icon">&#8689;</span></a>
+    <li><a href="http://www.behance.net/71dpi" title="Alex 's Behance portfolio" rel="external noopener">More UX, branding, and graphic design projects are hosted on my Bēhance <span class="linkout-icon">&#8689;</span></a>
     </li>
-    <li><a href="http://www.dribbble.com/71dpi" title="Alex's Works in Progress and explorations on Dribbble" rel="external, dribbble.com">See more visual exploration on Dribbble <span class="linkout-icon">&#8689;</span></a></li>
+    <li><a href="http://www.dribbble.com/71dpi" title="Alex's Works in Progress and explorations on Dribbble" rel="external noopener">See more visual exploration on Dribbble <span class="linkout-icon">&#8689;</span></a></li>
 </ul>
-</div>
 <div class="img-tile-mosaic">
 
     <picture>
@@ -178,9 +187,24 @@
         <source media="(max-width: 768px)" srcset="/img/about4.webp" type="image/webp">
         <img srcset="/img/about4.png" src="/img/about4.png" alt="Illustration of a bowl of rice with a happy face" class="tile pic-tile little-tile">
     </picture>
+</div>
   </main>
   <div w3-include-html="/components/footer.html" role="contentinfo" aria-label="Site footer"></div>
   <script>
     includeHTML();
 </script>
-  <script src="/js/pull-my-face.js" defer></script>
+  <script>
+    // The WebGL portrait is a progressive enhancement over the <img>: load it once the page is idle.
+    addEventListener('load', function () {
+        var go = function () {
+            var s = document.createElement('script');
+            s.src = '/js/pull-my-face.js';
+            document.body.appendChild(s);
+        };
+        if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 2000 });
+        else setTimeout(go, 200);
+    });
+  </script>
+</body>
+
+</html>

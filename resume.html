@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Resumé of Alex Lockwood, UX architect, product designer and creative director in Cincinnati, Ohio. Senior Product Designer at Kroger, previously GE Aerospace, Rockfish, OOHology and LEAP Digital Agency.">
-    <meta name="keywords" content="Alex Lockwood resume, UX architect, product designer, creative director, design manager, customer journey mapping, agentic design, Cincinnati">
     <meta name="author" content="Alex Lockwood">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://71dpi.github.io/resume.html">
@@ -74,22 +73,33 @@
             }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="preload" href="/fonts/71Hand-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/tokens.css">
+    <link rel="stylesheet" href="/style.css">
     <title>Resumé | Alex Lockwood</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <!-- Google Analytics: gtag.js loads on first interaction, or 5s after load, so it stays off the critical path.
+         Hits queued in dataLayer (incl. the page_view) are sent as soon as it arrives. -->
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-1J92RYBWB4');
+        (function () {
+            var loaded = false;
+            function load() {
+                if (loaded) return;
+                loaded = true;
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4';
+                document.head.appendChild(s);
+            }
+            ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+                addEventListener(e, load, { once: true, passive: true });
+            });
+            addEventListener('load', function () { setTimeout(load, 5000); });
+        })();
     </script>
 </head>
 
@@ -264,7 +274,7 @@
 
 <hr>
 <div class="projects-label">Would you like to see the work?</div>
-<span class="center"><button class="big-button" type="button" onclick="window.location.href='/projects/projects.html'" title="CX, UX, UI, Creative Direction and more">View Projects</button></span>
+<span class="center"><a class="big-button" href="/projects/projects.html" title="CX, UX, UI, Creative Direction and more">View Projects</a></span>
 </main>
 <div w3-include-html="/components/footer.html" role="contentinfo" aria-label="Site footer"></div>
 <script>

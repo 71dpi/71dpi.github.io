@@ -1,0 +1,64 @@
+# Builds the site with tools/build-site.py (inline header/footer, responsive images, lazy-loading, minify)
+# and deploys the result to GitHub Pages.
+#
+# One-time setup: repo Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# Pull requests build the site (so a broken build shows up before merge) but do not deploy.
+name: Build and deploy site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: pip install pillow
+
+      # Generated images are named by a hash of the source bytes, so stale entries are harmless;
+      # restore-keys lets a build that changed a few images reuse everything else.
+      - uses: actions/cache@v4
+        with:
+          path: .cache/img
+          key: img-${{ hashFiles('tools/build-site.py') }}-${{ hashFiles('img/**', 'gaems/**/*.png', 'gaems/**/*.jpg') }}
+          restore-keys: |
+            img-${{ hashFiles('tools/build-site.py') }}-
+
+      - run: python3 tools/build-site.py
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

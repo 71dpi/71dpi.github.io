@@ -6,7 +6,6 @@
   <title>Games | Alex Lockwood</title>
 
   <meta name="description" content="Collections of browser games and toys by Alex Lockwood, built with Claude as exercises in prompt engineering and vibe coding: Shovelware Volume 1, 100 Microgames Volume 2 and Boop·Scape, a pixel-art music maker.">
-  <meta name="keywords" content="Boop·Scape, music maker, microgames, browser games, vibe coding, Claude, shovelware, Alex Lockwood">
   <meta name="author" content="Alex Lockwood">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://71dpi.github.io/gaems/">
@@ -21,19 +20,32 @@
   <meta name="twitter:description" content="Collections of browser games and toys by Alex Lockwood, built with Claude as exercises in prompt engineering and vibe coding: Shovelware Volume 1, 100 Microgames Volume 2 and Boop·Scape, a pixel-art music maker.">
   <meta name="twitter:image" content="https://71dpi.github.io/gaems/vol2/img/71-vol2.png">
   <meta name="theme-color" content="#fff200">
-  <link rel="stylesheet" type="text/css" href="/style.css" />
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-
-        gtag('config', 'G-1J92RYBWB4');
-    </script>
+  <link rel="preload" href="/fonts/71Hand-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/tokens.css">
+  <link rel="stylesheet" href="/style.css">
+  <!-- Google Analytics: gtag.js loads on first interaction, or 5s after load, so it stays off the critical path.
+       Hits queued in dataLayer (incl. the page_view) are sent as soon as it arrives. -->
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-1J92RYBWB4');
+      (function () {
+          var loaded = false;
+          function load() {
+              if (loaded) return;
+              loaded = true;
+              var s = document.createElement('script');
+              s.async = true;
+              s.src = 'https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4';
+              document.head.appendChild(s);
+          }
+          ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+              addEventListener(e, load, { once: true, passive: true });
+          });
+          addEventListener('load', function () { setTimeout(load, 5000); });
+      })();
+  </script>
   <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

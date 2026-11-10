@@ -1,5 +1,3 @@
-@import url('/tokens.css');
-
 @font-face {
   font-family: '71Hand';
   src: url('/fonts/71Hand-Bold.woff2') format('woff2');
@@ -218,6 +216,11 @@ nav.game-volumes .caption {
             max-width: 100%;
         }
 
+        /* width/height attributes reserve space (no layout shift); height:auto keeps the aspect ratio when CSS sets a width */
+        img {
+            height: auto;
+        }
+
         header {
             display: inline-block;
             width: 100%;
@@ -426,7 +429,10 @@ nav.game-volumes .caption {
             clear: both;
         }
 
-        h4 {
+        h4,
+        p.subhead {
+            font-family: var(--font-ui);
+            padding-bottom: 0;
             overflow-wrap: anywhere;
             font-size: var(--text-md);
             font-weight: 600;
@@ -628,7 +634,7 @@ nav.game-volumes .caption {
             display: inline-block;
         }
 
-        a.button.big-button,
+        a.big-button,
         button.big-button {
             color: var(--color-on-accent);
             background-color: var(--color-accent);
@@ -690,18 +696,35 @@ nav.game-volumes .caption {
             cursor: pointer;
         }
 
-        a.button.big-button {
-            border-style: solid;
-            border-color: rgba(0, 0, 0, 0);
-            width: -webkit-fill-available;
+        /* .big-button as a real link: same look as the <button> version, minus the JS navigation */
+        a.big-button,
+        a.big-button:visited,
+        a.big-button:hover {
+            display: inline-block;
+            box-sizing: border-box;
+            color: var(--color-on-accent);
+            font-family: var(--font-ui);
+            font-size: .75rem;
+            font-weight: 600;
+            line-height: normal;
+            letter-spacing: 0.25rem;
+            text-transform: uppercase;
+            text-align: center;
+            text-decoration: none;
             cursor: pointer;
-
+            transition: all .2s ease-in-out;
         }
 
+        a.big-button:hover {
+            transform: scale(1.02);
+        }
+
+        a.big-button:hover,
         button.big-button:hover {
             background-color: var(--color-accent-hover);
         }
 
+        a.big-button:active,
         button.big-button:active {
             background-color: var(--color-accent-active);
         }
@@ -727,6 +750,7 @@ nav.game-volumes .caption {
         .face-stage img {
             display: block;
             width: 100%;
+            height: auto;
             margin: 0;
         }
 
@@ -989,10 +1013,12 @@ nav.game-volumes .caption {
             }
 
             button.scroll-to-top,
+            a.big-button,
             button.big-button {
                 width: 30rem;
             }
 
+            a.big-button,
             button.big-button {
                 font-size: var(--text-md);
             }
@@ -1003,6 +1029,7 @@ nav.game-volumes .caption {
             h4,
             h6,
             p,
+            p.subhead,
             .tldr-label,
             ul,
             ol {
@@ -1143,6 +1170,7 @@ nav.game-volumes .caption {
         h2,
         h3,
         h4,
+        p.subhead,
         h5,
         h6 {
             line-height: var(--leading-heading);

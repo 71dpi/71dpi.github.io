@@ -23,7 +23,9 @@
       "isPartOf": {"@type": "Person", "name": "Alex Lockwood", "url": "https://71dpi.github.io/"}
     }
     </script>
-    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="preload" href="/fonts/71Hand-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/tokens.css">
+    <link rel="stylesheet" href="/style.css">
     <title>Alex Lockwood's Website</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
     <script>
@@ -59,17 +61,28 @@
             }
         }
     </script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <!-- Google Analytics: gtag.js loads on first interaction, or 5s after load, so it stays off the critical path.
+         Hits queued in dataLayer (incl. the page_view) are sent as soon as it arrives. -->
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-1J92RYBWB4');
+        (function () {
+            var loaded = false;
+            function load() {
+                if (loaded) return;
+                loaded = true;
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4';
+                document.head.appendChild(s);
+            }
+            ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+                addEventListener(e, load, { once: true, passive: true });
+            });
+            addEventListener('load', function () { setTimeout(load, 5000); });
+        })();
     </script>
 </head>
 
@@ -88,7 +101,7 @@
 </picture>
 <h3>• 404 •</h3>
 <div class="projects-label ">Maybe we should just head back to the homepage…</div>
-<span class="center"><button class="big-button" type="button" onclick="window.location.href='index.html'" title="CX, UX, UI, Creative Direction and more">Start Over</button></span>
+<span class="center"><a class="big-button" href="index.html" title="CX, UX, UI, Creative Direction and more">Start Over</a></span>
 <hr>
 <p style="width: 60%; margin: auto 20%;">Look, I'm not sure how it came to this, but we don't need to make a big deal out of it. Mistakes were made. <a href="/index.html">Let's just move on</a>, capisce?</p>
 &nbsp;</span>

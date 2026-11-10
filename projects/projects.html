@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Portfolio Projects: Alex Lockwood showcases 20+ projects across digital products, design systems, and brand strategy. Case studies in UX design, product development, and user experience.">
-    <meta name="keywords" content="portfolio, design projects, case studies, UX design, product design, creative direction">
     <meta name="author" content="Alex Lockwood">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://71dpi.github.io/projects/projects.html">
@@ -64,22 +63,33 @@
             }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="preload" href="/fonts/71Hand-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/tokens.css">
+    <link rel="stylesheet" href="/style.css">
     <title>Projects & Case Studies | Alex Lockwood</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4"></script>
+    <!-- Google Analytics: gtag.js loads on first interaction, or 5s after load, so it stays off the critical path.
+         Hits queued in dataLayer (incl. the page_view) are sent as soon as it arrives. -->
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-1J92RYBWB4');
+        (function () {
+            var loaded = false;
+            function load() {
+                if (loaded) return;
+                loaded = true;
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-1J92RYBWB4';
+                document.head.appendChild(s);
+            }
+            ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+                addEventListener(e, load, { once: true, passive: true });
+            });
+            addEventListener('load', function () { setTimeout(load, 5000); });
+        })();
     </script>
 </head>
 
@@ -270,13 +280,13 @@
     
         <li><a href="project-template.html" title="what am I telling screen readers?">Text goes here</a></li>
         -->
-    <!--<li><a href="http://www.behance.net/71dpi" title="Alex's Behance portfolio" rel="external, Behance.net">More UX, branding, and graphic design projects are hosted on my Bēhance <span class="linkout-icon">&#8689;</span></a></li>
-                <li><a href="http://www.dribbble.com/71dpi" title="Alex's Works in Progress and explorations on Dribbble" rel="external, dribbble.com">See more visual exploration on Dribbble <span class="linkout-icon">&#8689;</span></a></li>
+    <!--<li><a href="http://www.behance.net/71dpi" title="Alex's Behance portfolio" rel="external noopener">More UX, branding, and graphic design projects are hosted on my Bēhance <span class="linkout-icon">&#8689;</span></a></li>
+                <li><a href="http://www.dribbble.com/71dpi" title="Alex's Works in Progress and explorations on Dribbble" rel="external noopener">See more visual exploration on Dribbble <span class="linkout-icon">&#8689;</span></a></li>
                 -->
 </ul>
 <h4>Some other places my work is featured:</h4>
-<span class="center"><button class="big-button" type="button" onclick="window.location.href='http://www.dribbble.com/71dpi'" title="Alex's Works in Progress and explorations on Dribbble" rel="external, dribbble.com">Visual WIPs on Dribbble</button></span>
-<span class="center"><button class="big-button" type="button" onclick="window.location.href='http://www.behance.net/71dpi'" title="Alex's Behance portfolio" rel="external, Behance.net">Portfolio on Bēhance</button></span>
+<span class="center"><a class="big-button" href="http://www.dribbble.com/71dpi" title="Alex's Works in Progress and explorations on Dribbble" rel="external noopener">Visual WIPs on Dribbble</a></span>
+<span class="center"><a class="big-button" href="http://www.behance.net/71dpi" title="Alex's Behance portfolio" rel="external noopener">Portfolio on Bēhance</a></span>
 
 <div w3-include-html="/components/footer.html"></div>
 <script>

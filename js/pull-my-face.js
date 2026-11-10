@@ -412,7 +412,7 @@ void main(){
     requestAnimationFrame(frame);
   }
 
-  // texture comes from the same <img> that serves as the fallback (use the JPG src, not a <picture> source)
+  // texture comes from the same <img> that serves as the fallback (whichever file its <picture> resolved to)
   const img = new Image();
   img.onload = () => {
     gl.activeTexture(gl.TEXTURE0);
@@ -455,5 +455,6 @@ void main(){
     stage.appendChild(grabber);
   };
   // on error nothing happens: the <img> fallback is already on screen
-  img.src = base.getAttribute('src');
+  // currentSrc is the file the browser already downloaded for the <picture> (the WebP), so no second fetch
+  img.src = base.currentSrc || base.getAttribute('src');
 })();
